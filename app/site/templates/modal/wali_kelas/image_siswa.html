@@ -1,0 +1,27 @@
+<div class="modal fade" id="image-{{ i.id }}">
+    <div class="modal-dialog overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fas fa-file-image">&nbsp;
+                    {{ i.first_name | upper if i.first_name | length != 2 else i.last_name| upper}}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row justify-content-center mb-2 ">
+
+                    <img style="border-radius: 8px;"
+                        src="{{url_for('siswa.static', filename='img/siswa/foto/'+i.pic if i.pic else '')}}"
+                        height="164px" alt="">
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</div>

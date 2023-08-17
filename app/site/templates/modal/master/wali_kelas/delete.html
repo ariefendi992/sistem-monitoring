@@ -1,0 +1,24 @@
+<div class="modal fade" id="delete-{{ _.id }}">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content ">
+            <div class="modal-header bg-danger">
+                <h4 class="modal-title">
+                    <i class="fas fa-trash-alt fa-xs"></i> Delete Data
+                </h4>
+                <button type="button" class="close bg-danger" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Anda ingin menghapus data Wali Kelas <br>
+                    <strong>{{ _.first_name | title}} {{ _.last_name | title}}</strong> ?
+                </p>
+            </div>
+            <div class="modal-footer justify-content-end">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <a href="{{ url_for('admin2.delete_wali', id=_.id) }}" class="btn btn-danger btn-sm">Ya, delete</a>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+</div>

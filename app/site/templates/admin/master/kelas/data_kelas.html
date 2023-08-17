@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% set filename = 'data-kelas' %}
+{% block title %}Data Kelas{% endblock %}
+{% block head %}
+{{super()}}
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+<!-- DataTables -->
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title font-weight-bold text-lg">&nbsp;Data Kelas</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <a href="{{ url_for('admin2.add_kelas') }}" class="btn btn-sm btn-primary mb-3">
+            <i class="fas fa-plus"></i>
+            Tambah Data Kelas
+        </a>
+        <div class="col-md-9">
+            <table id="tabel" class="table table-bordered table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kelas</th>
+                        <th>Laki-Laki</th>
+                        <th>Perempuan</th>
+                        <th>Jumlah Siswa</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for _ in model['data'] %}
+                    <tr>
+                        <td class="align-middle text-center" style="width: 12px;">{{ loop.index}}</td>
+                        <td class="align-middle">{{ _.kelas }}</td>
+                        <td class="align-middle">{{ _.laki }}</td>
+                        <td class="align-middle">{{ _.perempuan }}</td>
+                        <td class="align-middle">{{ _.jum_seluruh }}</td>
+                        <!-- AKSI -->
+                        <td class="align-middle text-center" style="width: 120px;">
+                            <a href="{{ url_for('admin2.edit_kelas',  id=_.id)}}" class="btn btn-warning btn-xs" title="Edit Data">
+                                <i class="fas fa-pencil-alt"></i>
+                                Edit
+                            </a>
+                            <button class="btn btn-danger btn-xs" title="Delete Data." data-toggle="modal"
+                                data-target="#delete-{{_.id}}">
+                                <i class="fas fa-trash-alt"></i>
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% include 'modal/master/kelas/delete.html' %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer"></div>
+</div>
+
+{% endblock %}
+{% block js %}
+<!-- Tempusdominus Bootstrap 4 -->
+<script
+    src="{{ url_for('.static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}">
+</script>
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+<script>
+    $(function () {
+        bsCustomFileInput.init();
+        $('#tabel').DataTable({
+            processing: true
+        });
+        $('#reservationdate').datetimepicker({
+            format: 'L'
+        });
+
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %} {% block head %} {{ super() }}
+<link rel="stylesheet" href="{{ url_for('.static', filename='css/my_style.css')}}" />
+
+{% endblock head %} {% set filename='tambah-pelanggar' %} {% block content %}
+<div class="row">
+  <div class="col col-md-9">
+    <div class="card card-info card-outline">
+      <div class="card-header">
+        <h5 class="card-text">Tambah Data Pelanggar</h5>
+      </div>
+      <form action="" method="post">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              {{ form.csrf_token }}
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    {{ form.kelas.label }}
+                    <label id="bintang">*</label>
+                    {% if form.kelas.errors %}
+                    {{ form.kelas(class="custom-select form-control-border is-invalid") }}
+                    {% for msg in form.kelas.errors %}
+                    <span class="error invalid-feedback">{{msg}}</span>
+                    {% endfor %}
+                    {% elif form.kelas.data %}
+                    {{ form.kelas(class="custom-select form-control-border") }}
+                    {% else %}
+                    {{ form.kelas(class="custom-select form-control-border") }}
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  <div class="form-group">
+                    {{ form.siswa.label }}
+                    <label id="bintang">*</label>
+                    {% if form.siswa.errors %}
+                    {{form.siswa(class="custom-select form-control-border is-invalid") }}
+                    {% for msg in form.siswa.errors %}
+                    <span class="error invalid-feedback">{{ msg }}</span>
+                    {% endfor %}
+                    {% elif form.siswa.data %}
+                    {{form.siswa(class="custom-select form-control-border") }}
+                    {% else %}
+                    {{ form.siswa(class="custom-select form-control-border") }}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    {{ form.pelapor.label}}
+                    <label id="bintang">*</label>
+                    {% if form.pelapor.errors %}
+                    {{ form.pelapor(class="custom-select form-control-border is-invalid")}}
+                    {% for msg in form.pelapor.errors %}
+                    <span class="error invalid-feedback">{{msg}}</span>
+                    {% endfor %}
+                    {% elif form.pelapor.data %}
+                    {{ form.pelapor(class="custom-select form-control-border")}}
+                    {% else %}
+                    {{ form.pelapor(class="custom-select form-control-border")}}
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    {{ form.jenisPelanggaran.label }}
+                    {% if form.jenisPelanggaran.errors %}
+                    {{ form.jenisPelanggaran(class="custom-select form-control-border is-invalid") }}
+                    {% for msg in form.jenisPelanggaran.errors %}
+                    <span class="error invalid-feedback">{{ msg }}</span>
+                    {% endfor %}
+                    {% elif form.jenisPelanggaran.data %}
+                    {{ form.jenisPelanggaran(class="custom-select form-control-border") }}
+                    {% else %}
+                    {{ form.jenisPelanggaran(class="custom-select form-control-border") }}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    {{ form.catatan.label }}
+                    <label id="bintang">*</label>
+                    {% if form.catatan.errors %}
+                    {{ form.catatan(class="form-control is-invalid") }}
+                    {% for msg in form.catatan.errors %}
+                    <span class="error invalid-feedback">{{ msg }}</span>
+                    {% endfor %}
+                    {% elif form.catatan.data %}
+                    {{ form.catatan(class="form-control") }}
+                    {% else %}
+                    {{ form.catatan(class="form-control") }}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <label id="bintang" class="font-weight-normal">
+                  (*) Data wajib diisi
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="row justify-content-between">
+            <button type="reset" class="btn btn-danger ">
+              <i class="fas fa-undo mr-1"></i>
+              <strong>Reset</strong></button>
+            <button type="submit" class="btn btn-primary "><strong>Submit</strong>
+              <i class="fas fa-arrow-right ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %} {% block js %}
+{#
+<script>
+  //let selectKelas = document.getElementById("kelas");
+  //console.log(selectKelas.value);
+  //let selectSiswa = document.getElementById("siswa");
+  //selectKelas.onchange = function () {
+  //  let kelas = selectKelas.value;
+  //  fetch(`/api/v2/student/get-siswa-kelas/${kelas}`).then(function (response) {
+  //    response.json().then(function (data) {
+  //      let optHtml = "";
+  //      for (i of data["data"]) {
+  //        optHtml += `<option value="${i.id}">${i.first_name} ${i.last_name}</option>`;
+  //      }
+  //      selectSiswa.innerHTML = optHtml;
+  //    });
+  //  });
+  //};
+</script>#}
+
+<script>
+  let select_kelas = document.getElementById('kelas');
+  let select_siswa = document.getElementById('siswa');
+
+  select_kelas.onchange = function () {
+    kelas = select_kelas.value;
+    fetch(`/api/v2/student/get-siswa-kelas/${kelas}`).then(function (response) {
+      response.json().then(function (data) {
+        let opt = `<option value="">- Pilih -</option>`;
+        for (i of data['data']) {
+          opt += `<option value="${i.id}">${i.first_name} ${i.last_name}</option>`;
+        }
+
+        select_siswa.innerHTML = opt;
+      });
+    });
+  }
+</script>
+
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+{% endblock js %}

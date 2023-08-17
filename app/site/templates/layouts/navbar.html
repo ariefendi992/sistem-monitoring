@@ -1,0 +1,102 @@
+<!-- Navbar -->
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+  <!-- Left navbar links -->
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+    </li>
+  </ul>
+
+  <!-- Right navbar links -->
+  <ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+      <a href="#" class="nav-link">
+        <i class="fas fa-school mr-1"></i>
+        UPT SPF SMPN2 MAKASSAR
+      </a>
+    </li>
+    {% if current_user.is_authenticated %}
+    <li class="nav-item">
+      <a href="#" class="nav-link" data-toggle="dropdown">
+        <i class="fas fa-user-cog mr-1"></i>
+        {{ session.first_name }} {{ session.last_name}}
+        {% if current_user.group == 'admin' %}
+        (ADMIN)
+        {% elif current_user.group == 'bk' %}
+        (GURU BK)
+        {% elif current_user.group == 'guru' %}
+        {% if sql_wali_ %}
+        (WALI KELAS)
+        {% else %}
+        (GURU MAPEL)
+        {% endif %}
+        {% endif %}
+      </a>
+      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        {% if current_user.group == 'guru' and wali_kelas %}
+        <span class="dropdown-header dropdown-item">AKSES SEBAGAI</span>
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('wali_kelas.index') }}" class="dropdown-item">
+          <i class="fas fa-user-tie mr-1"></i>
+          Wali Kelas
+        </a>
+        <div class="dropdown-divider"></div>
+        {% endif %}
+        {% if current_user.group == 'guru' and sql_wali_ %}
+        <span class="dropdown-header dropdown-item">AKSES SEBAGAI</span>
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('guru2.index') }}" class="dropdown-item">
+          <i class="fas fa-user-tie mr-1"></i>
+          Guru Mapel
+        </a>
+        <div class="dropdown-divider"></div>
+        {% endif %}
+        <span class="dropdown-header dropdown-item">ATUR PROFIL</span>
+        <div class="dropdown-divider"></div>
+        <!-- ADMIN -->
+        {% if current_user.group == 'admin' %}
+        <a href="#" class="dropdown-item">
+          <i class="fas fa-user-edit mr-1"></i>
+          Ubah Data
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('guru2.update_pswd') }}" class="dropdown-item">
+          <i class="fas fa-user-lock mr-1"></i>
+          Ubah Password
+        </a>
+
+        <!-- BK -->
+        {% elif current_user.group == 'bk' %}
+        <a href="#" class="dropdown-item">
+          <i class="fas fa-user-edit mr-1"></i>
+          Ubah Data
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+          <i class="fas fa-user-lock mr-1"></i>
+          Ubah Password
+        </a>
+
+        <!-- GURU -->
+        {% elif current_user.group == 'guru' %}
+        <a href="{{ url_for('guru2.profile_guru') }}" class="dropdown-item">
+          <i class="fas fa-user-edit mr-1"></i>
+          Ubah Data
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('guru2.update_pswd') }}" class="dropdown-item">
+          <i class="fas fa-user-lock mr-1"></i>
+          Ubah Password
+        </a>
+        {% endif %}
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('auth2.logout') }}" class="dropdown-item">
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          Keluar
+        </a>
+      </div>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+<!-- /.navbar -->

@@ -1,0 +1,113 @@
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="#" class="brand-link">
+    <img src="{{ url_for('admin2.static', filename='img/logo.png') }}" alt="Admin2LTE Logo"
+      class="brand-image img-circle elevation-3" style="opacity: 0.8" />
+    <span class="brand-text font-weight-light">E-Monitoring Siswa</span>
+  </a>
+
+  <!-- Sidebar -->
+  {% block sideBar %}
+  <div class="sidebar">
+    <!-- Sidebar Menu -->
+    <nav class="mt-3">
+      <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact" data-widget="treeview" role="menu"
+        data-accordion="false">
+        <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+        <li class="nav-header">Main Menu</li>
+        <li class="nav-item">
+          <a href="{{url_for('guru_bk.index')}}" class="nav-link {{ 'active' if filename=='index-bk' else None }}">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>Beranda</p>
+          </a>
+        </li>
+        <!-- <li class="nav-item">
+                    <a href="{{ url_for('wali_kelas.data_siswa') }}"
+                        class="nav-link {{ 'active' if filename=='data-siswa' else '' }}">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Data Siswa</p>
+                    </a>
+                </li> -->
+        {#<li class="nav-item">
+          <a href="{{ url_for('guru_bk.add_data_pelanggar') }}"
+            class="nav-link {{ 'active' if filename=='tambah-pelanggar' else '' }}">
+            <i class="nav-icon far fa-edit"></i>
+            <p>Input Pelanggar</p>
+          </a>
+        </li>#}
+        <li class="nav-item">
+          <a href="{{ url_for('guru_bk.fetch_data_pelanggaran') }}"
+            class="nav-link {{ 'active' if filename=='daftar-pelanggar' or filename=='detail-pelanggaran' else '' }}">
+            <i class="nav-icon fas fa-layer-group"></i>
+            <p>Data Pelanggar</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('guru_bk.atur_pelanggaran')}}"
+            class="nav-link {{'active' if filename == 'atur' else ''}}"><i class="nav-icon fas fa-layer-group"></i>
+            <p>Jenis Pelanggaran</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('guru_bk.data_pembinaan') }}"
+            class="nav-link {{ 'active' if filename=='data_pembinaan' else '' }}">
+            <i class="nav-icon fas fa-layer-group"></i>
+            <p>Data Pembinaan</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('guru_bk.get_tata_tertib') }}"
+            class="nav-link {{ 'active' if filename=='tata-tertib' else ''}}">
+            <i class="nav-icon fas fa-layer-group"></i>
+            <p>Tata Tertib</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('guru_bk.laporan_kehadiran')}}"
+            class="nav-link {{ 'active' if filename == 'rekap-bulan' else none }}"><i
+              class="nav-icon fas fa-file-alt"></i>
+            <p>Laporan Kehadiran</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('guru_bk.laporan_pelanggaran' ) }}"
+            class="nav-link {{'active' if filename=='laporan-pelanggaran' else ''}}">
+            <i class="nav-icon fas fa-file-alt"></i>
+            <p>Laporan Pelanggaran</p>
+          </a>
+        </li>
+
+
+        {#<li
+          class="nav-item {{ 'menu-open' if filename=='daftar-pelanggar' or filename=='tambah-pelanggar' else '' }}">
+          <a href="#"
+            class="nav-link {{ 'active' if filename=='daftar-pelanggar' or filename=='tambah-pelanggar' else '' }}">
+            <i class="nav-icon fas fa-list-alt"></i>
+            <p>Data Pelanggaran</p>
+            <i class="right fas fa-angle-left"></i>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{{ url_for('guru_bk.add_data_pelanggar') }}"
+                class="nav-link {{ 'active' if filename=='tambah-pelanggar' else '' }}">
+                <i class="nav-icon far fa-circle {{ 'fa-dot-circle' if filename=='tambah-pelanggar' else '' }}"></i>
+                <p>Tambah Data</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url_for('guru_bk.data_pelanggar') }}"
+                class="nav-link {{ 'active' if filename=='daftar-pelanggar' else '' }}">
+                <i class="nav-icon far fa-circle {{ 'fa-dot-circle' if filename=='daftar-pelanggar' else '' }}"></i>
+                <p>Daftar Pelanggaran</p>
+              </a>
+            </li>
+          </ul>
+        </li>#}
+
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+  {% endblock %}
+</aside>

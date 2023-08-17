@@ -1,0 +1,43 @@
+<div class="modal fade" id="editData{{_.id}}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Edit Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('admin2.edit_wali', id=_.id)}}" method="post" class="form-horizontal">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            <label for="">Nama Guru :</label>
+            <select class="form-control form-control-sm" name="namaGuru" id="namaGuru">
+              {% for i in jsonGuru %}
+              <option value="{{i.id}}" {{'selected' if _.first_name  == i.first_name and _.last_name == i.last_name  else ''}}>{{i.first_name | title}} {{ i.last_name | title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="">Nama Kelas :</label>
+            <select class="form-control form-control-sm" name="namaKelas" id="namaKelas" onmousedown="if(this.options.length>6){this.size=6;}"  onchange='this.size=0;' onblur="this.size=0;">
+              {% for i in jsonKelas %}
+              <option value="{{i.id}}" {{'selected' if _.kelas == i.kelas else ''}}>{{i.kelas}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            {{ form.submit(class="btn btn-primary btn-flat") }}
+          </div>
+        </form>
+      </div>
+      <!-- <div class="modal-footer justify-content-sm-start"> -->
+      <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button> -->
+      <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      <!-- </div> -->
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>

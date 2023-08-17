@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% set filename='result-bulan' %}
+{% block head %}
+{{ super() }}
+<!-- DataTables -->
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="card card-info card-outline">
+  {# <div class="card-header">
+    <h3 class="card-title">Daftar Hadir Kelas : {{data.kelas}}</h3>
+  </div> #}
+  <div class="card-body">
+    <div class="row mb-2">
+      <div class="col-md-6">
+        <table width="100%" class="table-responsive card-text text-bold">
+          <tr>
+            <td>Daftar Hadir Kelas</td>
+            <td>&nbsp;</td>
+            <td>:</td>
+            <td>&nbsp;</td>
+            <td>{{ data.kelas }}</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</td>
+            <td>Semester</td>
+            <td>&nbsp;</td>
+            <td>:</td>
+            <td>&nbsp;</td>
+            <td>{{ data.semester | title }}</td>
+
+          </tr>
+          <tr>
+            <td>Bulan</td>
+            <td>&nbsp;</td>
+            <td>:</td>
+            <td>&nbsp;</td>
+            <td>{{ data.bulan | title }}</td>
+            <td>{{ data.tahun }}</td>
+            <td>&nbsp;</td>
+            <td>&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</td>
+            <td>Tahun Ajaran</td>
+            <td>&nbsp;</td>
+            <td>:</td>
+            <td>&nbsp;</td>
+            <td>{{ data.tahun_ajaran }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <table id="example2" class="display table-bordered table-striped table-responsive-md" style="width:100%;">
+          <thead>
+            <tr>
+              <th rowspan="2" class="text-center align-middle">NO</th>
+              <th rowspan="2" class="text-center align-middle">Nama Siswa</th>
+              <th rowspan="2" class="text-center align-middle">L/P</th>
+              <th colspan="{{ data.month_range }}" class="text-center">Tanggal</th>
+              <th colspan="4" class="text-center">Jumlah</th>
+            </tr>
+            <tr>
+              {% for i in range(data.month_range) %}
+              <th class="text-center" style="width: 2%;">{{ loop.index }}</th>
+              {% endfor %}
+              <th class="text-center align-middle bg-gradient-green" style="width: 2%;">H</th>
+              <th class="text-center align-middle bg-gradient-yellow" style="width: 2%;">S</th>
+              <th class="text-center align-middle bg-gradient-blue" style="width: 2%;">I</th>
+              <th class="text-center align-middle bg-gradient-red" style="width: 2%;">A</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in sql_kehadiran %}
+            <tr>
+              <td class="text-center align-middle">{{ loop.index }}</td>
+              <td>{{ i.siswa.first_name | title}} {{ i.siswa.last_name | title }}</td>
+              <td class="text-center">{{ 'L' if i.siswa.gender =='laki-laki' else 'P'}}</td>
+              {% for n in range(1, data.month_range+1) %}
+              <td class="text-center align-middle" style="background-color: #9e9e9e;">
+                {% for ket in sql_ket
+                  .filter(AbsensiModel.siswa_id==i.siswa_id)
+                  .filter(func.day(AbsensiModel.tgl_absen)==n)
+                  .filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year)
+                  .filter(func.month(AbsensiModel.tgl_absen) == i.tgl_absen.month)
+                  .group_by(func.day(AbsensiModel.tgl_absen)) %}
+                {% if ket.ket=='H' %}
+                <div class="bg-gradient-green">{{ ket.ket }}</div>
+                {% elif ket.ket=='S' %}
+                <div class="bg-gradient-yellow">{{ ket.ket }}</div>
+                {% elif ket.ket=='I' %}
+                <div class="bg-gradient-blue">{{ ket.ket }}</div>
+                {% elif ket.ket=='A' %}
+                <div class="bg-gradient-red">{{ ket.ket }}</div>
+                {% endif %}
+                {% endfor %}
+              </td>
+              {% endfor %}
+              <td class="text-center align-middle">
+                {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='H').filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).filter(func.month(AbsensiModel.tgl_absen) == i.tgl_absen.month).group_by(AbsensiModel.tgl_absen).count() }}
+              </td>
+              <td class="text-center align-middle">
+                {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='S').filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).filter(func.month(AbsensiModel.tgl_absen) == i.tgl_absen.month).group_by(AbsensiModel.tgl_absen).count() }}
+              </td>
+              <td class="text-center align-middle">
+                {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='I').filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).filter(func.month(AbsensiModel.tgl_absen) == i.tgl_absen.month).group_by(AbsensiModel.tgl_absen).count() }}
+              </td>
+              <td class="text-center align-middle">
+                {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='A').filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).filter(func.month(AbsensiModel.tgl_absen) == i.tgl_absen.month).group_by(AbsensiModel.tgl_absen).count() }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+
+    $('#example1').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+
+    });
+  });
+</script>
+{% endblock js %}

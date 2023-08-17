@@ -1,0 +1,78 @@
+<div class="modal fade" id="modal-detail{{ i.id }}">
+  <div class="modal-dialog overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title fas fa-user-check">&nbsp;Detail Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">NISN</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.user.username }}" disabled>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">Nama</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.first_name}} {{ i.last_name}}"
+                disabled>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">Tempat Lahir</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.tempat_lahir | upper}}" disabled>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">Tgl Lahir</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.tgl_lahir}}" disabled>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">Agama</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.agama | title}}" disabled>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">Alamat</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.alamat | title}}" disabled>
+            </div>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">Nama Orang Tua/Wali</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.nama_ortu_or_wali}}" disabled>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="font-weight-normal">No. Telp</label>
+              <input type="text" class="form-control form-control-sm" value="{{ i.no_telp}}" disabled>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>

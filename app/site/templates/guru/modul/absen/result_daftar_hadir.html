@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% set filename='result-absen' %}
+{% block content %}
+<div class="row">
+  <div class="col col-md-12">
+    <div class="card card-primary card-outline">
+      <div class="card-header font-weight-bold">Daftar Kehadiran Siswa</div>
+      <div class="card-body">
+        <div class="row mb-2 mt-0">
+          <div class="col col-md-6">
+            <table class="font-weight-bold">
+              <tr>
+                <td width="110">Mata Pelajaran</td>
+                <td width="10">:</td>
+                <td width="195">{{ data.mapel | title }}</td>
+                <td width="95">Semester</td>
+                <td width="10">:</td>
+                <td>{{ data.semester |upper}}</td>
+              </tr>
+              <tr>
+                <td>Kelas</td>
+                <td>:</td>
+                <td>{{ data.kelas }}</td>
+                <td>Tahun Ajaran</td>
+                <td>:</td>
+                <td>{{ data.tahun_ajaran }}</td>
+              </tr>
+              <tr>
+                <td>Bulan</td>
+                <td>:</td>
+                <td>{{ data.bulan | title }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-12">
+            <table class="table-bordered table-striped table-responsive-sm" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th width="35" rowspan="2" class="text-center align-middle">#</th>
+                  <th rowspan="2" class="text-center align-middle">Nama Siswa</th>
+                  <th width="35" rowspan="2" class="text-center align-middle">L/P</th>
+                  <th colspan="{{ sql_tgl_absen.count() }}" class="text-center">Tanggal Pertemuan</th>
+                  <th colspan="4" class="text-center">Jumlah Ket</th>
+                </tr>
+                <tr>
+                  {% for i in sql_tgl_absen %}
+                  <th class="text-center">{{ i.tgl_absen.day  }}</th>
+                  {% endfor %}
+                  <th class="text-center align-middle bg-gradient-green">H</th>
+                  <th class="text-center align-middle bg-gradient-yellow">S</th>
+                  <th class="text-center align-middle bg-gradient-blue">I</th>
+                  <th class="text-center align-middle bg-gradient-danger">A</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in sql_kehadiran%}
+                <tr>
+                  <td class="text-center">{{ loop.index }}.</td>
+                  <td class="pl-2">{{ i.siswa.first_name | title }} {{ i.siswa.last_name | title }}</td>
+                  <td class="text-center">{{ 'L' if i.siswa.gender  =='laki-laki' else 'P' }}</td>
+                  {% for key in sql_tgl_absen.filter(AbsensiModel.siswa_id==i.siswa_id) %}
+                  <td class="text-center">
+                    {% if key.ket == 'H' %}
+                    <div class="text-green font-weight-bold">{{ key.ket }}</div>
+                    {% elif key.ket == 'S' %}
+                    <div class="text-yellow font-weight-bold">{{ key.ket }}</div>
+                    {% elif key.ket == 'I' %}
+                    <div class="text-blue font-weight-bold">{{ key.ket }}</div>
+                    {% elif key.ket == 'A' %}
+                    <div class="text-red font-weight-bold">{{ key.ket }}</div>
+                    {% endif %}
+                  </td>
+                  {% endfor %}
+                  <td class="text-center">
+                    {{ sql_tgl_absen.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='H').count() }}
+                  </td>
+                  <td class="text-center">
+                    {{ sql_tgl_absen.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='S').count() }}
+                  </td>
+                  <td class="text-center">
+                    {{ sql_tgl_absen.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='I').count() }}
+                  </td>
+                  <td class="text-center">
+                    {{ sql_tgl_absen.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='A').count() }}
+                  </td>
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- <div class="row mt-3">
+          <div class="col col-md-4">
+            <a href="#" class="btn btn-primary"><span>Print Absen</span></a>
+          </div>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

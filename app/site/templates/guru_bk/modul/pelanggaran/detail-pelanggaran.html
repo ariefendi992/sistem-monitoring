@@ -1,0 +1,71 @@
+{% extends 'base.html' %} {% block head %} {{ super() }}
+<link rel="stylesheet" href="{{ url_for('.static', filename='css/my_style.css')}}" />
+<!-- DataTables -->
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}" />
+{% endblock %} {% set filename='detail-pelanggaran' %} {% block content %}
+<div class="row">
+    <div class="col-md-1">
+        <h6 class="font-weight-bold">Nama</h6>
+    </div>
+    <div>
+        <h6 class="font-weight-bold">:</h6>
+    </div>
+    <div class="col-md-auto">
+        <h6 class="font-weight-bold">
+            {{ detail.siswa.first_name | title() }} {{ detail.siswa.last_name | title() }}
+        </h6>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-1">
+        <h6 class="font-weight-bold">Kelas</h6>
+    </div>
+    <div>
+        <h6 class="font-weight-bold">:</h6>
+    </div>
+    <div class="col-md-auto">
+        <h6 class="font-weight-bold">{{ detail.siswa.kelas.kelas }}</h6>
+    </div>
+</div>
+<div class="row mt-2 p-0">
+    <div class="col-md">
+        <h5 class="m-0 text-bold">Riwayat pelanggaran yang sama</h5>
+        <a href="{{ url_for('guru_bk.detail_all_pelanggaran', id=detail.siswa_id)}}">Lihat Semua</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <hr class="mb-2 mt-1" />
+    </div>
+</div>
+<div class="row">
+    {% for item in data %}
+    <div class="col-md-3">
+        <div class="card card-danger card-outline">
+            <div class="card-body box-profile">
+                <p class="text-center text-danger mb-2 font-weight-bold">
+                    Pelanggaran Ke-{{loop.index}}
+                </p>
+                <ul class="list-group list-group-unbordered">
+                    <li class="list-group-item">
+                        <b class="text-dark">Tgl</b>
+                        <a class="float-right">{{ format(item.tgl_report) }}</a>
+                    </li>
+                </ul>
+                <p class="text-bold text-dark mb-0">Keterangan :</p>
+                <div class="ml-1 mr-1">
+                    <p class="text-dark text-justify font-weight-normal mb-0">
+                        {{ item.jenis_pelanggaran.jenis_pelanggaran.capitalize() }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}

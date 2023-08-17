@@ -1,0 +1,118 @@
+{% extends 'base.html' %} {% block head %} {{ super()}}
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}" />
+
+{% endblock head %} {% set filename='atur' %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-4">
+    <div class="card card-blue card-outline">
+      <div class="card-header">
+        <h5 class="card-title">Tambah Jenis Pelanggaran</h5>
+      </div>
+      <div class="card-body">
+        <form
+          action="{{ url_for('guru_bk.add_jenis_pelanggaran') if rq.url_rule | string == url_for('guru_bk.atur_pelanggaran') | string else url_for('guru_bk.get_one_jenis_pelanggaran', id=id) }}"
+          method="post">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            {{form.jenisPelanggaran.label}}
+            <label id="bintang">*</label>
+            {% if form.jenisPelanggaran.errors %}
+            {{ form.jenisPelanggaran(class="form-control is-invalid")}}
+            {% for msg in form.jenisPelanggaran.errors %}
+            <span class="error invalid-feedback">{{ msg }}</span>
+            {% endfor %}
+            {% elif form.jenisPelanggaran.data %}
+            {{ form.jenisPelanggaran(class='form-control')}}
+            {% else %}
+            {{ form.jenisPelanggaran(class='form-control', rows="3")}}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            {{ form.status.label }}
+            {{ form.status(class='custom-select form-control-border')}}
+          </div>
+          <div class="form-group">
+            {{form.submit(class='btn btn-primary')}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card card-blue card-outline">
+      <div class="card-header">
+        <h5 class="card-title">Jenis Pelanggaran</h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered table-striped table-sm">
+          <thead>
+            <tr class=" text-center">
+              <th style="width: 14px;">No.</th>
+              <th>Jenis Pelanggaran</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in data %}
+            <tr>
+              <td class="text-center">{{loop.index}}.</td>
+              <td>{{i.jenis_pelanggaran.title()}}</td>
+              <td class="text-center"><span class="badge {{'bg-primary' if i.status == '1' else 'bg-danger'}}">{{'AKTIF'
+                  if i.status=='1' else 'TIDAK AKTIF' }}</span>
+              </td>
+              <td class="text-center">
+                <a href="{{ url_for('guru_bk.get_one_jenis_pelanggaran', id=i.id)}}"
+                  class="btn btn-outline-warning btn-xs" data-toggle="tooltip" data-placement="left"
+                  title="Edit JenisPelanggaran">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="#" class="ml-1 btn btn-outline-danger btn-xs" data-toggle="tooltip" data-placement="left"
+                  title="Delete JenisPelanggaran">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+<script>
+  $(function () {
+    $("#tabel").DataTable({
+      processing: true,
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock js %}

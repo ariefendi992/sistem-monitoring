@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super() }}
+<!-- DataTables -->
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% set filename='kategori-pelanggaran' %}
+{% block content %}
+<div class="row">
+  <div class="col col-md-6">
+    <div class="card card-info card-outline">
+      <div class="card-header">
+        <h5 class="card-title">KATEGORI PELANGGARAN</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col col-md-12">
+            <a href class="btn btn-sm btn-primary mb-3" data-toggle="modal" data-target="#tambahKategori">
+              <i class="fas fa-plus"></i>
+              Tambah Data
+            </a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <table id="tabel" class="table table-bordered table-striped table-sm">
+              <thead>
+                <tr>
+                  <th width="15" class="text-center">No.</th>
+                  <th class="text-center">Nama Kategori</th>
+                  <th width="165" class="text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in sql_kategori %}
+                <tr>
+                  <td class="text-center align-middle">{{ loop.index }}</td>
+                  <td class="align-middle">{{ i.kategori }}</td>
+                  <td class="text-center">
+                    <a href="#" data-toggle="modal" data-target="#editKategori-{{i.id}}"
+                      class="btn btn-sm btn-outline-warning mr-1">
+                      <i class="fas fa-edit"></i>
+                      <span>Edit</span>
+                    </a>
+                    <a href="#" data-toggle="modal" data-target="#delete-{{i.id}}"
+                      class="btn btn-sm btn-outline-danger">
+                      <i class="fas fa-trash"></i>
+                      <span>Hapus</span>
+                    </a>
+                  </td>
+                </tr>
+                {% include 'admin/master/pelanggaran/modal/edit-kategori.html' %}
+                {% include 'admin/master/pelanggaran/modal/delete-kategori.html' %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'admin/master/pelanggaran/modal/tambah-kategori.html' %}
+{% endblock content %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+<script>
+  $(function () {
+    $('#tabel').DataTable({
+      processing: true
+    });
+
+  });
+</script>
+{% endblock js %}

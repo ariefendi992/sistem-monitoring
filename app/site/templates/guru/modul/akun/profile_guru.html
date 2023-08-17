@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% set filename='update_profile' %}
+{% block content %}
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title">Profil Guru</h3>
+      </div>
+      <form id="myForm" action="{{url_for('guru2.update_profile', id=current_user.id)}}" method="post">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.nip.label}}
+                {{form.nip(class="form-control", disabled=True)}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.fullname.label}}
+                {{form.fullname(class="form-control", disabled=True)}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.gender.label}}
+                {{form.gender(class="form-control", disabled=True)}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.agama.label}}
+                {{form.agama(class="form-control", disabled=True)}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.alamat.label}}
+                {{form.alamat(class="form-control", disabled=True)}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.telp.label}}
+                {{form.telp(class="form-control", disabled=True)}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          {{form.submit2(class="btn btn-secondary", onclick="btnUbah()", type="button")}}
+          {{form.submit(class="btn btn-primary", hidden=True)}}
+          {{form.cancel(class="btn btn-default float-right", onclick="btnCancel()", type="button")}}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script>
+  function btnUbah() {
+    document.getElementById('nip').disabled = false
+    document.getElementById('fullname').disabled = false
+    document.getElementById('submit').hidden = false
+    document.getElementById('submit2').hidden = true
+    document.getElementById('gender').disabled = false
+    document.getElementById('agama').disabled = false
+    document.getElementById('alamat').disabled = false
+    document.getElementById('telp').disabled = false
+  }
+
+  function btnCancel() {
+    document.getElementById('nip').disabled = true
+    document.getElementById('fullname').disabled = true
+    document.getElementById('submit').classList.remove("btn-primary")
+    document.getElementById('submit').classList.add('btn-secondary')
+    document.getElementById('submit').value = "Ubah Data"
+    document.getElementById('gender').disabled = true
+    document.getElementById('agama').disabled = true
+    document.getElementById('alamat').disabled = true
+    document.getElementById('telp').disabled = true
+    document.getElementById('submit').hidden = true
+    document.getElementById('submit2').hidden = false
+  }
+</script>
+{% endblock js %}

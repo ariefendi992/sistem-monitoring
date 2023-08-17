@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super()}}
+<link rel="stylesheet" href="{{ url_for('.static', filename='css/my_style.css')}}" />
+
+{% endblock %}
+{% set filename = "laporan-pelanggaran" %}
+{% block content %}
+<div class="row">
+  <div class="col">
+    <div class="callout callout-danger">
+      <h5>
+        <i class="fas fa-info"></i>
+        <span>Info:</span>
+      </h5>
+      <p>Silahkan lengkapi Form untuk menaplikan data yang diinginkan.</p>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-9">
+    <div class="card card-outline card-blue">
+      <div class="card-header">
+        <h6 class="card-title">Pilih Siswa</h6>
+      </div>
+      <form action="" method="post">
+        {{ form.csrf_token }}
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                {{ form.kelas.label}}
+                <label id="bintang">*</label>
+                {% if form.kelas.errors %}
+                {{ form.kelas(class="custom-select form-control-border is-invalid") }}
+                {% for msg in form.kelas.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.kelas.data %}
+                {{ form.kelas(class="custom-select form-control-border") }}
+                {% else %}
+                {{ form.kelas(class="custom-select form-control-border") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                {{ form.siswa.label }}
+                {{ form.siswa(class="form-control-border custom-select") }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="{{ url_for('guru_bk.laporan_pelanggaran')}}" class="btn btn-sm btn-danger pl-2 pr-2">
+            <i class="fas fa-undo mr-1"></i>
+            <span class="text-bold">Reset</span>
+          </a>
+          <button class="btn btn-sm btn-primary float-right pl-2 pr-2">
+            <span class="text-bold">Submit</span>
+            <i class="fas fa-arrow-right ml-1"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% if pelanggaran %}
+<div class="row" id="result">
+  <div class="col">
+    <div class="card card-outline card-blue">
+      <div class="card-header">
+        <div class="row justify-content-between align-items-center">
+          <h6 class="m-0 text-bold">Laporan Pelanggaran Siswa</h6>
+          <a href="{{ url_for('.result_pelanggaran' ) }}" target="_blank" class="btn btn-danger btn-sm"><i
+              class="fas fa-file-pdf mr-1"></i>
+            Cetak PDF</a>
+        </div>
+      </div>
+      <div class="card-body pt-2">
+        <div class="row">
+          <table class="table table-bordered table-striped table-sm display nowrap" style="width: 100%;">
+            <tr>
+              <th colspan="3"><i class="fas fa-user mr-1"></i>Data Siswa</th>
+            </tr>
+            <tr>
+              <td style="width: 200px;">NISN</td>
+              <td style="width: 20px; text-align: center;">:</td>
+              <td>{{ form.siswa.data.user.username}}</td>
+            </tr>
+            <tr>
+              <td style="width: 200px;">Nama Siswa</td>
+              <td style="width: 20px; text-align: center;">:</td>
+              <td>{{ form.siswa.data.first_name.title()}} {{ form.siswa.data.last_name.title()}}</td>
+            </tr>
+            <tr>
+              <td style="width: 200px;">Jenis Kelamin</td>
+              <td style="width: 20px; text-align: center;">:</td>
+              <td>{{ form.siswa.data.gender.title()}}</td>
+            </tr>
+            <tr>
+              <td style="width: 200px;">Kelas</td>
+              <td style="width: 20px; text-align: center;">:</td>
+              <td>{{ form.siswa.data.kelas.kelas}}</td>
+            </tr>
+            <tr>
+              <td style="width: 200px;">Alamat</td>
+              <td style="width: 20px; text-align: center;">:</td>
+              <td>{{'-' if not form.siswa.data.alamat else form.siswa.data.alamat.title() }}</td>
+            </tr>
+            <tr>
+              <td style="width: 200px;">Orang Tua/Wali</td>
+              <td style="width: 20px; text-align: center;">:</td>
+              <td>{{'-' if not form.siswa.data.nama_ortu_or_wali else form.siswa.data.nama_ortu_or_wali.title() }}</td>
+            </tr>
+            <tr>
+              <td style="width: 200px;">No. Telp/HP</td>
+              <td style="width: 20px; text-align: center;">:</td>
+              <td>{{'-' if not form.siswa.data.no_telp or form.siswa.data.no_telp == '' else form.siswa.data.no_telp }}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block js %}
+<script src="{{ url_for('static', filename='js/htmx.min.js' ) }}"></script>
+{% if pelanggaran %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var load = document.getElementById('result');
+    if (load) {
+      window.scrollTo({
+        top: load.offsetTop,
+        behavior: 'smooth'
+      });
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

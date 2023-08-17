@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% set filename='hadir-semester' %}
+{% block content %}
+<div class="row">
+    <div class="col col-md-4 col-lg-4 col-sm-4">
+        <div class="card card-info card-outline">
+            {# <div class="card-header">
+                <h3 class="card-title">Data Hadir Siswa</h3>
+            </div> #}
+            <div class="card-body">
+                <form action="" method="post">
+                    {{ form.csrf_token() }}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.kelas.label }}
+                                {% if form.kelas.errors %}
+                                {{ form.kelas(class="custom-select form-control-border is-invalid") }}
+                                {% for msg in form.kelas.errors %}
+                                <span class="error invalid-feedback">{{ msg }}</span>
+                                {% endfor %}
+                                {% elif form.kelas.data %}
+                                {{ form.kelas(class="custom-select form-control-border") }}
+                                {% else %}
+                                {{ form.kelas(class="custom-select form-control-border") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.semester.label }}
+                                {% if form.semester.errors %}
+                                {{ form.semester(class="custom-select form-control-border is-invalid") }}
+                                {% for msg in form.semester.errors %}
+                                <span class="error invalid-feedback">{{ msg }}</span>
+                                {% endfor %}
+                                {% elif form.semester.data %}
+                                {{ form.semester(class="custom-select form-control-border") }}
+                                {% else %}
+                                {{ form.semester(class="custom-select form-control-border") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form.submit(class="btn btn-primary btn-block btn-sm") }}
+                        </div>
+                        {# <div class="form-group justify-content-end">
+                            <input type="submit" class="btn btn-primary pr-5 pl-5 " value="Lihat Data">
+                        </div> #}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block js %}
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+{% endblock js %}

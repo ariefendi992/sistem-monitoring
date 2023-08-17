@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<style>
+  input[type='radio'] {
+    width: 30px;
+
+    height: 30px;
+
+    border-radius: 15px;
+  }
+</style>
+{% endblock %}
+{% set filename=data_mengajar.mengajar_id %}
+{% set page='absen' %}
+{% block content %}
+{# {% if url_for(request.endpoint, **request.view_args).split('/')[-1] %}
+{{ data_mengajar.mengajar_id}}
+{% endif %} #}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card card-blue">
+      <div class="card-header">
+        <h3 class="card-title">Absen Siswa</h3>
+      </div>
+      <form action method="post">
+        {{ form.csrf_token }}
+        <div class="card-body">
+          {# {{ url_for(request.endpoint, **request.view_args).split('/')[-1] }} #}
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-6">
+              <table class="font-weight-bold">
+                <tr>
+                  <td>Hari</td>
+                  <td>:</td>
+                  <td>{{today | date_indo }}</td>
+                </tr>
+                <tr>
+                  <td width="110">Mata Pelajaran</td>
+                  <td width="15">:</td>
+                  <td>{{data_mengajar.mapel}}</td>
+                </tr>
+                <tr>
+                  <td>Kelas</td>
+                  <td>:</td>
+                  <td>{{data_mengajar.kelas}}</td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              {{form.today(class="form-control form-control-sm form-control-border text-bold", value=today, hidden=true )}}
+            </div>
+          </div>
+          <table id="tabel" class="table table-bordered table-striped table-sm table-responsive-sm">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Siswa</th>
+                <th class="text-center">Kehadiran</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in model %}
+              <div class="from-group">
+                <input type="hidden" value="{{data_mengajar.mengajar_id}}" name="mengajarId">
+                <input type="hidden" value="{{i.user_id}}" name="userId-{{loop.index}}">
+              </div>
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ i.first_name | title }} {{ i.last_name | title }}</td>
+                <td class="text-center ">
+                  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-outline-success rounded-circle btn-sm text-center mr-2" style="width: 30px;">
+                      <input type="radio" name="ket-{{loop.index}}" value="H"><span>H</span>
+                    </label>
+                    <label class="btn btn-outline-warning rounded-circle btn-sm text-center mr-2" style="width: 30px;">
+                      <input type="radio" name="ket-{{loop.index}}" value="S"><span>S<span>
+                    </label>
+                    <label class="btn btn-outline-info rounded-circle btn-sm text-center mr-2" style="width: 30px;">
+                      <input type="radio" name="ket-{{loop.index}}" value="I"><span>I<span>
+                    </label>
+                    <label class="btn btn-outline-danger rounded-circle btn-sm text-center" style="width: 30px;">
+                      <input type="radio" name="ket-{{loop.index}}" value="A"><span>A<span>
+                    </label>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+        <div class="card-footer">
+          <div class="d-flex justify-content-center">
+            <button type="submit" class="btn  btn-primary mr-2">
+              <i class="fas fa-check"></i>
+              <span>Simpan</span>
+            </button>
+            {# <button type="button" onclick="ref()" class="btn btn-sm btn-danger form-control">
+              <i class="fas fa-times"></i>
+              <span>Batal</span>
+            </button> #}
+            <a href="{{ url_for('guru2.update_absen', mengajar_id=data_mengajar.mengajar_id) }}"
+              class="btn btn-warning">
+              <i class="fas fa-edit"></i>
+              <span>Edit Absensi</span>
+            </a>
+            <div class="form-group">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="col col-md-4 col-sm-4">
+    <div class="card card-blue">
+      <div class="card-header">
+        <h3 class="card-title">Keterangan</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-group mb-0">
+          <h6 class="text-bold mb-1">Keterangan: </h6>
+          <span class="badge bg-success ml-4 text-sm">- H : Hadir</span> <br>
+          <span class="badge bg-warning ml-4 text-sm">- S : Sakit</span> <br>
+          <span class="badge bg-info ml-4 text-sm">- I : Izin</span> <br>
+          <span class="badge bg-danger ml-4 text-sm mb-2">- A : Alpha</span> <br>
+          <span class="text-secondary mt-2"><strong>Note:</strong> *Harap periksa kembali sebelum menekan tombol
+            simpan.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+    $('#example1').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+
+    });
+  });
+
+  function ref() {
+    window.location = window.location;
+  }
+</script>
+{% endblock js %}

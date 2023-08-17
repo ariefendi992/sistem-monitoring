@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% set filename = 'data-guru' %}
+{% block title %}Data Guru{% endblock %}
+{% block head %}
+{{ super() }}
+<!-- DataTables -->
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title fas fa-users font-weight-bold text-lg">&nbsp;Data Guru</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <a href="{{ url_for('admin2.add_guru')}}" class="btn btn-sm btn-primary mb-3">
+      <i class="fas fa-plus"></i>
+      Tambah Data
+    </a>
+    <table id="example1" class="table table-bordered table-striped table-sm">
+      <thead>
+        <tr>
+          <th>NO</th>
+          <th>NIP</th>
+          <th>Nama</th>
+          <th>Gender</th>
+          <th>Agama</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for _ in model %}
+        <tr>
+          <td class="align-middle">{{ loop.index }}</td>
+          <td class="align-middle">{{ _.nip }}</td>
+          <td class="align-middle">{{ _.first_name }} {{_.last_name}}</td>
+          <td class="align-middle">{{ _.gender }}</td>
+          <td class="align-middle">{{ _.agama }}</td>
+          <!-- AKSI -->
+          <td class="align-middle text-center">
+            <button class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#modal-detail{{_.id}}">
+              <i class="fas fa-eye"></i>
+            </button>
+            <a href="{{ url_for('admin2.update_guru', id=_.id)}}" class="btn btn-outline-warning btn-xs">
+              <i class="fas fa-pencil-alt"></i>
+            </a>
+            <button class="btn btn-outline-danger btn-xs" title="Delete data." data-toggle="modal"
+              data-target="#delete-{{_.id}}">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+        {% include 'modal/admin/guru/detail_guru.html' %}
+        {% include 'modal/admin/guru/delete_guru.html' %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer"></div>
+</div>
+
+{% endblock %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<!-- <script src="../../plugins/jszip/jszip.min.js"></script>
+<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+<script src="../../plugins/pdfmake/vfs_fonts.js"></script> -->
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+
+    $('#example1').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+
+    });
+  });
+</script>
+{% endblock js %}

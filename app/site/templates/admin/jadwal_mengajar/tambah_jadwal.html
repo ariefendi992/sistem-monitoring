@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% set filename = 'tambah-jadwal'  %}
+{% block title %}tambah-jadwal{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<div class="card card-info card-outline">
+  <!-- .card-header -->
+  <div class="card-header">
+    <h3 class="card-title text-lg">Form Tambah Data</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body">
+    <form action="" method="post">
+      {{ form.csrf_token }}
+      <div class="col-md-8 ml-3">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              {{ form.kode.label }}
+              {{ form.kode(class="form-control", readonly=true)}}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              {{ form.tahunAjaran.label }}
+              {{ form.tahunAjaran(class="form-control", readonly=true)}}
+              {{ form.ta}}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              {{ form.semester.label }}
+              {{ form.semester(class="form-control", readonly=true)}}
+              {{ form.sms}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.namaGuru.label}}
+              {% if form.namaGuru.errors %}
+              {{ form.namaGuru(class="form-control is-invalid", aria_invalid=true)}}
+              {% for msg in form.namaGuru.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.namaGuru.data %}
+              {{ form.namaGuru(class="form-control", aria_invalid=false)}}
+              {% else %}
+              {{ form.namaGuru(class="form-control")}}
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.namaMapel.label}}
+              {% if form.namaMapel.errors %}
+              {{ form.namaMapel(class="form-control is-invalid", aria_invalid=true)}}
+              {% for msg in form.namaMapel.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.namaMapel.data %}
+              {{ form.namaMapel(class="form-control", aria_invalid=false)}}
+              {% else %}
+              {{ form.namaMapel(class="form-control")}}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.hari.label}}
+              {% if form.hari.errors %}
+              {{ form.hari(class="form-control is-invalid", aria_invalid=true) }}
+              {% for msg in form.hari.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.hari.data %}
+              {{ form.hari(class="form-control", aria_invalid=false) }}
+              {% else %}
+              {{ form.hari(class="form-control") }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.kelas.label}}
+              {% if form.kelas.errors %}
+              {{ form.kelas(class="form-control is-invalid", aria_invalid=true) }}
+              {% for msg in form.kelas.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.kelas.data %}
+              {{ form.kelas(class="form-control", aria_invalid=false) }}
+              {% else %}
+              {{ form.kelas(class="form-control") }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.waktuMulai2.label}}
+              {% if form.waktuMulai2.errors %}
+              {{ form.waktuMulai2(class="form-control is-invalid", aria_invalid=true, placeholder="_:_") }}
+              {% for msg in form.waktuMulai2.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.waktuMulai2.data %}
+              {{ form.waktuMulai2(class="form-control", aria_invalid=false) }}
+              {% else %}
+              {{ form.waktuMulai2(class="form-control", placeholder="_:_") }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.waktuSelesai2.label}}
+              {% if form.waktuSelesai2.errors %}
+              {{ form.waktuSelesai2(class="form-control is-invalid", aria_invalid=true, placeholder="_:_") }}
+              {% for msg in form.waktuSelesai2.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.waktuSelesai2.data %}
+              {{ form.waktuSelesai2(class="form-control", aria_invalid=false) }}
+              {% else %}
+              {{ form.waktuSelesai2(class="form-control", placeholder="_:_") }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {# <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.waktuMulai.label}}
+              {% if form.waktuMulai.errors %}
+              {{ form.waktuMulai(class="form-control is-invalid", aria_invalid=true) }}
+              {% for msg in form.waktuMulai.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.waktuMulai.data %}
+              {{ form.waktuMulai(class="form-control", aria_invalid=false) }}
+              {% else %}
+              {{ form.waktuMulai(class="form-control") }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.waktuSelesai.label}}
+              {% if form.waktuSelesai.errors %}
+              {{ form.waktuSelesai(class="form-control is-invalid", aria_invalid=true) }}
+              {% for msg in form.waktuSelesai.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.waktuSelesai.data %}
+              {{ form.waktuSelesai(class="form-control", aria_invalid=false) }}
+              {% else %}
+              {{ form.waktuSelesai(class="form-control") }}
+              {% endif %}
+            </div>
+          </div>
+        </div> #}
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.jamKe.label}}
+              {% if form.jamKe.errors %}
+              {{ form.jamKe(class="form-control is-invalid", aria_invalid=true, placeholder="1 - 10")}}
+              {% for msg in form.jamKe.errors %}
+              <span class="error invalid-feedback">{{msg}}</span>
+              {% endfor %}
+              {% elif form.jamKe.data %}
+              {{ form.jamKe(class="form-control", aria_invalid=false,  placeholder="1 - 10")}}
+              {% else %}
+              {{ form.jamKe(class="form-control", placeholder="1 - 10")}}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.submit(class="btn btn-primary")}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

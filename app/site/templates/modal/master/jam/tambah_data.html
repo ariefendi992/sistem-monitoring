@@ -1,0 +1,43 @@
+<div class="modal fade" id="tambahData">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Tambah Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('admin2.add_jam')}}" method="post">
+          {{ form.csrf_token }}
+          <div class="row">
+            <div class="col-md-10 justify-content-lg-start">
+              <div class="form-group">
+                {{ form.jam.label}}
+                {% if form.jam.errors %}
+                {{ form.jam(class="form-control form-control-sm is-invalid", placeholder="format = __:__" ,aria_invalid="true")}}
+                {% for msg in form.jam.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.jam.data %}
+                {{ form.jam(class="form-control form-control-sm", aria_invalid="format = __:__")}}
+                {% else %}
+                {{ form.jam(class="form-control form-control-sm", placeholder="format = __:__")}}
+                {% endif %}
+              </div>
+              <div class="form-group">
+                {{ form.submit(class="btn btn-primary btn-flat") }}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- <div class="modal-footer justify-content-sm-start"> -->
+      <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button> -->
+      <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      <!-- </div> -->
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>

@@ -1,0 +1,111 @@
+import json
+import requests as req
+from flask import (
+    Blueprint,
+    abort,
+    flash,
+    request,
+    redirect,
+    render_template,
+    url_for,
+    session,
+)
+from app.frontend.models.user_login_model import UserLogin
+from app.frontend.forms.form_auth import FormLogin
+from ..lib.base_url import base_url
+from flask_login import login_user, current_user, login_required, logout_user
+from urllib.parse import urljoin, urlparse
+
+login = Blueprint("login", __name__, url_prefix="/", template_folder="../templates/")
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
+
+
+def get_redirect_target():
+    for target in request.values.get("next"), request.referrer:
+        if not target:
+            continue
+        if is_safe_url(target):
+            return target
+
+
+def redirect_back(endpoint, **values):
+    target = request.form["next"]
+    if not target or not is_safe_url(target):
+        target = url_for(endpoint, **values)
+    return redirect(target)
+
+
+@login.get("/")
+def index():
+    form = FormLogin(request.form)
+    if current_user.is_authenticated:
+        if session["admin"] == "admin":
+            return redirect(url_for("admin2.index"))
+        if session["admin"] == "guru":
+            return redirect(url_for("guru2.index"))
+    next = get_redirect_target()
+    return render_template("auth/login.html", form=form, next=next)
+
+
+@login.route("sign-in", methods=["GET", "POST"])
+def masuk():
+    url = base_url + "api/v2/auth/login"
+    form = FormLogin(request.form)
+    if request.method == "POST" and form.validate_on_submit():
+        username = request.form.get("username")
+        password = request.form.get("password")
+        group = request.form.get("level")
+
+        payload = json.dumps({"username": username, "password": password})
+        headers = {"Content-Type": "application/json"}
+        resp = req.post(url=url, data=payload, headers=headers)
+        jsonResp = resp.json()
+        if resp.status_code == 200:
+            users = UserLogin()
+            users.id = jsonResp["id"]
+            session["username"] = jsonResp["username"]
+            session["group"] = jsonResp["group"]
+            session["firstName"] = jsonResp["first_name"]
+            session["lastName"] = jsonResp["last_name"]
+            session["gender"] = jsonResp["gender"]
+            session["alamat"] = jsonResp["alamat"]
+            if jsonResp["group"] == "admin" and group == "admin":
+                login_user(users)
+                # if "next" in session and session["next"]:
+                #     if is_safe_url(session["next"]):
+                #         return redirect(session["next"])
+
+                flash(
+                    f"Login berhasil. Selamat datang {str(jsonResp['group']).upper()}. Status : {resp.status_code}",
+                    "success",
+                )
+                # return redirect(url_for("admin2.index"))
+                return redirect_back("admin2.index")
+            elif jsonResp["group"] == "guru" and group == "guru":
+                login_user(users)
+
+                return redirect(url_for("guru2.index"))
+            else:
+                flash(
+                    "Login gagal, tipe level pengguna salah. Harap periksa kembali.",
+                    "error",
+                )
+                return redirect(url_for("login.index"))
+        else:
+            flash(f"{jsonResp['msg']} Status : {resp.status_code}", "error")
+            # return redirect(url_for("login.index"))
+    # session["next"] = request.args.get("next")
+    # return render_template("auth/login.html", form=form)
+
+
+@login.route("sign-out")
+@login_required
+def logout():
+    logout_user()
+    session.clear()
+    return redirect(url_for("login.index"))

@@ -1,0 +1,38 @@
+<div class="modal fade" id="editData{{_.id}}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Edit Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('admin2.edit_bk', id=_.id)}}" method="post" class="form-horizontal">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            <label for="">Status :</label>
+            <select class="form-control form-control-sm" name="status" id="status">
+              <option value>- Pilih -</option>
+              <option value="1" {{'selected' if _.status  == 'aktif'  else ''}}>
+                Aktif
+              </option>
+              <option value="0" {{'selected' if _.status  == 'tidak'  else ''}}>
+                Tidak
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            {{ form.submit(class="btn btn-primary btn-flat") }}
+          </div>
+        </form>
+      </div>
+      <!-- <div class="modal-footer justify-content-sm-start"> -->
+      <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button> -->
+      <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      <!-- </div> -->
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>

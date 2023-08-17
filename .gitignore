@@ -1,0 +1,12 @@
+.idea/
+.vscode/
+env/
+__pycache__/
+app/__pycache__/
+alchemydumps/
+migrations/
+.mypy_cache/
+test.py
+test_json.py
+key.pem
+cert.pem

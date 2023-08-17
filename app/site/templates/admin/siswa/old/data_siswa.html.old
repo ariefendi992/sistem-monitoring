@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% set filename = 'data-siswa' %}
+{% block title %}Tambah Data{% endblock %}
+{% block head %}
+{{ super()}}
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+<!-- DataTables -->
+<link rel="stylesheet"
+  href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title fas fa-users font-weight-bold text-lg">&nbsp;Data Siswa</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <a href="{{ url_for('staff.add_siswa')}}" class="btn btn-sm btn-primary mb-3">
+      <i class="fas fa-plus"></i>
+      Tambah Data Siswa
+    </a>
+    <table id="tabel" class="table table-bordered table-striped table-sm">
+      <thead>
+        <tr>
+          <th>NO</th>
+          <th>NISN</th>
+          <th>Nama</th>
+          <th>Gender</th>
+          <th>Kelas</th>
+          <th>Tempat Lahir</th>
+          <th>QR Code</th>
+          <th>Foto</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for _ in model['data'] %}
+        <tr>
+          <td class="align-middle">{{ loop.index }}</td>
+          <td class="align-middle">{{ _.nisn }}</td>
+          <td class="align-middle">{{ _.first_name }} {{_.last_name}}</td>
+          <td class="align-middle">{{ _.gender }}</td>
+          <td class="align-middle">{{ _.kelas }}</td>
+          <td class="align-middle">{{ _.tempat_lahir }}</td>
+          <!-- QR CODE -->
+          <td class="align-middle text-center">
+            {% if _.qr_code %}
+            <img src="{{ _.qr_code}}" height="50px" alt=""><br>
+            <button class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#qr-{{_.id}}">
+              <i class="fas fa-eye"></i> Lihat
+            </button>
+            {% else %}
+            <a href="{{ url_for('staff.generate_qc', id=_.id) }}" class="btn btn-xs btn-primary">
+              <i class="fas fa-qrcode"></i>
+              Generate
+            </a>
+            {% endif %}
+          </td>
+          <!-- IMAGE -->
+          <td class="align-middle text-center">
+            {% if _.picture %}
+            <img src="{{ _.picture }}" height="50px" alt=""> <br>
+            <button class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#image-{{_.id}}">
+              <i class="fas fa-eye"></i> Lihat
+            </button>
+            <a href="{{ url_for('download.image', name=_.pic_name) }}" target="_blank" title="Unduh"
+              class="btn btn-outline-success btn-xs">
+              <i class="fas fa-download"></i>
+            </a>
+            {% else %}
+            <button class="btn btn-outline-warning btn-xs" data-toggle="modal" data-target="#upload-{{_.id}}">
+              <i class="fas fa-upload"></i> Upload
+            </button>
+            {% endif %}
+          </td>
+          <!-- AKSI -->
+          <td class="align-middle text-center">
+            <button class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#modal-detail{{_.id}}">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn btn-outline-warning btn-xs" data-toggle="modal" data-target="#edit-{{_.id}}">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-xs" title="Delete data." data-toggle="modal"
+              data-target="#delete-{{_.id}}">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+        {% include 'staff/modal/siswa/view_image.html' %}
+        {% include 'staff/modal/siswa/view_qr.html' %}
+        {% include 'staff/modal/siswa/modal_upload.html' %}
+        {% include 'staff/modal/siswa/modal_detail_siswa.html' %}
+        {% include 'staff/modal/siswa/edit_siswa.html' %}
+        {% include 'staff/modal/siswa/delete.html' %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer"></div>
+</div>
+<div class="form-group">
+  <label>Date:</label>
+    <div class="input-group date" id="reservationdate" data-target-input="nearest">
+        <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate"/>
+        <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{{ url_for('static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+
+
+<script>
+  $(function () {
+    bsCustomFileInput.init();
+    $('#tabel').DataTable({
+      processing: true
+    })
+    $('#reservationdate').datetimepicker({
+      format: 'L'
+    });
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% set filename='result-semester' %}
+{% block head %}
+{{ super() }}
+<!-- DataTables -->
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col col-md-8">
+        <div class="card card-info card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Jumlah Kehadiran Per-semester</h3>
+            </div>
+            <div class="card-body">
+                <table id="example1" class="table-bordered table-striped w-100">
+                    <thead>
+                        <tr>
+                            <th width="30" rowspan="2" class="text-center">#</th>
+                            <th rowspan="2" class="text-center">Nama Siswa</th>
+                            <th colspan="4" class="text-center">Jumlah Keterangan</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">Hadir</th>
+                            <th class="text-center">Sakit</th>
+                            <th class="text-center">Ijin</th>
+                            <th class="text-center">Alpha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in sql_siswa%}
+                        <tr>
+                            <td class="text-center">{{ loop.index }}</td>
+                            <td class="pl-2"> {{ i.siswa.first_name }} {{ i.siswa.last_name }}</td>
+                            <td class="text-center">{{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id)
+                                    .filter(AbsensiModel.ket=='H')
+                                    .group_by(AbsensiModel.tgl_absen)
+                                    .count() }}
+                            </td>
+                            <td class="text-center">{{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id)
+                                    .filter(AbsensiModel.ket=='S')
+                                    .group_by(AbsensiModel.tgl_absen)
+                                    .count() }}
+                            </td>
+                            <td class="text-center">{{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id)
+                                    .filter(AbsensiModel.ket=='I')
+                                    .group_by(AbsensiModel.tgl_absen)
+                                    .count() }}
+                            </td>
+                            <td class="text-center">{{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id)
+                                    .filter(AbsensiModel.ket=='A')
+                                    .group_by(AbsensiModel.tgl_absen)
+                                    .count() }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Page specific script -->
+<script>
+    $(function () {
+
+        $('#example1').DataTable({
+            "paging": false,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            "responsive": true,
+
+        });
+    });
+</script>
+{% endblock js %}

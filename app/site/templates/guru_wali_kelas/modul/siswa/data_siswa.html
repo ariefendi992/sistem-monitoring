@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super() }}
+<!-- DataTables -->
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+
+{% set filename = 'data-siswa' %}
+{% block content %}
+<div class="row">
+    <div class="col col-md-12">
+        <div class="card card-info card-outline">
+            <div class="card-header">
+                <h5 class="card-title">Data Siswa</h5>
+            </div>
+            <div class="card-body">
+                <table id="example1" class="table table-bordered table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th width="10" class="text-center">No.</th>
+                            <th class="text-center">Nama Siswa</th>
+                            <th width="10" class="text-center">L/P</th>
+                            <th class="text-center">Alamat</th>
+                            <th class="text-center">Tempat Lahir</th>
+                            <th width="10" class="text-center">Kelas</th>
+                            <th class="text-center">Foto</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in sql_siswa %}
+                        <tr>
+                            <td class="text-center">{{ loop.index }}</td>
+                            <td>{{ i.first_name | title }} {{ i.last_name | title }}</td>
+                            <td class="text-center">{{ 'L' if i.gender == 'laki-laki' else 'P' }}</td>
+                            <td>{{ i.alamat if i.alamat else '-' }}</td>
+                            <td>{{ i.tempat_lahir if i.tempat_lahir else '-' }}</td>
+                            <td class="text-center">{{ i.kelas }}</td>
+                            <td class="text-center">
+                                {% if i.pic %}
+                                <button class="btn btn-outline-info btn-xs my-1" data-toggle="modal"
+                                    data-target="#image-{{i.id}}">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-outline-info btn-xs" data-toggle="modal"
+                                    data-target="#modal-detail{{i.id}}">
+                                    <span>Detail Data</span>
+                                </button>
+                            </td>
+                        </tr>
+                        {% include 'modal/wali_kelas/image_siswa.html' %}
+                        {% include 'modal/wali_kelas/detail_siswa.html' %}
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<!-- <script src="../../plugins/jszip/jszip.min.js"></script>
+<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+<script src="../../plugins/pdfmake/vfs_fonts.js"></script> -->
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Page specific script -->
+<script>
+    $(function () {
+
+        $('#example1').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+
+        });
+    });
+</script>
+{% endblock js %}

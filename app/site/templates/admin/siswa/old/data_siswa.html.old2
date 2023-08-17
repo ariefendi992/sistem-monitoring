@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% set filename = 'data-siswa' %}
+{% block title %}Data Siswa{% endblock %}
+
+{% block head %}
+{{ super() }}
+<!-- DataTables -->
+<link rel="stylesheet"
+  href="{{ url_for('static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+  href="{{ url_for('static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title fa fa-users font-weight-bold text-lg"> Data Siswa</h3>
+  </div>
+  <!-- /.card-header -->
+
+  <div class="card-body">
+    <a href="{{ url_for('staff.add_siswa')}}" class="btn btn-sm btn-primary mb-3">
+      <i class="fas fa-plus"></i>
+      Tambah Data Siswa
+    </a>
+    <table id="tabel" class="table table-bordered table-striped table-sm">
+      <thead>
+        <tr>
+          <th>NO</th>
+          <th>NISN</th>
+          <th>Nama</th>
+          <th>Gender</th>
+          <th>Kelas</th>
+          <th>Tempat Lahir</th>
+          <th>QR Code</th>
+          <th>Foto</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for _ in model['data'] %}
+        <tr>
+          <td class="align-middle">{{ loop.index }}</td>
+          <td class="align-middle">{{ _.nisn }}</td>
+          <td class="align-middle">{{ _.first_name }} {{_.last_name}}</td>
+          <td class="align-middle">{{ _.gender }}</td>
+          <td class="align-middle">{{ _.kelas }}</td>
+          <td class="align-middle">{{ _.tempat_lahir }}</td>
+          {% if _.qr_code != '#' %}
+          <td class="align-middle text-center">
+            <img src="{{ _.qr_code}}" height="50px" alt=""> <br>
+            <a href="#" title="View QR Code" class="btn btn-outline-primary btn-xs" data-toggle="modal" data-target="#qr{{_.id}}">
+              <i class="fas fa-qrcode"></i>
+            </a>
+          </td>
+          {% else %}
+          <td class="align-middle text-center"><a href="{{ url_for('staff.generate_qc', id=_.id) }}" class="btn btn-sm btn-primary">Generate</a></td>
+          {% endif %}
+          {% if _.picture != '#' %}
+          <td class="align-middle text-center">
+            <img src="{{ _.picture }}" height="50px" alt=""> <br>
+            <a href="#" title="View Image" class="btn btn-outline-primary btn-xs" data-toggle="modal" data-target="#image{{_.id}}">
+              <i class="fas fa-file-image"></i>
+            </a>
+            <a href="{{ url_for('download.image', name=_.pic_name) }}" title="Download Image" class="btn btn-outline-success btn-xs">
+              <i class="fas fa-download"></i>
+            </a>
+          </td>
+          {% else %}
+          <td class="align-middle text-center">
+            <a href="#" class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#modal-upload{{_.id}}">
+              <i class="fas fa-upload"></i>
+            </a>
+          </td>
+          {% endif %}
+          <td class="align-middle" align="center">
+            <a href="#" class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#modal-detail{{_.id}}">
+              <i class="fas fa-eye"></i>
+            </a>
+            <a href="#" class="btn btn-outline-warning btn-xs">
+              <i class="fas fa-pencil-alt"></i>
+            </a>
+            <a href="#" class="btn btn-outline-danger btn-xs">
+              <i class="fas fa-trash-alt"></i>
+            </a>
+          </td>
+        </tr>
+        {% include 'staff/modal/siswa/view_qr.html' %}
+        {% include 'staff/modal/siswa/view_image.html' %}
+        {% include 'staff/modal/siswa/modal_upload.html' %}
+        {% include 'staff/modal/siswa/modal_detail_siswa.html' %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- /.card-body -->
+</div>
+<!-- /.card -->
+</div>
+{% endblock %}
+
+
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+<!-- Page specific script -->
+<script>
+  $(document).ready(function (){
+    $('#tabel').DataTable({
+      processing: true
+    })
+  });
+</script>
+<script>
+  $(function () {
+    bsCustomFileInput.init();
+  });
+</script>
+<script>
+  /*
+  $(document).ready(function () {
+    $("#example2").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    
+    $('#example1').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": true,
+      "responsive": true,
+    });
+  });  
+      */
+      
+</script>
+
+<script>
+/*
+  $(document).ready(function () {
+    var table = $('#tabel').DataTable({
+      responsive: true,
+      autoWidth: false,
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      ajax: {
+        url: '{{ url_for("siswa.get") }}',
+        dataSrc: 'data'
+      },
+      columns: [
+        {
+          data: 'id',
+          width: '25px',
+         render: function(data, type, row, meta){
+          return meta.row + meta.settings._iDisplayStart + 1;
+          } 
+        },
+        {data: 'nisn'},
+        {
+          data: 'firstname', 
+          data: 'last_name', 
+         },
+         {data: 'gender'},
+         {data: 'kelas'},
+         {data: 'tempat_lahir'},
+         {data: 'tgl_lahir'},
+         {data: 'active'},  
+      ]
+    });
+
+    $('#tabel tbody').on('click', 'button', function(){
+      var data = table.row($(this).parents('tr')).data()
+
+      var id = data['id']
+
+    });
+    setInterval(function () {
+      table.ajax.reload(null, false)
+    }, 1000)
+  });
+  */
+</script>
+{% endblock js %}

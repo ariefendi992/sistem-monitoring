@@ -1,0 +1,16 @@
+Flask
+Flask-JWT-Extended
+Flask-Login
+Flask-Migrate
+Flask-SQLAlchemy
+Flask-WTF
+Jinja2
+Pillow
+PyJWT
+PyMySQL
+python-dotenv
+pytz
+qrcode
+requests
+xlwt
+WTForms-SQLAlchemy

@@ -1,0 +1,126 @@
+{% extends 'base.html' %} {% block head %} {{ super()}}
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}" />
+
+{% endblock head %} {% set filename = 'tata-tertib' %} {% block content %}
+<div class="col">
+  <div class="row mb-2">
+    <a href="{{ url_for('guru_bk.add_tertib_utama')}}" class="btn btn-primary">
+      <i class="fas fa-plus"></i>
+      <span>Tata Tertib</span>
+    </a>
+    <a href="{{ url_for('guru_bk.add_sub_tata_tertib1')}}" class="ml-2 btn btn-primary">
+      <i class="fas fa-plus"></i>
+      <span>Sub Tata Tertib-1</span>
+    </a>
+    <a href="{{ url_for('guru_bk.add_sub_ttertib2')}}" class="btn btn-primary ml-2">
+      <i class="fas fa-plus"></i>
+      <span>Sub Tata Tertib-2<Tertib-2></Tertib-2></span>
+    </a>
+    <a href="{{ url_for('guru_bk.add_sub_ttertib2')}}" class="btn btn-primary ml-2">
+      <i class="fas fa-plus"></i>
+      <span>Sub Tata Tertib-3<Tertib-2></Tertib-2></span>
+    </a>
+    {% if not pernyataan %}
+    <a href="{{ url_for('guru_bk.add_pernyataan')}}" class="btn btn-primary ml-2">
+      <i class="fas fa-plus"></i>
+      <span>Pernyataan</span>
+    </a>
+    {% else %}
+    <a href="{{ url_for('guru_bk.get_one_pernyataan', ket=pernyataan.ket, id=pernyataan.id)}}"
+      class="btn btn-warning ml-2">
+      <i class="fas fa-edit"></i>
+      <span>Edit Pernyataan</span>
+    </a>
+
+    {% endif %}
+  </div>
+</div>
+<div class="row">
+  <div class="col col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="text-center text-bold">TATA TERTIB SMP NEGERI 2 MAKASSAR</h5>
+        <div class="col">
+          <div class="text-center mr-4 ml-4">
+            <p class="text-justify m-1">
+              {{ pernyataan.teks | safe | indent(4)}}
+            </p>
+            <table class="ml-1">
+              <tbody>
+                {% for i in utama %}
+                <tr>
+                  <td style="width: 4%;" class="text-left align-top">
+                    <strong>{{ alfabet[loop.index -1] | upper}}.</strong></td>
+                  <td class="text-justify"><strong>{{ i.tata_tertib | safe }}</strong>
+                    {% for index, i1 in enumerate(data, 1) %}
+                    {% if i.id == i1.t_tertib_id %}
+                <tr>
+                  <td style="width: 8%;" class="text-center align-top">
+                    <strong>{{ ''}}.</strong>
+                  </td>
+                  <td class="text-justify">{{ i1.tata_tertib }}
+                    {% for i2 in sub %}
+                    {% if i1.id == i2.sub1_id %}
+
+                <tr>
+                  <td style="width: 12%;" class="text-right align-top pr-1">
+                    <strong>{{ loop.index }}.</strong></td>
+                  <td class="text-justify">{{ i2.tata_tertib | safe }}
+                </tr>
+                {% endif %}
+                {% endfor %}
+                </td>
+                </tr>
+
+
+                {% endif %}
+                {% endfor %}
+
+                </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <table class="table table-bordered table-striped table-sm">
+      <thead>
+        <th class="text-center">NO</th>
+        <th class="text-center">Tata Tertib</th>
+        <th class=" text-center">Aksi</th>
+      </thead>
+      <tbody>
+        {% for i in data %}
+        <tr>
+          <td class="text-center">{{loop.index}}.</td>
+          <td>{{i.tata_tertib | truncate(50, False, '...',0)}}</td>
+          <td class="text-center">
+            <a href="#" class="btn btn-outline-info btn-xs" data-toggle="tooltip" data-placement="left"
+              title="Detail Tata Tertib">
+              <i class="fas fa-eye"></i>
+            </a>
+            <a href="{{ url_for('guru_bk.get_one_sub1', id=i.id)}}" class="ml-1 btn btn-outline-warning btn-xs"
+              data-toggle="tooltip" data-placement="right" title="Edit Tata Tertib">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="#" class="ml-1 btn btn-outline-danger btn-xs" data-toggle="tooltip" data-placement="left"
+              title="Delete Tata Tertib">
+              <i class="fas fa-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}

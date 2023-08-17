@@ -1,0 +1,4 @@
+{% for i in siswa %}
+<option value="{{ i.id }}">{{ i.first_name.title()}} {{ i.last_name.title() }}
+</option>
+{% endfor %}

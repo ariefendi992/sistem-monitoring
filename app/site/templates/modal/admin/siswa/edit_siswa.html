@@ -1,0 +1,124 @@
+<div class="modal fade" id="modal-edit{{i.id}}">
+  <div class="modal-dialog overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title fas fa-user-edit">&nbsp;Form Edit Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="" method="post">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">NISN:</label>
+                <input type="text" name="nisn" class="form-control form-control-sm" value="{{ i.nisn }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">Nama Lengkap:</label>
+                <input type="text" name="fullaname" class="form-control form-control-sm"
+                  value="{{ i.first_name}} {{ i.last_name}}">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">Kelas:</label>
+                <select name="kelas" id="" class="form-control">
+                  <option value="">..::Select::..</option>
+                  {% for kelas in jsonKelas['data'] %}
+                  <option value="{{kelas.id}}" {{'selected' if i.kelas == kelas.kelas else '' }}>{{kelas.kelas}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">Jenis Kelamin:</label>
+                <select name="jenisKelamin" id="" class="form-control">
+                  <option value="">..::Select::..</option>
+                  <option value="laki-laki" {{'selected' if  i.gender | lower == 'laki-laki' else '' }}>Laki-Laki
+                  </option>
+                  <option value="perempuan" {{'selected' if  i.gender | lower == 'perempuan' else '' }}>Perempuan
+                  </option>
+                </select>
+                <!-- <input type="text" class="form-control form-control-sm" value="{{ i.gender}}"> -->
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">Tempat Lahir:</label>
+                <input type="text" name="tempatLahir" class="form-control form-control-sm" value="{{ i.tempat_lahir}}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Date:</label>
+                <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                  <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" />
+                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">Agama:</label>
+                <select name="agama" id="" class="form-control">
+                  <option value="">..::Select::..</option>
+                  <option value="islam" {{'selected' if  i.agama | lower == 'islam' else '' }}>Islam
+                  </option>
+                  <option value="kristen" {{'selected' if  i.agama | lower == 'kristen' else '' }}>Kristen
+                  </option>
+                  <option value="katolik" {{'selected' if  i.agama | lower == 'katolik' else '' }}>Katolik
+                  </option>
+                  <option value="hindu" {{'selected' if  i.agama | lower == 'hindu' else '' }}>Hindu
+                  </option>
+                  <option value="budha" {{'selected' if  i.agama | lower == 'budha' else '' }}>Budha
+                  </option>
+                </select>
+                <!-- <input type="text" class="form-control form-control-sm" value="{{ i.agama}}"> -->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">Alamat</label>
+                <input type="text" class="form-control form-control-sm" value="{{ i.alamat}}">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">Nama Orang Tua/Wali</label>
+                <input type="text" class="form-control form-control-sm" value="{{ i.nama_ortu}}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-normal">No. Telp</label>
+                <input type="text" class="form-control form-control-sm" value="{{ i.telp}}">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-end">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>

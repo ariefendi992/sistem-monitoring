@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% set filename = 'index-bk' %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% block nama_user %}Selamat Datang, <strong>{{ session.first_name}} {{ session.last_name}} </strong> {% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md">
+    
+  </div>
+  <div class="col-md-3">
+    <div class="card card-primary card-outline">
+      <div class="card-body box-profile">
+        <div class="text-center">
+          <img class="profile-user-img img-fluid img-circle" src="{{ url_for('.static', filename='img/logo.png') }}"
+            alt="">
+        </div>
+        <h3 class="profile-username text-center">UPT SPF SMPN2 MAKASSAR</h3>
+        <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+
+        <p class="text-muted">Jl. Amanagappa, No. 4 No.4, Baru, Kec. Ujung Pandang,<br> Kota Makassar, Sulawesi Selatan
+          90115</p>
+
+        <hr>
+      </div>
+
+    </div>
+  </div>
+  <!-- <div class="col-md-5">
+    <div class="card card-info card-outline h-100">
+      <div class="card-body">
+        <div class="text-center">
+          <img src="{{ url_for('.static', filename='img/logo.png') }}" width="75px" alt="">
+          <h6 class=" font-weight-bolder mt-1 mb-0">UPT SPF SMP NEGERI 2 MAKASSAR</h6>
+          <p class="description-text mt-0">
+            Jl. Amanagappa, No. 4 No.4, Baru, Kec. Ujung Pandang,<br> Kota Makassar, Sulawesi Selatan 90115
+          </p>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <!-- <div class="col-md-6">
+        <div class="card card-info card-outline">
+            <div class="card-body">
+                <ul class="nav nav-pills justify-content-center" id="pills-tab-with-icon" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-app" id="pills-home-tab-icon" data-toggle="tab"
+                            href="#pills-home-icon" role="tab" aria-controls="pills-home-icon" aria-selected="true">
+                            <i class="fas fa-clipboard-list"></i>
+                            Absen
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-app" id="pills-profile-tab-icon" data-toggle="tab"
+                            href="#pills-profile-icon" role="tab" aria-controls="pills-profile-icon"
+                            aria-selected="false">
+                            <i class="fas fa-list-alt"></i>
+                            Rekap
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-app" id="pills-contact-tab-icon" data-toggle="tab"
+                            href="#pills-contact-icon" role="tab" aria-controls="pills-contact-icon"
+                            aria-selected="false">
+                            <i class="fas fa-user-astronaut"></i>
+                            About
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-2 mb-3" id="pills-with-icon-tabContent">
+                    <div class="tab-pane fade" id="pills-contact-icon">
+                        <p>
+                            <hr>
+                            Aplikasi Absensi siswa ini dibuat untuk mendokumentasikan kehadiran siswa, Aplikasi sangat
+                            Mudah
+                            digunakan
+                            (Berbasis Web)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+</div>
+{% endblock content %}

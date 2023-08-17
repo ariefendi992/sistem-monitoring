@@ -1,0 +1,36 @@
+<div class="modal fade" id="modal-user-{{_.id}}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title fas fa-user-edit">&nbsp;Update Password</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post" action="{{ url_for('admin2.update_password', id=_.id) }}">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="" class="font-weight-normal">Password :</label>
+            <input type="password" class="form-control form-control-sm" name="kataSandi">
+            {#{% if formPassword.kataSandi.errors %}
+            {{ formPassword.kataSandi(class="form-control form-control-sm is-invalid", aria_invalid=true)}}
+            {% for msg in formPassword.kataSandi.errors %}
+            <span class="error invalid-feedback">{{ msg }}</span>
+            {% endfor %}
+            {% elif formPassword.kataSandi.data %}
+            {{ formPassword.kataSandi(class="form-control form-control-sm", aria_invalid=false)}}
+            {% else %}
+            {{ formPassword.kataSandi(class="form-control form-control-sm")}}
+            {% endif %}#}
+          </div>
+        </div>
+        <div class="modal-footer justify-content-end">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>

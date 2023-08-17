@@ -1,0 +1,50 @@
+{% extends 'base.html' %} {% block head %} {{ super()}}
+<link rel="stylesheet" href="{{ url_for('.static', filename='css/my_style.css')}}" />
+
+{% endblock head %} {% set filename = 'tata-tertib' %} {% block content %}
+<div class="row">
+  <div class="col col-md-8">
+    <div class="card card-info card-outline">
+      <div class="card-header">
+        <h5 class="card-text">Tambah Sub Tata Tertib-2</h5>
+      </div>
+      <div class="card-body">
+        <form action="" method="post">
+          {{ form.csrf_token}}
+          <div class="form-group">
+            {{ form.pilihTTertib.label}}
+            <label id="bintang">*</label>
+            {% if form.pilihTTertib.errors %}
+            {{ form.pilihTTertib(class="custom-select form-control-border is-invalid")}}
+            {% for msg in form.pilihTTertib.errors %}
+            <span class="error invalid-feedback">{{msg}}</span>
+            {% endfor %}
+            {% elif form.pilihTTertib.data %}
+            {{ form.pilihTTertib(class="custom-select form-control-border")}}
+            {% else %}
+            {{ form.pilihTTertib(class="custom-select form-control-border")}}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            {{ form.subTataTertib.label}}
+            <label id="bintang">*</label>
+            {% if form.subTataTertib.errors %}
+            {{ form.subTataTertib(class="form-control is-invalid" )}}
+            {% for msg in form.subTataTertib.errors %}
+            <span class="error invalid-feedback">{{msg}}</span>
+            {% endfor %}
+            {% elif form.subTataTertib.data %}
+            {{ form.subTataTertib(class="form-control")}}
+            {% else %}
+            {{ form.subTataTertib(class="form-control")}}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            {{ form.submit(class="btn btn-primary btn-flat btn-block")}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

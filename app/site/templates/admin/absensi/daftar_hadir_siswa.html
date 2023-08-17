@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% set filename='daftar_hadir' %}
+{% block content %}
+<div class="row">
+  <div class="col col-md-6 col-lg-6 col-sm-6">
+    <div class="card card-info card-outline">
+      <div class="card-header">
+        <h3 class="card-title">Data Hadir Siswa</h3>
+      </div>
+      <div class="card-body">
+        <form action="" method="post">
+          {{ form.csrf_token() }}
+          <div class="row">
+            <div class="col col-md-12">
+              <div class="form-group">
+                {{ form.kelas.label }}
+                {% if form.kelas.errors %}
+                {{ form.kelas(class="custom-select form-control-border is-invalid") }}
+                {% for msg in form.kelas.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.kelas.data %}
+                {{ form.kelas(class="custom-select form-control-border") }}
+                {% else %}
+                {{ form.kelas(class="custom-select form-control-border") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.bulan.label }}
+                {% if form.bulan.errors %}
+                {{ form.bulan(class="custom-select form-control-border is-invalid") }}
+                {% for msg in form.bulan.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.bulan.data %}
+                {{ form.bulan(class="custom-select form-control-border") }}
+                {% else %}
+                {{ form.bulan(class="custom-select form-control-border") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.tahun.label }}
+                {% if form.tahun.errors %}
+                {{ form.tahun(class="custom-select form-control-border is-invalid") }}
+                {% for msg in form.tahun.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.tahun.data %}
+                {{ form.tahun(class="custom-select form-control-border") }}
+                {% else %}
+                {{ form.tahun(class="custom-select form-control-border") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group justify-content-end">
+              <input type="submit" class="btn btn-primary pr-5 pl-5 " value="Lihat Data">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block js %}
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+{% endblock js %}

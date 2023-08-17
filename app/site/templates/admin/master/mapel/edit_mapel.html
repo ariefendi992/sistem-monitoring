@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% set filename = 'edit-mapel'  %}
+{% block title %}Edit Mapel{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title font-weight-bold text-lg">&nbsp;Form Edit Data Mapel</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form action="" method="post">
+      {{ form.csrf_token }}
+      <div class="col-md-11 m-auto">
+        <div class="row">
+          <!-- USERNAME -->
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.mapel.label}}
+              {% if form.mapel.errors %}
+              {{ form.mapel(class="form-control form-control-sm is-invalid", placeholder="Mata Pelajaran" ,aria_invalid="true")}}
+              {% for msg in form.mapel.errors %}
+              <span class="error invalid-feedback">{{ msg }}</span>
+              {% endfor %}
+              {% elif form.mapel.data %}
+              {{ form.mapel(class="form-control form-control-sm", aria_invalid="false")}}
+              {% else %}
+              {{ form.mapel(class="form-control form-control-sm", placeholder="Mata Pelajaran")}}
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-6">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            {{ form.submit(class="btn btn-primary btn-sm") }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="card-footer">
+    <!-- <div class="col-md-11 m-auto">
+        {{ form.submit(class="btn btn-primary btn-sm") }}
+      </div> -->
+  </div>
+</div>
+{% endblock %}
+{% block js %}
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+<script>
+  $(function () {
+    bsCustomFileInput.init();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekap Daftar Hadir Siswa</title>
+
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='plugins/fontawesome-free/css/all.min.css') }}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/adminlte.min.css') }}" />
+
+  <style>
+    * {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      padding: 0;
+      line-height: normal;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="d-flex justify-content-center">
+          <table style="width: 100%;" class="table-responsive-sm">
+            <tr>
+              <td>
+                <div class="text-center mb-0 pb-0">
+                  <img src="{{ url_for('admin2.static', filename='img/kota_makassar.png') }}" width="75" alt="">
+                  <div style="font-size: 10pt; margin-top: 5px;">NPSN : 40307325</div>
+                </div>
+              </td>
+              <td>
+                <div class="text-center mr-2 ml-2">
+                  <div style="font-size: 14pt;">PEMERINTAH KOTA MAKASSAR <br>
+                    DINAS PENDIDIKAN <br>
+                    UPT SATUAN PENDIDIKAN FORMAL <br></div>
+                  <div style="font-size: 14pt; font-weight: 600;">SMP NEGERI 2 MAKASSAR</div>
+                  <div style="font-size: 10pt;">Jl. Amanagappa No. 4 Makassar (90111) - Telp. (0411) 3611404</div>
+                  <div style="font-size: 10pt; font-style: italic; text-decoration: underline; color:#0088FF">Email :
+                    smp02makassar78@gmail.com</div>
+                </div>
+              </td>
+              <td>
+                <div class="text-center  mb-0 pb-0">
+                  <img src="{{ url_for('admin2.static', filename='img/logo.png') }}" height="90" alt="">
+                  <div style="font-size: 10pt;">NSS : 201196007002</div>
+                </div>
+              </td>
+            </tr>
+            <tr class="mt-0">
+              <td colspan="3" style="padding-left: 35px; padding-right: 40px;">
+                <hr class="d-flex align-items-start mt-0" style="border: 1.5pt solid black;">
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col col-md-12">
+        <div class="d-flex justify-content-center">
+          <table>
+            <tr>
+              <td>
+                <div
+                  style="font-size: 14pt; font-weight: 600; text-decoration: underline; text-decoration-style: solid; text-decoration-thickness: 2px;">
+                  REKAP KEHADIRAN SISWA</div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col col-md-12">
+        <table style="width: 100%; font-size: 13pt; " class="mr-5 ml-5 mb-2">
+          <tr>
+            <td width="130">Pertemuan Bulan</td>
+            <td width="10">:</td>
+            <td width="150">{{ data.bulan | upper }}</td>
+            <td width="100">Semester</td>
+            <td width="10">:</td>
+            <td>{{ data.semester |upper }}</td>
+          </tr>
+          <tr>
+            <td>Kelas</td>
+            <td>:</td>
+            <td>{{ data.kelas }}</td>
+            <td>Tahun Ajaran</td>
+            <td>:</td>
+            <td>{{ data.ta }}</td>
+          </tr>
+          <tr>
+            <td>Nama Wali Kelas</td>
+            <td>:</td>
+            <td>{{ data.wali_kelas }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="d-flex justify-content-center">
+          <table class="table-bordered table-striped table-sm nowrap ml-1 mr-1" style="width: 100%;">
+            <thead>
+              <tr>
+                <th width="10" rowspan="2" class="text-center">NO</th>
+                <th rowspan="2" class="text-center">Nama Siswa</th>
+                <th rowspan="2" width="15">P/L</th>
+                <th class="text-center" colspan="{{ data.month_range }}">Tanggal</th>
+                <th class="text-center" colspan="3">Jumlah</th>
+              </tr>
+              <tr>
+                {% for i in range(1, data.month_range + 1) %}
+                <th class="text-center" width="20" style="padding: 2px; font-weight: 400;">{{ loop.index }}</th>
+                {% endfor %}
+                <th class="text-center" width="20" style="color: #ffc107;">S</th>
+                <th class="text-center" width="20" style="color: #007bff;">I</th>
+                <th class="text-center" width="20" style="color: #dc3545;">A</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in sql_siswa %}
+              <tr>
+                <td class="text-center">{{ loop.index }}</td>
+                <td>{{ i.siswa.first_name | title }} {{ i.siswa.last_name | title }}</td>
+                <td class="text-center">{{ 'L' if i.siswa.gender=='laki-laki' else 'P' }}</td>
+                {% for v in range(1, data.month_range + 1) %}
+                <td class="text-center">
+                  {# {% set sql_ket = db.session.query(AbsensiModel)
+                    .filter(AbsensiModel.siswa_id==i.siswa_id)
+                    .filter(func.day(AbsensiModel.tgl_absen)==v)
+                    .filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month) %} #}
+                  {% for ket in sql_ket %}
+                  {% if ket.tgl_absen.day == v and ket.siswa_id==i.siswa_id and ket.tgl_absen.year == i.tgl_absen.year %}
+                  {# {{ ket.ket }} #}
+                  {% if ket.ket == 'S' %}
+                  <div style="color: #ffc107; font-weight: 600;">{{ ket.ket }}</div>
+                  {% elif ket.ket=='H' %}
+                  <div style="color:#28a745 ; font-weight: 600;">{{ ket.ket }}</div>
+                  {% elif ket.ket=='I' %}
+                  <div style="color:#007bff ; font-weight: 600;">{{ ket.ket }}</div>
+                  {% elif ket.ket=='A' %}
+                  <div style="color:#dc3545 ; font-weight: 600;">{{ ket.ket }}</div>
+                  {% endif %}
+                  {% endif %}
+                  {% endfor %}
+                </td>
+                {% endfor %}
+                <td class="text-center">
+                  <div style="color: #ffc107; font-weight: 600;">
+                    {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='S').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count() }}
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div style="color: #007bff; font-weight: 600;">
+                    {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='I').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count() }}
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div style="color: #dc3545; font-weight: 600;">
+                    {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='A').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count() }}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <div class="d-flex justify-content-end">
+          <table class="mr-5" style="font-size: 12pt;">
+            <tr>
+              <td>
+                <div class="mr-5">Makassar, {{ data.today | date_indo_non_weekday }}</div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div>
+          <table class="ml-4" style="font-size: 12pt;">
+            <tr>
+              <td>
+                <div>Mengetahui :</div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="d-flex justify-content-between">
+          <table class="ml-4" style="font-size: 12pt; width: 100%;">
+            <tr>
+              <td width="700">
+                <div style="font-weight: 600;">Kepala Sekolah</div>
+              </td>
+              <td>
+                <div style="font-weight: 600;">Wali Kelas</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-top: 85px;">
+                <div style="font-weight: 600; display: block;">
+                  <span style="padding-bottom: 2px; border-bottom: 1px solid #000; line-height: 25px;">
+                    {{ data.kepsek }}</span>
+                </div>
+              </td>
+              {# <td style="padding-top: 85px;">
+                <div style="font-weight: 600; border-bottom: 1px solid #000; margin-right: 516px;">{{ data.kepsek }}
+                </div>
+              </td> #}
+              <td style="padding-top: 85px;">
+                <div style="font-weight: 600; display: block;"><span
+                    style="padding-bottom: 2px; border-bottom: 1px solid #000; line-height: 25px;">{{ data.wali_kelas }}</span>
+                </div>
+              </td>
+              {# <td style="padding-top: 85px;">
+                <div style="font-weight: 600; border-bottom: 1px solid #000; margin-right: 210px;">{{ data.wali_kelas }}
+                </div>
+              </td> #}
+            </tr>
+            <tr>
+              <td>
+                <div style="font-size: 11pt;">NIP: {{ data.nip_kepsek }}</div>
+              </td>
+              <td>
+                <div style="font-size: 11pt;">NIP: {{ data.nip_wali }}</div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- jQuery -->
+  <script src="{{ url_for('admin2.static', filename='plugins/jquery/jquery.min.js') }}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{ url_for('admin2.static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <!-- AdminLTE App -->
+  <script src="{{ url_for('admin2.static', filename='js/adminlte.min.js') }}"></script>
+  <script>
+    window.print()
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Pernyataan</title>
+
+    <style>
+        * {
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .table-head #npsn,
+        #nss {
+            font-size: 10pt;
+            margin-left: 6px;
+            margin-right: 6px;
+        }
+
+        .table-head #cop1 {
+            font-size: 13pt;
+        }
+
+        .table-head #cop2 {
+            font-size: 13;
+            font-weight: bold;
+        }
+
+        .table-head #cop3 {
+            font-size: 10pt;
+            font-style: italic;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .table-head #cop4 {
+            font-size: 10pt;
+            text-decoration: underline;
+            color: #0088FF;
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+        }
+
+        table #garis-cop {
+            border: 2px solid black;
+            margin-top: 0px;
+            padding-top: 0px;
+        }
+
+        .table-head #judul-surat {
+            margin-top: 10px;
+            font-size: 13pt;
+            font-weight: bold;
+            text-decoration: underline;
+            text-decoration-style: solid;
+            text-decoration-thickness: 2px;
+        }
+
+        .table-body {
+            margin-top: 25px;
+        }
+
+        .table-content #text-body {
+            text-align: justify;
+            line-height: 1.5;
+
+        }
+
+        .table-footer1 {
+            margin-top: 40px;
+        }
+
+        .table-footer1 #tgl {
+            text-align: right;
+            line-height: 0;
+            margin-bottom: 0;
+
+        }
+
+        .table-footer2 #kepsek {
+            text-align: right;
+            margin-top: 50px;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .table-footer3 #nip {
+            line-height: 0;
+            font-size: 10pt;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <table class="table-head">
+            <tr>
+                <td>
+                    <center>
+                        <img src="{{ url_for('admin2.static', filename='img/kota_makassar.png') }}" width="70"
+                            alt="logo kota makassar"><br>
+                        <div id="npsn">NPSN : 40307325</div>
+                    </center>
+                </td>
+                <td>
+                    <center>
+                        <div id="cop1">
+                            PEMERINTAH KOTA MAKASSAR <br>
+                            DINAS PENDIDIKAN <br>
+                            UPT SATUAN PENDIDIKAN FORMAL <br>
+                        </div>
+                        <div id="cop2">SMP NEGERI 2 MAKASSAR</div>
+                        <div id="cop3">Jl. Amanagappa No. 4 Makassar (90111) - Telp. (0411) 3611404</div>
+                        <div id="cop4">Email : smp02makassar78@gmail.com</div>
+                    </center>
+                </td>
+                <td>
+                    <center>
+                        <img src="{{ url_for('admin2.static', filename='img/logo.png') }}" width="85"
+                            alt="logo tutwuri"><br>
+                        <div id="nss">NSS : 201196007002</div>
+                    </center>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <center>
+                        <hr id="garis-cop">
+                    </center>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <center>
+                        <div id="judul-surat">SURAT PERNYATAAN</div>
+                    </center>
+                </td>
+                <td></td>
+            </tr>
+
+        </table>
+
+        <table class="table-body" <tr>
+            <td>Saya yang bertanda tangan di bawah ini</td>
+            <td width="340">:</td>
+            </tr>
+        </table>
+
+        <table class="table-body2">
+            <tr>
+                <td width="190">Nama</td>
+                <td width="405" style="font-weight: 600;">: {{ sql_siswa.first_name | title }}
+                    {{ sql_siswa.last_name | title }}</td>
+            </tr>
+            <tr>
+                <td>Tempat / Tanggal Lahir</td>
+                <td>: {{ sql_siswa.tempat_lahir | title if sql_siswa.tempat_lahir else '-' }} /
+                    {{ sql_siswa.tgl_lahir | date_indo_non_weekday if sql_siswa.tgl_lahir else '-' }}</td>
+            </tr>
+            <tr>
+                <td>Jenis Kelamin</td>
+                <td>: {{ sql_siswa.gender | title }}</td>
+            </tr>
+            <tr>
+                <td>Kelas</td>
+                <td>: {{ sql_siswa.kelas.kelas }}</td>
+            </tr>
+            <tr>
+                <td>Alamat</td>
+                <td>: {{ sql_siswa.alamat | title if sql_siswa.alamat else '-' }}</td>
+            </tr>
+        </table>
+
+        <table width="605" class="table-content">
+            <td>
+                <div id="text-body">
+                    Saya menyatakan dengan sungguh-sungguh dan dengan sepenuh hati serta secara sadar. Di saksikan oleh
+                    guru
+                    UPT SPF SMP Negeri 2 Makassar, orang tua dan diri saya sendiri, bahwa saya tidak akan mengulangi
+                    kesalahan saya dan bersedia mematuhi seluruh peraturan yang berlaku di UPT SPF SMP Negeri 2
+                    Makassar.
+                    Apabila saya melanggar, saya bersedia menerima sanksi yang telah di tetapkan oleh pihak sekolah.
+                    Demikian surat pernyataan ini saya buat dengan penuh tanggung jawab dan tanpa ada paksaan dari pihak
+                    manapun.
+                </div>
+            </td>
+        </table>
+
+        <table width="550" class="table-footer1">
+            <tr>
+                <td>
+                    <div id="tgl">Makassar, {{ today | date_indo_non_weekday }}</div><br>
+                </td>
+                <td></td>
+            </tr>
+
+        </table>
+        <table width="600" class="table-footer2">
+            <tr>
+                <td>Mengetahui :</td>
+            </tr>
+            <tr>
+                <td>Orang Tua / Wali</td>
+                <td style="text-align: right;">
+                    <div>Yang membuat pernyataan</div>
+                </td>
+                <td width="30"></td>
+            </tr>
+        </table>
+
+        <table width="600" class="table-ortu" style="margin-top: 65px;">
+            <tr>
+                <td width="390" style="font-weight: 600;">
+                    {{ sql_siswa.nama_ortu_or_wali | title if sql_siswa.nama_ortu_or_wali else '___________________'}}
+                </td>
+                <td style="font-weight: 600;">{{ sql_siswa.first_name | title }}
+                    {{ sql_siswa.last_name | title }}</td>
+            </tr>
+        </table>
+
+        <table width="600" style="text-align: center; margin-top: 30px;">
+            <tr>
+                <td>Disaksikan Oleh :</td>
+            </tr>
+        </table>
+
+        <table width=600>
+            <tr>
+                <td width="390">Guru BK</td>
+                <td>Wali Kelas</td>
+            </tr>
+        </table>
+
+        <table width="600" style="margin-top: 65px;">
+            <tr>
+                <td style="font-weight: 600;" width="390">{{ sql_bk.guru.first_name }} {{ sql_bk.guru.last_name }}</td>
+                <td style="font-weight: 600;">{{ sql_wali.guru.first_name }} {{ sql_wali.guru.last_name }}</td>
+            </tr>
+        </table>
+
+
+        <!--
+        <table width="558" class="table-footer3">
+            <tr>
+                <td>
+                    <div id="nip">NIP : 196606271996022001</div>
+                </td>
+            </tr>
+        </table> -->
+
+
+    </center>
+
+    <script>
+        window.print()
+    </script>
+
+</body>
+
+</html>

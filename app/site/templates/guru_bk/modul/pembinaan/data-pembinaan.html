@@ -1,0 +1,85 @@
+{% extends 'base.html' %} {% block head %} {{ super()}}
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}" />
+<link rel="stylesheet"
+  href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}" />
+
+{% endblock head %} {% set filename='data_pembinaan' %} {% block content %}
+<div class="card card-outline card-blue">
+  <div class="card-header">
+    <h5 class="card-title">DATA PEMBINAAAN</h5>
+  </div>
+  <div class="card-body ">
+    <!-- <div class="row">
+          <div class="col">
+            <a href="#" class="btn btn-sm btn-primary mb-3">
+              <i class="fas fa-plus"></i>
+              Tambah Data
+            </a>
+          </div>
+        </div> -->
+    <div class="row">
+      <div class="col">
+        <table id="tabel" class="table table-bordered table-striped table-sm">
+          <thead>
+            <tr>
+              <th class="text-center">No.</th>
+              <th class="text-center">Nama Siswa</th>
+              <th class="text-center">Kelas</th>
+              <th class="text-center">Pelanggaran Terakhir </th>
+              <th class="text-center">Binaan</th>
+              <th class="text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i, bina in data %}
+            <tr>
+              <td class="text-center ">{{ loop.index}}</td>
+              <td>{{ i.pelanggaran.siswa.first_name }} {{ i.pelanggaran.siswa.last_name }}</td>
+              <td>{{ i.pelanggaran.siswa.kelas.kelas }}</td>
+              <td>{{ i.pelanggaran.jenis_pelanggaran.jenis_pelanggaran}}</td>
+              <td class="text-center">Ke-{{ bina}}</td>
+              <td class="text-center">
+                <a href="#" class="btn btn-outline-primary btn-sm border-0" data-toggle="tooltip" data-placement="left"
+                  title="Krim pesan ke orang tua">
+                  <i class="fas fa-paper-plane"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+<script>
+  $(function () {
+    $("#tabel").DataTable({
+      processing: true,
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock js %}

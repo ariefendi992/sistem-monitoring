@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% set filename='rekap-bulan' %}
+{% block content %}
+<div class="row">
+  <div class="col">
+    <div class="callout callout-danger">
+      <h5>
+        <i class="fas fa-info"></i>
+        <span>Info:</span>
+      </h5>
+      <p>Silahkan lengkapi Form untuk menaplikan data yang diinginkan.</p>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col col-md-8">
+    <div class="card card-info card-outline">
+      <div class="card-header">
+        <h3 class="card-title"></h3>
+      </div>
+      <form id="myForm" action="" method="post">
+        <div class="card-body">
+          {{ form.csrf_token() }}
+          <div class="row">
+            <div class="col col-md-12">
+              <div class="form-group">
+                {{ form.kelas.label }}
+                {% if form.kelas.errors %}
+                {{ form.kelas(class="custom-select form-control-border is-invalid") }}
+                {% for msg in form.kelas.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.kelas.data %}
+                {{ form.kelas(class="custom-select form-control-border") }}
+                {% else %}
+                {{ form.kelas(class="custom-select form-control-border") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.bulan.label }}
+                {% if form.bulan.errors %}
+                {{ form.bulan(class="custom-select form-control-border is-invalid") }}
+                {% for msg in form.bulan.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.bulan.data %}
+                {{ form.bulan(class="custom-select form-control-border") }}
+                {% else %}
+                {{ form.bulan(class="custom-select form-control-border") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.tahun.label }}
+                {% if form.tahun.errors %}
+                {{ form.tahun(class="custom-select form-control-border is-invalid") }}
+                {% for msg in form.tahun.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.tahun.data %}
+                {{ form.tahun(class="custom-select form-control-border") }}
+                {% else %}
+                {{ form.tahun(class="custom-select form-control-border") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="card-footer">
+          <div class="row justify-content-between">
+            {# <a target="_blank" href="#" type="submit" class="btn btn-primary btn-block">Rekap Absen</a> #}
+            <button type="reset" class="btn btn-danger btn-md"><i
+                class="fas fa-undo mr-1"></i><strong>Reset</strong></button>
+            <button class="btn btn-primary btn-md"><strong>Submit</strong><i class="fas fa-arrow-right ml-1"></i>
+            </button>
+
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block js %}
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var formElement = document.getElementById('myForm');
+
+    formElement.addEventListener('submit', function (event) {
+      var allSelectFilled = true;
+
+      var selectElements = formElement.querySelectorAll("select");
+
+      for (var i = 0; i < selectElements.length; i++) {
+        var selectElement = selectElements[i];
+        var selectedValue = selectElement.value;
+
+        if (selectedValue !== "") {
+          formElement.target = "_blank";
+        } else {
+          formElement.removeAttribute("target");
+        }
+      }
+    });
+
+  });
+</script>
+{% endblock js %}

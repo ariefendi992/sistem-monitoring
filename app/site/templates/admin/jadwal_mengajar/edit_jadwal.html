@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% set filename = 'edit-jadwal'  %}
+{% block title %}edit-jadwal{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<div class="card card-info card-outline">
+  <!-- .card-header -->
+  <div class="card-header">
+    <h3 class="card-title text-lg">Form Edit Data</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body">
+    <form action="" method="post">
+      {{ form.hidden_tag() }}
+      <div class="col-md-8 ml-3">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              {{ form.kode.label }}
+              {{ form.kode(class="form-control", readonly=true)}}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              {{ form.tahunAjaran.label }}
+              {{ form.tahunAjaran(class="form-control", readonly=true)}}
+              {{ form.ta}}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              {{ form.semester.label }}
+              {{ form.semester(class="form-control", readonly=true)}}
+              {{ form.sms}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.namaGuru.label}}
+              {{ form.namaGuru(class="form-control")}}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.namaMapel.label}}
+              {{ form.namaMapel(class="form-control")}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.hari.label}}
+              {{ form.hari(class="form-control") }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.kelas.label}}
+              {{ form.kelas(class="form-control") }}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.waktuMulai2.label}}
+              {{ form.waktuMulai2(class="form-control") }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.waktuSelesai2.label}}
+              {{ form.waktuSelesai2(class="form-control") }}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.jamKe.label}}
+              {{ form.jamKe(class="form-control", placeholder="1 - 10")}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              {{ form.submit(class="btn btn-primary")}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

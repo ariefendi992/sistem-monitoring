@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% set filename='edit-pelanggar' %}
+{% block content %}
+<div class="row">
+  <div class="col col-md-5">
+    <div class="card card-info card-outline">
+      <div class="card-header">
+        <h5 class="card-text">Edit Data Pelanggar</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <form action="" method="post">
+              {{ form.csrf_token }}
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    {{ form.siswa.label }}
+                    {{ form.siswa(class="form-control form-control-sm", disabled=true) }}
+                  </div>
+                </div>
+                {#<div class="col-md-6">
+                  <div class="form-group">
+                    {{ form.jenisPelanggaran.label }}
+                    <select name="jenisPelanggaran" id="" class="form-control form-control-sm">
+                      <option value="">- Pilih -</option>
+                      {% for i in sql_jenis %}
+                      <option value="{{ i.id }}" {{ 'selected' if i.id==sql_pelanggaran.jenis_pelanggaran_id else '' }}>
+                        {{ i.jenis }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>#}
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    {{ form.keterangan.label }}
+                    {{ form.keterangan(class="form-control") }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    {{ form.submit(class="btn btn-primary btn-flat btn-block", value='Submit Data') }}
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block js %}
+<script>
+  let selectKelas = document.getElementById('kelas')
+  let selectSiswa = document.getElementById('siswa')
+  selectKelas.onchange = function () {
+    let kelas = selectKelas.value
+    fetch(`/api/v2/student/get-siswa-kelas/${kelas}`).then(function (response) {
+      response.json().then(function (data) {
+        let optHtml = ''
+        for (i of data['data']) {
+          optHtml += `<option value="${i.id}">${i.first_name} ${i.last_name}</option>`
+        }
+        selectSiswa.innerHTML = optHtml;
+      })
+    })
+  }
+</script>
+
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+{% endblock js %}

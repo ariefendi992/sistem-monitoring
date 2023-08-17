@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% set filename = 'get-siswa' %}
+{% block title %}Data Siswa{% endblock %}
+{% block head %}
+{{ super() }}
+<!-- DataTables -->
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+{% endblock %}
+{% block content %}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title fas fa-users font-weight-bold text-lg">&nbsp;Data Siswa</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col-12 col-sm-12 mt-2 ml-0">
+        <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+            {% for object in kelas['data'] | sort(attribute="kelas", reverse=false)%}
+            {% if object.jum_seluruh != 0 %}
+            <li class="nav-item">
+                {# <a class="nav-link {{'active' if 'VIII-1' in object.kelas else ''}}" id="custom-tabs-three-home-tab" #}
+                <a class="nav-link {{'active' if loop.index==1 else ''}}" id="custom-tabs-three-home-tab"
+                    data-toggle="pill" href="#{{object.kelas}}" role="tab" aria-controls="custom-tabs-three-home"
+                    aria-selected="true">KELAS {{object.kelas}}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="card-body">
+        <a href="{{ url_for('admin2.add_siswa')}}" class="btn btn-sm btn-primary mb-2">
+            <i class="fas fa-plus"></i>
+            Tambah Data
+        </a>
+        <div class="tab-content" id="custom-tabs-three-tabContent">
+            {% for object in kelas['data'] | sort(attribute="kelas", reverse=false) %}
+            {% if object.jum_seluruh != 0 %}
+            {# <div class="tab-pane fade {{'show active' if 'VIII-1' in object.kelas  else ''}} " id="{{object.kelas}}" #}
+            <div class="tab-pane fade {{ loop.index }} {{'show active' if loop.index==1  else ''}} "
+                id="{{object.kelas}}" role="tabpanel" aria-labelledby="custom-tabs-three-home-tab">
+                <h6 class="mt-2 font-weight-bold">Jumlah Siswa : {{object.jum_seluruh}}</h6>
+                <table id="example1-{{loop.index}}"
+                    class="table table-bordered table-striped table-sm table-responsive-md ">
+                    <thead>
+                        <tr>
+                            <th>NISN</th>
+                            <th>Nama</th>
+                            <th>Gender</th>
+                            <!-- <th>Kelas</th> -->
+                            <th>Tempat Lahir</th>
+                            <th>QR Code</th>
+                            <th>Foto</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for _ in siswa['data']  %}
+                        {% if object.kelas == _.kelas %}
+                        <tr>
+                            <td>{{_.nisn}}</td>
+                            <td>{{_.first_name}} {{_.last_name}}</td>
+                            <td class="align-middle">{{ _.gender }}</td>
+                            <!-- <td class="align-middle">{{ _.kelas }}</td> -->
+                            <td class="align-middle">{{ _.tempat_lahir }}</td>
+                            <!-- QR CODE -->
+                            <td class="align-middle text-center">
+                                {% if _.qr_code %}
+                                <!-- <img src="{{ _.qr_code}}" height="50px" style="border-radius: 12%;" alt=""><br> -->
+                                <button class="btn btn-outline-info btn-xs mt-1" data-toggle="modal"
+                                    data-target="#qr-{{_.id}}">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                {% else %}
+                                <a href="{{ url_for('admin2.generate_qc', id=_.id) }}" class="btn btn-xs btn-primary">
+                                    <i class="fas fa-qrcode"></i>
+                                    Generate
+                                </a>
+                                {% endif %}
+                            </td>
+                            <!-- IMAGE -->
+                            <td class="align-middle text-center">
+                                {% if _.picture %}
+                                <!-- <img src="{{ _.picture }}" height="50px" style="border-radius: 12%" alt=""> <br> -->
+                                <button class="btn btn-outline-info btn-xs my-1" data-toggle="modal"
+                                    data-target="#image-{{_.id}}">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                <a href="{{ url_for('download.image', name=_.pic_name) }}" target="_blank" title="Unduh"
+                                    class="btn btn-outline-success btn-xs">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                {% else %}
+                                <button class="btn btn-outline-warning btn-xs" data-toggle="modal"
+                                    data-target="#upload-{{_.id}}">
+                                    <i class="fas fa-upload"></i> Upload
+                                </button>
+                                {% endif %}
+                            </td>
+                            <!-- AKSI -->
+                            <td class="align-middle text-center">
+                                <button class="btn btn-outline-info btn-xs" data-toggle="modal"
+                                    data-target="#modal-detail{{_.id}}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <a href="{{ url_for('admin2.update_siswa', id=_.id)}}"
+                                    class="btn btn-outline-warning btn-xs">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <button class="btn btn-outline-danger btn-xs" title="Delete data." data-toggle="modal"
+                                    data-target="#delete-{{_.id}}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        {% endif %}
+                        {% include 'modal/admin/siswa/view_image.html' %}
+                        {% include 'modal/admin/siswa/view_qr.html' %}
+                        {% include 'modal/admin/siswa/modal_upload.html' %}
+                        {% include 'modal/admin/siswa/modal_detail_siswa.html' %}
+                        {% include 'modal/admin/siswa/delete.html' %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <!-- /.card -->
+    </div>
+    <div class="card-footer"></div>
+</div>
+{%endblock%}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<!-- <script src="../../plugins/jszip/jszip.min.js"></script>
+<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+<script src="../../plugins/pdfmake/vfs_fonts.js"></script> -->
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Page specific script -->
+{% for i in kelas['data'] %}
+<script>
+    $(function () {
+        $('#example1-{{loop.index}}').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": false,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+
+        });
+    });
+</script>
+
+{% endfor %}
+{% endblock js %}

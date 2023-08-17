@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- block head -->
+  {% block head %}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Halaman | {% if current_user.is_authenticated %}
+    {% if current_user.group == 'admin' %}
+    ADMIN
+    {% elif current_user.group == 'bk' %}
+    BK
+    {% elif current_user.group == 'guru' %}
+    {% if sql_wali_ %}
+    Wali Kelas
+    {% else %}
+    GURU MAPEL
+    {% endif %}
+    {% endif %}
+    {% endif %} </title>
+
+  <!-- <title>Halaman | {% block title %}{% endblock %}</title> -->
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='plugins/fontawesome-free/css/all.min.css') }}" />
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet"
+    href="{{ url_for('admin2.static', filename='plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}" />
+  <!-- Toastr -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='plugins/toastr/toastr.min.css') }}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/adminlte.min.css') }}" />
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('admin2.static', filename='img/icon/favicon.ico') }}" />
+  {% endblock %}
+  <!-- end block -->
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+  <!-- Site wrapper -->
+  <div class="wrapper">
+    <!-- Navbar -->
+    {% include 'layouts/navbar.html' %}
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    {% if current_user.is_authenticated %}
+    {% if current_user.group == 'admin' %}
+    {% include 'layouts/sidebar.html' %}
+    {% elif current_user.group == 'bk' %}
+    {% include 'layouts/sidebar_guru_bk.html' %}
+    {% elif current_user.group == 'guru' %}
+    {% if sql_wali_ %}
+    {% include 'layouts/sidebar_wali_kelas.html' %}
+    {% else %}
+    {% include 'layouts/sidebar_guru.html' %}
+    {% endif %}
+    {% endif %}
+    {% endif %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header pb-0 pt-1">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>{% block title_header %}{% endblock %}</h1>
+              <h6>{% block nama_user %}{% endblock nama_user %}</h6>
+            </div>
+            <div class="col-sm-6">
+              {# <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Calendar</li>
+              </ol> #}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">{% block content %} {% endblock %}</div>
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- footer -->
+    {% include "/layouts/footer.html" %}
+    <!-- /.footer -->
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+  </div>
+  <!-- ./wrapper -->
+
+  <!-- jQuery -->
+  <script src="{{ url_for('admin2.static', filename='plugins/jquery/jquery.min.js') }}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{ url_for('admin2.static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <!-- SweetAlert2 -->
+  <script src="{{ url_for('admin2.static', filename='plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+  <!-- Toastr -->
+  <script src="{{ url_for('admin2.static', filename='plugins/toastr/toastr.min.js') }}"></script>
+  <!-- AdminLTE App -->
+  <script src="{{ url_for('admin2.static', filename='js/adminlte.min.js') }}"></script>
+  <!-- Moment js -->
+  <script src="{{ url_for('admin2.static', filename='plugins/moment/moment.min.js') }}"></script>
+
+  {% block js %}{% endblock js %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <script>
+    $(function () {
+      var Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3200,
+      });
+
+      Toast.fire({
+        icon: "{{category}}",
+        title: "{{message}}",
+      });
+    });
+  </script>
+  {% endfor %} {% endif %} {% endwith %}
+
+  {# {% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+  {% for ctg, msg in messages %}
+  <script>
+    /*
+    $(function () {
+      Swal.fire({
+        icon: "{{ ctg }}",
+        text: "{{ msg }}",
+        timer: 3000,
+        showConfirmButton: false
+      });
+    }); */
+  </script>
+  {% endfor %}
+  {% endif %}
+
+  {% endwith %} #}
+</body>
+
+</html>

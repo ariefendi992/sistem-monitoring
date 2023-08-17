@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+{% endblock %}
+{% set filename='absen' %}
+{# {% set x = namespace() %}
+{% for i in siswa %}
+{% set x.kelas = i.kelas %}
+{% endfor %} #}
+{% block content %}
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card card-blue">
+      <div class="card-header">
+        <h3 class="card-title">Absen Kehadiran</h3>
+      </div>
+      <form action method="post">
+        {{ form.csrf_token }}
+        <div class="card-body">
+          <div class="row mb-0 align-items-center">
+            <div class="col-md-6">
+              <h6 class="text-bold">Kelas : {{data.kelas}}</h6>
+              <h6 class="text-bold">Mapel : {{data.mapel}}</h6>
+            </div>
+            <div class="col-md-4">
+              {{form.pertemuan(value=data.pertemuan)}}
+              <h6 class="text-bold mb-0">Pertemuan Ke : {{data.pertemuan}}</h6>
+              {{form.today(class="form-control form-control-sm form-control-border text-bold", value=today)}}
+
+            </div>
+          </div>
+          <hr>
+
+          <div class="row  mb-2">
+            <div class="col-md-6 align-middle">
+              {% for i in model %}
+              <div class="from-group">
+                <input type="hidden" value="{{data.mengajar_id}}" name="mengajarId">
+                <input type="hidden" value="{{i.user_id}}" name="userId-{{loop.index}}">
+                <input class="form-control form-control-border text-bold" type="text" name="name"
+                  value="{{i.first_name }} {{i.last_name}}">
+              </div>
+              <div class=" row justify-content-around ml-3 mr-1">
+                <div class="form-group">
+                  <input type="checkbox" class="form-check-input" name="ket-{{loop.index}}" value="H">
+                  <label class="form-check-label">H</label>
+                </div>
+                <div class="form-group">
+                  <input type="checkbox" class="form-check-input" name="ket-{{loop.index}}" value="I">
+                  <label class="form-check-label">I</label>
+                </div>
+                <div class="form-group">
+                  <input type="checkbox" class="form-check-input" name="ket-{{loop.index}}" value="S">
+                  <label class="form-check-label">S</label>
+                </div>
+                <div class="form-group">
+                  <input type="checkbox" class="form-check-input" name="ket-{{loop.index}}" value="T">
+                  <label class="form-check-label">T</label>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-4">
+              <div class="form-group">
+
+                <h6 class="text-bold">Keterangan</h6>
+                <span class="badge bg-success">- H : Hadir</span> <br>
+                <span class="badge bg-info">- I : Izin</span> <br>
+                <span class="badge bg-warning">- S : Sakit</span> <br>
+                <span class="badge bg-danger">- T : TIdak Hadir</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          {# {{ form.submit(class="fas btn btn-primary w-25")}} #}
+          <div class="form-group ml-5 mr-5 pl-5 pr-5 text-center d-flex">
+            <button type="submit" class="btn btn-primary form-control mr-2">
+              <i class="fas fa-check"></i>
+              <span>Selesai</span>
+            </button>
+            <button type="reset" class="btn btn-danger form-control">
+              <i class="fas fa-times"></i>
+              <span>Batal</span>
+            </button>
+            <div class="form-group">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block js %}
+<!-- bs-custom-file-input -->
+<script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+{% endblock %}

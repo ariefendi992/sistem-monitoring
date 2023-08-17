@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% set filename='jadwal_guru' %}
+{% block content %}
+<div class="card h-100">
+  <div class="card-header p-2">
+    <div class="nav nav-pills">
+      <ul class="nav nav-pills">
+        <li class="nav-item"><a class="nav-link active" href="#jadwal" data-toggle="tab">Jadwal Sepekan</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#today" data-toggle="tab">Jadwal Hari Ini</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tomorrow" data-toggle="tab">Jadwal Hari Besok</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="tab-content">
+      <div class="tab-pane active" id="jadwal">
+        <div class="row">
+          {% for i in sqlJadwal %}
+          <div class="col-sm-4">
+            <div class="card card-blue">
+              <div class="card-header">
+                <h5 class="card-title">Hari : {{i.hari.hari | title}}</h5>
+              </div>
+              <div class="card-body">
+                <div class="d-inline-block text-truncate" style="max-width: auto;">
+                  {# <li>Nama Guru : {{i.guru.first_name}} {{i.guru.last_name}}</li>
+                  <li>Mapel : {{i.mapel.mapel}} </li>
+                  <li>Jam Ke : {{i.jam_ke}}</li>
+                  <li>Waktu : {{i.jam_mulai}}-{{i.jam_selesai}}</li>
+                  <li>Kelas : {{i.kelas.kelas}}</li> #}
+                  <table style="width: 100%;">
+                    <tr>
+                      <td width="70">Nama Guru</td>
+                      <td>:</td>
+                      <td>{{i.guru.first_name}} {{i.guru.last_name}}</td>
+                    </tr>
+                    <tr>
+                      <td>Mapel</td>
+                      <td>:</td>
+                      <td>{{i.mapel.mapel |title}}</td>
+                    </tr>
+                    <tr>
+                      <td>Semester</td>
+                      <td>:</td>
+                      <td>{{ i.semester.semester | title }}</td>
+                    </tr>
+                    <tr>
+                      <td>Jam-ke</td>
+                      <td>:</td>
+                      <td>{{i.jam_ke}}</td>
+                    </tr>
+                    <tr>
+                      <td>Waktu</td>
+                      <td>:</td>
+                      <td>{{i.jam_mulai}} - {{i.jam_selesai}}</td>
+                    </tr>
+                    <tr>
+                      <td>Kelas</td>
+                      <td>:</td>
+                      <td>{{ i.kelas.kelas }}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="tab-pane" id="today">
+        <div class="row">
+          {% for i in sqlToday %}
+          <div class="col-sm-4">
+            <div class="card card-blue">
+              <div class="card-header">
+                <h5 class="card-title">Hari : {{i.hari.hari | title}}</h5>
+              </div>
+              <div class="card-body">
+                <div class="d-inline-block text-truncate" style="max-width: auto;">
+                  <table style="width: 100%;">
+                    <tr>
+                      <td width="70">Nama Guru</td>
+                      <td>:</td>
+                      <td>{{i.guru.first_name}} {{i.guru.last_name}}</td>
+                    </tr>
+                    <tr>
+                      <td>Mapel</td>
+                      <td>:</td>
+                      <td>{{i.mapel.mapel |title}}</td>
+                    </tr>
+                    <tr>
+                      <td>Semester</td>
+                      <td>:</td>
+                      <td>{{ i.semester.semester | title }}</td>
+                    </tr>
+                    <tr>
+                      <td>Jam-ke</td>
+                      <td>:</td>
+                      <td>{{i.jam_ke}}</td>
+                    </tr>
+                    <tr>
+                      <td>Waktu</td>
+                      <td>:</td>
+                      <td>{{i.jam_mulai}} - {{i.jam_selesai}}</td>
+                    </tr>
+                    <tr>
+                      <td>Kelas</td>
+                      <td>:</td>
+                      <td>{{ i.kelas.kelas }}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="tab-pane" id="tomorrow">
+        <div class="row">
+          {% if not sqlTomorrow %}
+          <div class="col">
+            <p class="card-text text-center">Ma'af tidak ada jadwal untuk besok.
+          </div>
+          </p>
+          {% else %}
+          {% for i in sqlTomorrow %}
+          <div class="col-sm-4">
+            <div class="card card-blue">
+              <div class="card-header">
+                <h5 class="card-title">Hari : {{i.hari.hari | title}}</h5>
+              </div>
+              <div class="card-body">
+                <div class="d-inline-block text-truncate" style="max-width: auto;">
+                  <table style="width: 100%;">
+                    <tr>
+                      <td width="70">Nama Guru</td>
+                      <td>:</td>
+                      <td>{{i.guru.first_name}} {{i.guru.last_name}}</td>
+                    </tr>
+                    <tr>
+                      <td>Mapel</td>
+                      <td>:</td>
+                      <td>{{i.mapel.mapel |title}}</td>
+                    </tr>
+                    <tr>
+                      <td>Semester</td>
+                      <td>:</td>
+                      <td>{{ i.semester.semester | title }}</td>
+                    </tr>
+                    <tr>
+                      <td>Jam-ke</td>
+                      <td>:</td>
+                      <td>{{i.jam_ke}}</td>
+                    </tr>
+                    <tr>
+                      <td>Waktu</td>
+                      <td>:</td>
+                      <td>{{i.jam_mulai}} - {{i.jam_selesai}}</td>
+                    </tr>
+                    <tr>
+                      <td>Kelas</td>
+                      <td>:</td>
+                      <td>{{ i.kelas.kelas }}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock content %}

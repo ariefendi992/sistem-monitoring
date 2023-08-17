@@ -99,9 +99,10 @@
               <td>{{ form.siswa.data.gender.title()}}</td>
             </tr>
             <tr>
-              <td style="width: 200px;">Kelas</td>
+              <td style="width: 200px;">Kelas - Nama Wali</td>
               <td style="width: 20px; text-align: center;">:</td>
-              <td>{{ form.siswa.data.kelas.kelas}}</td>
+              <td>{{ form.siswa.data.kelas.kelas}} - {{ wali.guru.first_name.title() }} {{ wali.guru.last_name.title()
+                }}</td>
             </tr>
             <tr>
               <td style="width: 200px;">Alamat</td>

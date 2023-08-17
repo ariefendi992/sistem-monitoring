@@ -9,18 +9,58 @@
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
-            margin-top: 10px;
-            margin-bottom: 10;
-            margin-left: 30px;
-            margin-right: 30px;
+            margin: 10px 30px;
+
+        }
+
+        #kopSurat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        #garis {
+            margin-top: -5px;
         }
     </style>
 </head>
 
-<body>
-    <p style="text-align: center;">
-        <img src="{{ url_for('admin2.static', filename='img/kota_makassar.png') }}"
-            style="float: left; height: 100px; width: 100px;">
+<body ona>
+
+    <div id="kopSurat">
+        <div>
+            <img src="{{ url_for('.static', filename='img/kota_makassar.png') }}" style="height: 100px; width: 100px;"
+                alt="">
+            <br>
+            <p style="font-size: 10pt; margin-top: 5px; margin-bottom: 0;">NPSN : 40307325</p>
+        </div>
+        <div style="padding: 0 10px;">
+            <p style="font-size: 20px; margin: 0;">
+                PEMERINTAH KOTA MAKASSAR <br>
+                DINAS PENDIDIKAN <br>
+                UPT SATUAN PENDIDIKAN FORMAL <br>
+                <span style="font-weight: 600;">SMP NEGERI 2 MAKASSAR</span><br>
+                <span style="font-size: 15px;">Jl. Amanagappa No. 4 Makassar (90111) - Telp. (0411) 3611404</span><br>
+                <span style="font-size: 15px; font-style:italic; color:#0088FF">Email: smp02makassar78@gmail.com</span>
+            </p>
+        </div>
+        <div>
+            <img src="{{ url_for('.static', filename='img/logo.png') }}" style="height: 100px; width: 100px;" alt="">
+            <br>
+            <p style="font-size: 10pt; margin-top: 5px; margin-bottom: 0;">NSS : 201196007002</p>
+        </div>
+    </div>
+
+    <div id="garis">
+        <hr style="border: 1px groove #000000;" />
+        <hr style="border: 2px groove #000000; margin-top: -5px;" />
+    </div>
+
+    <div style="text-align: center; padding-right: 15px;">
+        <p style="font-size: 18px; font-weight: 600; ">SURAT PELANGGARAN</p>
+    </div>
 
 </body>
 

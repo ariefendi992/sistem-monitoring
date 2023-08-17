@@ -22,7 +22,6 @@ from sqlalchemy import func, or_, and_
 from app.lib.date_time import format_indo
 from app.lib.filters import *
 from builtins import enumerate
-
 from app.site.forms.form_laporan import FormLaporanPelanggaran
 
 guru_bk = Blueprint(
@@ -882,8 +881,8 @@ def laporan_pelanggaran():
             ).first()
 
             if form.validate_on_submit():
-                print(form.kelas.data.id)
-                print(form.siswa.data.user_id)
+                # print(form.kelas.data.id)
+                # print(form.siswa.data.user_id)
 
                 if not sql_pelanggaran:
                     flash("Data yang dimaksud belum melakukan pelanggaran.", "error")
@@ -926,8 +925,13 @@ def get_siswa():
 def result_pelanggaran():
     if current_user.is_authenticated:
         if current_user.group == "bk":
-            return render_template("laporan/result_pelanggaran.html")
+            rendered = render_template("laporan/result_pelanggaran.html")
 
+            response = make_response(rendered)
+            # response.headers["Content-Type"] = "application/pdf"
+            # response.headers["Content-Disposition"] = "inline; filename=output.pdf"
+
+            return response
         else:
             abort(404)
 

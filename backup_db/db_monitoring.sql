@@ -2,10 +2,10 @@
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Aug 17, 2023 at 09:08 AM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 7.4.33
+-- Host: 127.0.0.1
+-- Generation Time: Aug 17, 2023 at 10:39 PM
+-- Server version: 10.4.25-MariaDB
+-- PHP Version: 7.4.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,14 +29,14 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `alembic_version` (
   `version_num` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `alembic_version`
 --
 
 INSERT INTO `alembic_version` (`version_num`) VALUES
-('4255e037be45');
+('734cfb5c95db');
 
 -- --------------------------------------------------------
 
@@ -48,7 +48,7 @@ CREATE TABLE `auth_status_user_login` (
   `id` varchar(36) NOT NULL,
   `user_login_id` int(11) DEFAULT NULL,
   `status_login` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `auth_status_user_login`
@@ -71,7 +71,7 @@ CREATE TABLE `auth_token_block` (
   `jti` varchar(36) NOT NULL,
   `created_at` datetime NOT NULL,
   `user_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `auth_token_block`
@@ -208,7 +208,7 @@ CREATE TABLE `auth_user` (
   `is_active` varchar(2) NOT NULL,
   `user_last_login` datetime DEFAULT NULL,
   `user_logout` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `auth_user`
@@ -255,7 +255,7 @@ INSERT INTO `auth_user` (`id`, `username`, `password`, `group`, `join_date`, `up
 (42, '198109122009022008', 'pbkdf2:sha256:260000$Ey4gA0RLQ95t7eDY$57a4397769588a3eae028250728faca20f360fa6f682c79dc1e0024870ba830d', 'guru', '2023-01-03 19:34:33', NULL, '1', NULL, NULL),
 (43, '196312311988032109', 'pbkdf2:sha256:260000$lkvfeYneHJ1NSsCQ$514f4531f96788ca5f6ec9089a72c71b50cbf41f603c342b3e2c53303abb8c55', 'guru', '2023-01-03 19:34:33', NULL, '1', NULL, NULL),
 (44, '196512311989032117', 'pbkdf2:sha256:260000$u2aFy7r2VgYZ0k4u$27bb5858363ec031fedd3df4673093fb416c7782ea86f657dcf3bfce27d8da04', 'guru', '2023-01-03 23:23:19', NULL, '1', NULL, NULL),
-(45, '196509141991032011', 'pbkdf2:sha256:260000$0RMyU05XqAkihPtL$540bea8f04bdc3a8fa537225c8978f68001d59831a7c53d923041d18c428244c', 'bk', '2023-01-03 23:23:19', NULL, '1', '2023-08-17 02:38:04', NULL);
+(45, '196509141991032011', 'pbkdf2:sha256:260000$0RMyU05XqAkihPtL$540bea8f04bdc3a8fa537225c8978f68001d59831a7c53d923041d18c428244c', 'bk', '2023-01-03 23:23:19', NULL, '1', '2023-08-17 20:52:43', NULL);
 
 -- --------------------------------------------------------
 
@@ -269,7 +269,7 @@ CREATE TABLE `data_absensi` (
   `siswa_id` int(11) DEFAULT NULL,
   `tgl_absen` date DEFAULT NULL,
   `ket` varchar(16) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `data_absensi`
@@ -394,7 +394,7 @@ CREATE TABLE `data_jenis_pelanggaran` (
   `id` int(11) NOT NULL,
   `jenis_pelanggaran` text DEFAULT NULL,
   `status` varchar(64) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `data_jenis_pelanggaran`
@@ -424,14 +424,14 @@ CREATE TABLE `data_pelanggaran` (
   `tgl_report` date NOT NULL,
   `status` varchar(128) DEFAULT NULL,
   `guru_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `data_pelanggaran`
 --
 
 INSERT INTO `data_pelanggaran` (`id`, `siswa_id`, `jenis_pelanggaran_id`, `note`, `tgl_report`, `status`, `guru_id`) VALUES
-(35, 16, 7, 'Tidak mengikuti upacara hari senin', '2023-08-17', 'Pelanggaran Ke-1', NULL);
+(36, 16, 7, 'Tidak mengikuti upacara', '2023-08-17', 'Pelanggaran Ke-1', NULL);
 
 -- --------------------------------------------------------
 
@@ -444,17 +444,7 @@ CREATE TABLE `data_pembinaan` (
   `bina` int(11) DEFAULT NULL,
   `tgl_bina` date NOT NULL,
   `pelanggaran_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `data_pembinaan`
---
-
-INSERT INTO `data_pembinaan` (`id`, `bina`, `tgl_bina`, `pelanggaran_id`) VALUES
-(1, 1, '2023-08-09', 31),
-(2, 2, '2023-08-09', 31),
-(3, 1, '2023-08-09', 34),
-(4, 3, '2023-08-09', 31);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -466,7 +456,7 @@ CREATE TABLE `data_sub_tata_tertib1` (
   `id` int(11) NOT NULL,
   `tata_tertib` varchar(255) DEFAULT NULL,
   `t_tertib_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `data_sub_tata_tertib1`
@@ -506,7 +496,7 @@ CREATE TABLE `data_sub_tata_tertib2` (
   `id` int(11) NOT NULL,
   `sub1_id` int(11) DEFAULT NULL,
   `tata_tertib` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `data_sub_tata_tertib2`
@@ -528,7 +518,7 @@ INSERT INTO `data_sub_tata_tertib2` (`id`, `sub1_id`, `tata_tertib`) VALUES
 CREATE TABLE `data_tata_tertib` (
   `id` int(11) NOT NULL,
   `tata_tertib` varchar(128) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `data_tata_tertib`
@@ -548,7 +538,7 @@ CREATE TABLE `data_teks` (
   `id` int(11) NOT NULL,
   `teks` text DEFAULT NULL,
   `ket` varchar(128) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `data_teks`
@@ -570,7 +560,7 @@ CREATE TABLE `detail_admin` (
   `gender` varchar(32) DEFAULT NULL,
   `alamat` varchar(128) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `detail_admin`
@@ -594,7 +584,7 @@ CREATE TABLE `detail_guru` (
   `alamat` varchar(256) DEFAULT NULL,
   `telp` varchar(16) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `detail_guru`
@@ -638,7 +628,7 @@ CREATE TABLE `detail_siswa` (
   `pic` text DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `kelas_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `detail_siswa`
@@ -681,7 +671,7 @@ CREATE TABLE `master_guru_bk` (
   `id` int(11) NOT NULL,
   `guru_id` int(11) DEFAULT NULL,
   `status` varchar(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_guru_bk`
@@ -699,7 +689,7 @@ INSERT INTO `master_guru_bk` (`id`, `guru_id`, `status`) VALUES
 CREATE TABLE `master_hari` (
   `id` int(11) NOT NULL,
   `hari` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_hari`
@@ -731,7 +721,7 @@ CREATE TABLE `master_jadwal_mengajar` (
   `kelas_id` int(11) DEFAULT NULL,
   `semester_id` int(11) DEFAULT NULL,
   `tahun_ajaran_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_jadwal_mengajar`
@@ -900,7 +890,7 @@ INSERT INTO `master_jadwal_mengajar` (`id`, `kode_mengajar`, `guru_id`, `mapel_i
 CREATE TABLE `master_jam_mengajar` (
   `id` int(11) NOT NULL,
   `jam` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_jam_mengajar`
@@ -933,7 +923,7 @@ CREATE TABLE `master_kelas` (
   `jml_laki` int(11) DEFAULT NULL,
   `jml_perempuan` int(11) DEFAULT NULL,
   `jml_seluruh` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_kelas`
@@ -956,7 +946,7 @@ CREATE TABLE `master_kepsek` (
   `id` int(11) NOT NULL,
   `guru_id` int(11) DEFAULT NULL,
   `status` varchar(2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_kepsek`
@@ -974,7 +964,7 @@ INSERT INTO `master_kepsek` (`id`, `guru_id`, `status`) VALUES
 CREATE TABLE `master_mapel` (
   `id` int(11) NOT NULL,
   `mapel` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_mapel`
@@ -1001,7 +991,7 @@ INSERT INTO `master_mapel` (`id`, `mapel`) VALUES
 CREATE TABLE `master_nama_bulan` (
   `id` int(11) NOT NULL,
   `nama_bulan` varchar(32) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_nama_bulan`
@@ -1031,7 +1021,7 @@ CREATE TABLE `master_semester` (
   `id` int(11) NOT NULL,
   `semester` varchar(32) NOT NULL,
   `is_active` varchar(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_semester`
@@ -1051,7 +1041,7 @@ CREATE TABLE `master_tahun` (
   `id` int(11) NOT NULL,
   `tahun` varchar(4) NOT NULL,
   `status` varchar(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_tahun`
@@ -1072,7 +1062,7 @@ CREATE TABLE `master_tahun_ajaran` (
   `id` int(11) NOT NULL,
   `th_ajaran` varchar(32) NOT NULL,
   `is_active` varchar(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_tahun_ajaran`
@@ -1093,7 +1083,7 @@ CREATE TABLE `master_wali_kelas` (
   `id` int(11) NOT NULL,
   `guru_id` int(11) DEFAULT NULL,
   `kelas_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `master_wali_kelas`
@@ -1330,7 +1320,7 @@ ALTER TABLE `data_jenis_pelanggaran`
 -- AUTO_INCREMENT for table `data_pelanggaran`
 --
 ALTER TABLE `data_pelanggaran`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `data_pembinaan`
@@ -1479,9 +1469,9 @@ ALTER TABLE `data_absensi`
 -- Constraints for table `data_pelanggaran`
 --
 ALTER TABLE `data_pelanggaran`
-  ADD CONSTRAINT `data_pelanggaran_ibfk_2` FOREIGN KEY (`siswa_id`) REFERENCES `detail_siswa` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `data_pelanggaran_ibfk_3` FOREIGN KEY (`jenis_pelanggaran_id`) REFERENCES `data_jenis_pelanggaran` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `data_pelanggaran_ibfk_4` FOREIGN KEY (`guru_id`) REFERENCES `detail_guru` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `data_pelanggaran_ibfk_4` FOREIGN KEY (`guru_id`) REFERENCES `detail_guru` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `data_pelanggaran_ibfk_5` FOREIGN KEY (`jenis_pelanggaran_id`) REFERENCES `data_jenis_pelanggaran` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `data_pelanggaran_ibfk_6` FOREIGN KEY (`siswa_id`) REFERENCES `detail_siswa` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `data_pembinaan`
@@ -1517,8 +1507,8 @@ ALTER TABLE `detail_guru`
 -- Constraints for table `detail_siswa`
 --
 ALTER TABLE `detail_siswa`
-  ADD CONSTRAINT `detail_siswa_ibfk_1` FOREIGN KEY (`kelas_id`) REFERENCES `master_kelas` (`id`),
-  ADD CONSTRAINT `detail_siswa_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `detail_siswa_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `detail_siswa_ibfk_2` FOREIGN KEY (`kelas_id`) REFERENCES `master_kelas` (`id`);
 
 --
 -- Constraints for table `master_guru_bk`
@@ -1530,12 +1520,12 @@ ALTER TABLE `master_guru_bk`
 -- Constraints for table `master_jadwal_mengajar`
 --
 ALTER TABLE `master_jadwal_mengajar`
-  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_1` FOREIGN KEY (`guru_id`) REFERENCES `detail_guru` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_2` FOREIGN KEY (`hari_id`) REFERENCES `master_hari` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_1` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `master_tahun_ajaran` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_2` FOREIGN KEY (`mapel_id`) REFERENCES `master_mapel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `master_jadwal_mengajar_ibfk_3` FOREIGN KEY (`kelas_id`) REFERENCES `master_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_4` FOREIGN KEY (`mapel_id`) REFERENCES `master_mapel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_5` FOREIGN KEY (`semester_id`) REFERENCES `master_semester` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_6` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `master_tahun_ajaran` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_4` FOREIGN KEY (`hari_id`) REFERENCES `master_hari` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_5` FOREIGN KEY (`guru_id`) REFERENCES `detail_guru` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `master_jadwal_mengajar_ibfk_6` FOREIGN KEY (`semester_id`) REFERENCES `master_semester` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `master_kepsek`
@@ -1547,8 +1537,8 @@ ALTER TABLE `master_kepsek`
 -- Constraints for table `master_wali_kelas`
 --
 ALTER TABLE `master_wali_kelas`
-  ADD CONSTRAINT `master_wali_kelas_ibfk_1` FOREIGN KEY (`guru_id`) REFERENCES `detail_guru` (`user_id`),
-  ADD CONSTRAINT `master_wali_kelas_ibfk_2` FOREIGN KEY (`kelas_id`) REFERENCES `master_kelas` (`id`);
+  ADD CONSTRAINT `master_wali_kelas_ibfk_1` FOREIGN KEY (`kelas_id`) REFERENCES `master_kelas` (`id`),
+  ADD CONSTRAINT `master_wali_kelas_ibfk_2` FOREIGN KEY (`guru_id`) REFERENCES `detail_guru` (`user_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

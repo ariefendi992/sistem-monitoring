@@ -9,3 +9,4 @@ test.py
 test_json.py
 key.pem
 cert.pem
+*.pyc

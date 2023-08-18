@@ -951,7 +951,6 @@ def result_pelanggaran():
                 siswa=siswa,
                 bina=count_pembinaan,
                 pelanggaran=result_pelanggaran,
-                format_indo= format_indo
             )
 
             response = make_response(rendered)

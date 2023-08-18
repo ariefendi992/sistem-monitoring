@@ -892,6 +892,7 @@ def laporan_pelanggaran():
                     guru_bk=get_guru_bk(),
                     form=form,
                     pelanggaran=sql_pelanggaran,
+                    wali=sql_wali,
                 )
 
             return render_template(
@@ -925,7 +926,33 @@ def get_siswa():
 def result_pelanggaran():
     if current_user.is_authenticated:
         if current_user.group == "bk":
-            rendered = render_template("laporan/result_pelanggaran.html")
+            siswa_id = request.args.get("siswa")
+            count_pembinaan = (
+                db.session.query(PembinaanModel)
+                .filter(PembinaanModel.siswa_id == siswa_id)
+                .order_by(PembinaanModel.siswa_id.desc())
+                .first()
+            )
+
+            siswa = SiswaModel.query.filter_by(user_id=siswa_id).first()
+
+            result_pelanggaran = (
+                db.session.query(
+                    func.count(PelanggaranModel.siswa_id), PelanggaranModel
+                )
+                .filter_by(siswa_id=siswa_id)
+                .all()
+            )
+
+            
+
+            rendered = render_template(
+                "laporan/result_pelanggaran.html",
+                siswa=siswa,
+                bina=count_pembinaan,
+                pelanggaran=result_pelanggaran,
+                format_indo= format_indo
+            )
 
             response = make_response(rendered)
             # response.headers["Content-Type"] = "application/pdf"

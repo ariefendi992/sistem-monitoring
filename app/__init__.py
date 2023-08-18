@@ -3,7 +3,7 @@ from app.api.register_app import register_app
 from app.site.register_app import register_app_site
 from settings import Config
 from app.lib.date_time import *
-
+from app.register_filters import register_filters
 
 def create_app():
     app = Flask(__name__)
@@ -15,9 +15,7 @@ def create_app():
     register_app_site(app)
     loginManager(app)
 
-    app.jinja_env.filters["date_indo"] = format_indo
-    app.jinja_env.filters["date_indo_non_weekday"] = format_indo_non_weekday
-    app.jinja_env.filters["tgl"] = day_in_date
+    register_filters(app)
 
     return app
 

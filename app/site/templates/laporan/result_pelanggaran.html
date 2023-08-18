@@ -2,34 +2,159 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pelanggaran</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Pelanggaran</title>
 
-    <style>
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            margin: 10px 30px;
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='plugins/fontawesome-free/css/all.min.css') }}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/adminlte.min.css') }}" />
 
-        }
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 10px 30px;
+      font-size: 12pt;
 
-        #kopSurat {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            width: 100%;
-        }
+    }
 
-        #garis {
-            margin-top: -5px;
-        }
-    </style>
+    #kopSurat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+    }
+
+    #garis {
+      margin-top: -5px;
+    }
+  </style>
 </head>
 
-<body ona>
+<body>
+  <div class="container">
+    <div class="row justify-content-between text-center">
+      <div class="col text-left">
+        <img src="{{ url_for('.static', filename='img/kota_makassar.png') }}" style=" height: 100px; width: 100px;"
+          alt="">
+        <br>
+        <p style="font-size: 10pt; margin-top: 5px; margin-bottom: 0;">NPSN : 40307325</p>
+      </div>
+      <div class="col ">
+        <div style="font-size: 14pt;">PEMERINTAH KOTA MAKASSAR</div>
+        <div style="font-size: 14pt; margin-top: -5px;">DINAS PENDIDIKAN</div>
+        <div style="font-size: 14pt; margin-top: -5px;">UPT SATUAN PENDIDIKAN FORMAL</div>
+        <div style="font-size: 14pt;  font-weight: 600 ; margin-top: -5px;">SMP NEGERI 2 MAKASSAR</div>
+        <div style="font-size: 10pt; margin-top: -5px;">Jl. Amanagappa No. 4 Makassar (90111) - Telp. (0411)
+        </div>
+        <div style="font-size: 10pt; margin-top: -5px; color: blue; font-style: italic;">Email:
+          smp02makassar78@gmail.com</div>
+        <!-- <p style="font-size: 20px; margin: 0; padding:0;">
+                        PEMERINTAH KOTA MAKASSAR <br>
+                        DINAS PENDIDIKAN <br>
+                        UPT SATUAN PENDIDIKAN FORMAL <br>
+                        <span style="font-weight: 600;">SMP NEGERI 2 MAKASSAR</span><br>
+                        <span style="font-size: 15px;">Jl. Amanagappa No. 4 Makassar (90111) - Telp. (0411)
+                            3611404</span><br>
+                        <span style="font-size: 15px; font-style:italic; color:#0088FF">Email:
+                            smp02makassar78@gmail.com</span>
+                    </p> -->
+      </div>
+      <div class="col text-right">
+        <img src="{{ url_for('.static', filename='img/logo.png') }}" style="height: 100px; width: 100px;" alt="">
+        <br>
+        <p style="font-size: 10pt; margin-top: 5px; margin-bottom: 0;">NSS : 201196007002</p>
+      </div>
+    </div>
 
-    <div id="kopSurat">
+    <div class="row text-center" style="margin-top: -10px;">
+      <div class="col">
+        <hr style="border: 1px groove #000000;" />
+        <hr style="border: 2px groove #000000; margin-top: -12px;" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col text-center">
+        <div class="text-bold "
+          style="font-size: 14pt; text-decoration-line: underline; text-decoration-thickness: 2px;">SURAT KET.
+          PELANGGARAN</div>
+      </div>
+    </div>
+
+    <div class="row ml-4 mr-4">
+      <div class="col">
+        <div>Data Pelanggaran Siswa:</div>
+        <table cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="width: 150px; ">NISN</td>
+            <td style="width: 20px; text-align: center; ">:</td>
+            <td>{{ siswa.user.username }}</td>
+          </tr>
+          <tr>
+            <td style="width: 150px; ">Nama Siswa</td>
+            <td style="width: 20px; text-align: center; ">:</td>
+            <td>{{ siswa.first_name.title() }}{{ siswa.last_name.title() }}</td>
+          </tr>
+          <tr>
+            <td style="width: 150px; ">Kelas</td>
+            <td style="width: 20px; text-align: center; ">:</td>
+            <td>{{ siswa.kelas.kelas }}</td>
+          </tr>
+          <tr>
+            <td style="width: 150px; ">Nama Orang Tua/Wali</td>
+            <td style="width: 20px; text-align: center; ">:</td>
+            <td>{{'-' if not siswa.nama_ortu_or_wali or siswa.nama_ortu_or_wali == '' else
+              siswa.nama_ortu_or_wali.title() }}
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 150px; ">Alamat</td>
+            <td style="width: 20px; text-align: center; ">:</td>
+            <td>{{'-' if not siswa.alamat or siswa.alamat == '' else siswa.alamat.title() }}</td>
+          </tr>
+          <tr>
+            <td style="width: 150px; ">No. Telp/HP</td>
+            <td style="width: 20px; text-align: center; ">:</td>
+            <td>{{'-' if not siswa.no_telp or siswa.no_telp == '' else siswa.no_telp}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="row ml-4 mr-4">
+      <div class="col">
+        <table class="table table-sm table-bordered w-100">
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 25px;">No.</th>
+              <th class="text-center">Jenis Pelanggaran</th>
+              <th class="text-center">Catatan</th>
+              <th class="text-center">Dilaporkan Pada</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for count, i in pelanggaran %}
+            <tr>
+              <td class="text-center">{{ loop.index }}.</td>
+              <td>{{ i.jenis_pelanggaran.jenis_pelanggaran.title() }}</td>
+              <td>{{ i.note.capitalize() }}</td>
+              <td>{{ i.tgl_report | format_indo }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- <div id="kopSurat">
         <div>
             <img src="{{ url_for('.static', filename='img/kota_makassar.png') }}" style="height: 100px; width: 100px;"
                 alt="">
@@ -60,7 +185,14 @@
 
     <div style="text-align: center; padding-right: 15px;">
         <p style="font-size: 18px; font-weight: 600; ">SURAT PELANGGARAN</p>
-    </div>
+    </div> -->
+
+  <!-- jQuery -->
+  <script src="{{ url_for('admin2.static', filename='plugins/jquery/jquery.min.js') }}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{ url_for('admin2.static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <!-- AdminLTE App -->
+  <script src="{{ url_for('admin2.static', filename='js/adminlte.min.js') }}"></script>
 
 </body>
 

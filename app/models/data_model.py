@@ -125,8 +125,10 @@ class PembinaanModel(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
     bina = sa.Column(sa.Integer)
     tgl_bina = sa.Column(sa.Date, nullable=False)
-    pelanggaran_id = sa.Column(sa.ForeignKey("data_pelanggaran.id"), nullable=False)
+    pelanggaran_id = sa.Column(sa.ForeignKey("data_pelanggaran.id", ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     pelanggaran = db.relationship("PelanggaranModel", back_populates="pembinaan")
+    siswa_id = db.Column(sa.ForeignKey('detail_siswa.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    siswa = db.relationship('SiswaModel', backref='pembinaan')
     # evaluasi = sa.Column(sa.Integer)
     # tgl_evaluasi = sa.Column(sa.Date, nullable=True)
     # status = sa.Column(sa.String(128))
@@ -135,12 +137,14 @@ class PembinaanModel(db.Model):
         self,
         bina: int,
         pelanggaran_id: int,
+        siswa_id: int
         # evaluasi: int,
         # status: str,
         # tgl_evaluasi: datetime,
     ) -> any:
-        self.pelanggaran_id = pelanggaran_id
         self.bina = bina
+        self.pelanggaran_id = pelanggaran_id
+        self.siswa_id = siswa_id
         self.tgl_bina = datetime.date(datetime.today())
         # self.evaluasi = evaluasi
         # self.status = status

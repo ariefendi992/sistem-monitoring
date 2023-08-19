@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laporan Pelanggaran</title>
+  <title>Surat Teguran</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet"
@@ -17,9 +17,19 @@
   <style>
     body {
       font-family: 'Times New Roman', Times, serif;
-      margin: 10px 30px;
+      margin: 16px 32px;
       font-size: 12pt;
 
+    }
+
+    p {
+      font-size: 16px;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
     }
 
     #kopSurat {
@@ -38,7 +48,7 @@
 
 <body>
   <div class="container">
-    <div class="row justify-content-between text-center">
+    <div class="row justify-content-between text-center ml-4 mr-4">
       <div class="col text-left">
         <img src="{{ url_for('.static', filename='img/kota_makassar.png') }}" style=" height: 100px; width: 100px;"
           alt="">
@@ -72,24 +82,26 @@
       </div>
     </div>
 
-    <div class="row text-center" style="margin-top: -10px;">
+    <div class="row text-center ml-4 mr-4" style="margin-top: -1rem;">
       <div class="col">
-        <hr style="border: 1px groove #000000;" />
-        <hr style="border: 2px groove #000000; margin-top: -12px;" />
+
+        <hr style="border: 1pt solid rgb(43, 40, 40) ; " />
+        <hr style="border: 2.25pt solid black; margin-top: -14px;" />
       </div>
     </div>
 
     <div class="row">
       <div class="col text-center">
-        <div class="text-bold "
-          style="font-size: 14pt; text-decoration-line: underline; text-decoration-thickness: 2px;">SURAT KET.
-          PELANGGARAN</div>
+        <p class="text-bold "
+          style="font-size: 14pt; text-decoration-line: underline; text-decoration-thickness: 2px; margin-bottom: 1rem; margin-top: 0.2rem;">
+          SURAT KET.
+          PELANGGARAN</p>
       </div>
     </div>
 
     <div class="row ml-4 mr-4">
       <div class="col">
-        <div>Data Pelanggaran Siswa:</div>
+        <p style="margin-bottom: 0.5rem;">Data Pelanggaran Siswa:</p>
         <table cellpadding="0" cellspacing="0">
           <tr>
             <td style="width: 150px; ">NISN</td>
@@ -127,7 +139,7 @@
       </div>
     </div>
 
-    <div class="row ml-4 mr-4">
+    <div class="row ml-4 mr-4" style="margin-top: 1rem;">
       <div class="col">
         <table class="table table-sm table-bordered w-100">
           <thead>
@@ -139,7 +151,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for count, i in pelanggaran %}
+            {% for i in pelanggaran %}
             <tr>
               <td class="text-center">{{ loop.index }}.</td>
               <td>{{ i.jenis_pelanggaran.jenis_pelanggaran.title() }}</td>
@@ -147,8 +159,74 @@
               <td>{{ i.tgl_report | format_indo }}</td>
             </tr>
             {% endfor %}
+            <tr>
+              <td colspan="2" class="text-center"><strong>Jumlah Pelanggaran</strong></td>
+              <td colspan="2" class="text-center"><strong> {{ pelanggaran.count()}} Pelanggaran</strong></td>
+            </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <div class="row mr-4 ml-4">
+      <div class="col">
+        <div style="text-align: justify;">
+          <p style="margin-bottom: 0.5rem;">Setelah Membaca dengan cermat tentang tata tertib yang berlaku di
+            <strong>SMP
+              NEGERI 2 MAKASSAR</strong>
+            dengan ini menyatakan:
+          </p>
+          <ol type="1">
+            <li>Saya memahami serta menerima sepenuhnya ketentuan tata tertib yang berlaku di <strong>SMP NEGERI 2
+                MAKASSAR</strong></li>
+            <li>Saya menaati dan melaksanakan tata tertib yang berlaku di <strong>SMP NEGERI 2 MAKASSAR</strong> dengan
+              sebaik-baiknnya dan
+              penuh tanggung jawab</li>
+            <li>Saya berjanji untuk menghormati dan menunjung tinggi peraturan dan tata tertib yang berlaku di
+              <strong>SMP NEGERI 2 MAKASSAR</strong> demi untuk menjaga kehormatan, nama baik sekolah dan untuk
+              kepentingan diri sendiri sebagai
+              siswa, dimana saya menuntut ilmu.
+            </li>
+            <li>Saya akan menghormati semua saran, teguran, maupun peringatan terhadap diri saya, baik yang berasal dari
+              guru, karyawan maupun dari pihak sekolah, baik lisan maupun tertulis.</li>
+          </ol>
+          <p>Demikian pernyataan ini saya buat dengan sebenar-benarnya. Semoga dapat dipergunakan sebagaimana mestinya.
+            Terimakasih.</p>
+        </div>
+      </div>
+    </div>
+    <div class=" row align-items-end ml-5 " style=" margin-top: 1rem;">
+      <div class="col ml-4">
+        <div class="row">
+          <div class="col">
+            <p style="line-height: 1.2rem;">Orang Tua/Wali <br></p>
+          </div>
+          <div class="col-md-6"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6" style="margin-top: 6rem;">
+            <p>{{'-' if not siswa.nama_ortu_or_wali or siswa.nama_ortu_or_wali == '' else
+              siswa.nama_ortu_or_wali.title() }}<br></p>
+          </div>
+          <div class="col-md-6"></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="row">
+          <div class="col-md-4"></div>
+          <div class="col text-center">
+            <p style="line-height: 1.2rem;">Makassar, {{ today | format_indo }} <br>Yang
+              membuat
+              pernyataan</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"></div>
+          <div class="col text-center" style="margin-top: 6rem;">
+            <p>{{ siswa.first_name.title()}} {{ siswa.last_name.title()}} <br></p>
+
+          </div>
+        </div>
       </div>
     </div>
 

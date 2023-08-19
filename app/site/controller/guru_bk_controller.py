@@ -273,9 +273,9 @@ def atur_pelanggaran():
             form = FormJenisPelanggaran(request.form)
 
             model = JenisPelanggaranModel2
-            print(str(request.url_rule))
-            print(url_for("guru_bk.atur_pelanggaran"))
-            print(str(request.url_rule) == str(url_for("guru_bk.atur_pelanggaran")))
+            # print(str(request.url_rule))
+            # print(url_for("guru_bk.atur_pelanggaran"))
+            # print(str(request.url_rule) == str(url_for("guru_bk.atur_pelanggaran")))
             data = model.fetchAll()
 
             return render_template(
@@ -548,42 +548,43 @@ def get_tata_tertib():
                 alfabet=alfabet,
                 enumerate=enumerate,
                 form=form,
+                request=request,
             )
         else:
             return abort(404)
     return "<h2>Masalah pada autentikasi</h2>"
 
-@guru_bk.route("/get-sub-1", methods=["GET", "POST"])
+@guru_bk.route("/get-single-tata-tertib", methods=["GET", "POST"])
 @login_required
 def get_one_tata_tertib():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
             form = FormTambahTTertib(request.form)
-            t_ = TataTertibModel.query
-            for i in t_.all():
-                form.pilihTTertib.choices.append((i.id, f"{i.id} - {i.tata_tertib}"))
-            id = request.args.get("id")
-            data = TataTertibModel.query.filter_by(id=id).first()
+            
+            id = request.args.get("tataTertib")
+            data = TataTertibModel.query.all()
+            
+            sql_update = TataTertibModel.query.filter_by(id=id).first()
+            
+            form.tataTertib.data = sql_update.tata_tertib
 
-            form.tataTertib.data = data.tata_tertib
+           
 
             if request.method == "POST" and form.validate_on_submit():
-                utama_id = form.pilihTTertib.data
-                t_tertib = form.tataTertib.data
-                data.utama_id = utama_id
-                data.tata_tertib = t_tertib
-
+                tata_tertib = form.tataTertib.data
+                sql_update.tata_tertib = tata_tertib
                 db.session.commit()
 
-                flash("Sub tata tertib 1 telah diperbaharui!", "success")
+                flash("Tata-Tertib telah diperbaharui!", "success")
 
                 return redirect(url_for("guru_bk.get_tata_tertib"))
 
             return render_template(
-                "guru_bk/modul/tata_tertib/sub_tata_tertib1/edit_tata_tertib.html",
+               "guru_bk/modul/tata_tertib/get_tata_tertib.html",
                 guru_bk=get_guru_bk(),
                 form=form,
                 data=data,
+                id=id
             )
         else:
             return abort(404)

@@ -13,7 +13,9 @@
       <div class="card-header">
         <h6>Form Tata-Tertib </h6>
       </div>
-      <form action="{{ url_for('.add_tata_tertib' ) }}" method="post">
+      <form
+        action="{{ url_for('.add_tata_tertib') if request.url_rul | string == url_for('.get_tata_tertib') else url_for('.get_one_tata_tertib', tataTertib=id)}}"
+        method="post">
         <div class="card-body">
           {{ form.csrf_token}}
           <div class="form-group">
@@ -60,7 +62,7 @@
                   title="Detail Tata Tertib">
                   <i class="fas fa-eye"></i>
                 </a>
-                <a href="{{ url_for('guru_bk.get_one_tata_tertib', id=i.id)}}"
+                <a href="{{ url_for('guru_bk.get_one_tata_tertib', tataTertib=i.id)}}"
                   class="ml-1 btn btn-outline-warning btn-xs" data-toggle="tooltip" data-placement="right"
                   title="Edit Tata Tertib">
                   <i class="fas fa-edit"></i>

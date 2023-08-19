@@ -100,7 +100,6 @@ class FormTambahTTertibUtama(FlaskForm):
 
 
 class FormTambahTTertib(FlaskForm):
-    pilihTTertib = SelectField(label="Pilih Tata Tertib", choices=[("", "- Pilih -")])
     tataTertib = TextAreaField(label="Tata tertib")
     submit = SubmitField(label="Submit")
 

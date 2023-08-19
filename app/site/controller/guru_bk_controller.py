@@ -935,13 +935,13 @@ def result_pelanggaran():
             )
 
             siswa = SiswaModel.query.filter_by(user_id=siswa_id).first()
+            today = datetime.date(datetime.today())
 
             result_pelanggaran = (
                 db.session.query(
-                    func.count(PelanggaranModel.siswa_id), PelanggaranModel
+                   PelanggaranModel
                 )
                 .filter_by(siswa_id=siswa_id)
-                .all()
             )
 
             
@@ -951,6 +951,7 @@ def result_pelanggaran():
                 siswa=siswa,
                 bina=count_pembinaan,
                 pelanggaran=result_pelanggaran,
+                today=today
             )
 
             response = make_response(rendered)

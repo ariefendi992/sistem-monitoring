@@ -4,7 +4,7 @@ import sqlalchemy.orm as sql
 from sqlalchemy.orm import backref
 from app.models.master_model import *
 from datetime import datetime
-from sqlalchemy import Integer, String, ForeignKey, Column, Text
+from sqlalchemy import Integer, String, ForeignKey, Column, Text, true
 from sqlalchemy.orm import relationship
 from app.models.user_details_model import GuruModel
 import typing as t
@@ -129,84 +129,36 @@ class PembinaanModel(db.Model):
     pelanggaran = db.relationship("PelanggaranModel", back_populates="pembinaan")
     siswa_id = db.Column(sa.ForeignKey('detail_siswa.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     siswa = db.relationship('SiswaModel', backref='pembinaan')
-    # evaluasi = sa.Column(sa.Integer)
-    # tgl_evaluasi = sa.Column(sa.Date, nullable=True)
-    # status = sa.Column(sa.String(128))
+
 
     def __init__(
         self,
         bina: int,
         pelanggaran_id: int,
         siswa_id: int
-        # evaluasi: int,
-        # status: str,
-        # tgl_evaluasi: datetime,
+
     ) -> any:
         self.bina = bina
         self.pelanggaran_id = pelanggaran_id
         self.siswa_id = siswa_id
         self.tgl_bina = datetime.date(datetime.today())
-        # self.evaluasi = evaluasi
-        # self.status = status
-        # self.tgl_evaluasi = tgl_evaluasi
+
 
     def __repr__(self):
-        # data = f"id : {self.id}, user_id : {self.user_id}, nama siswa : {self.siswa.first_name} {self.siswa.last_name}, \
-        #         binaan : {self.bina}, evaluasi : {self.evaluasi}"
+    
         data = f"id : {self.id}"
         return data
 
 
+
 class TataTertibModel(db.Model):
     __tablename__ = "data_tata_tertib"
-    id = Column(Integer, primary_key=True)
-    tata_tertib = Column(String(128))
-    sub1 = relationship("SubTataTertibModel1", backref="parent")
-
-    def __init__(self, tata_tertib: t.Optional[str] = None) -> str:
-        self.tata_tertib = tata_tertib
-
-    def __repr__(self) -> str:
-        return f"utama id : {self.id}"
-
-
-class SubTataTertibModel1(db.Model):
-    __tablename__ = "data_sub_tata_tertib1"
     id = db.Column(db.Integer, primary_key=True)
     tata_tertib = db.Column(db.String(255))
-    t_tertib_id = Column(ForeignKey("data_tata_tertib.id"))
-    sub = relationship("SubTataTertibModel2", backref="tataTertib")
-
-    def __init__(self, tata_tertib: str = None, t_tertib_id: int = None) -> str:
+    status = db.Column(db.String(16), nullable=True)
+   
+    def __init__(self, tata_tertib: str = None,) -> str:
         self.tata_tertib = tata_tertib
-        self.t_tertib_id = t_tertib_id
 
     def __repr__(self) -> str:
         return f"id : {self.id}"
-
-
-class SubTataTertibModel2(db.Model):
-    __tablename__ = "data_sub_tata_tertib2"
-    id = db.Column(db.Integer, primary_key=True)
-    sub1_id = db.Column(ForeignKey("data_sub_tata_tertib1.id"))
-    tata_tertib = db.Column(db.String(255))
-
-    # tata_tertib = db.relationship("TataTertibModel", back_populates="details")
-
-    def __init__(self, sub1_id: t.Optional[int] = None, tata_tertib: str = None) -> str:
-        self.sub1_id = sub1_id
-        self.tata_tertib = tata_tertib
-
-    def __repr__(self) -> str:
-        return f"Sub id : {id}"
-
-
-class TeksModel(db.Model):
-    __tablename__ = "data_teks"
-    id: int = Column(Integer, primary_key=True)
-    teks: str = Column(Text)
-    ket: str = Column(String(128))
-
-    def __init__(self, teks: str, ket: str) -> str:
-        self.teks = teks
-        self.ket = ket

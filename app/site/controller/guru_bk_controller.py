@@ -498,90 +498,19 @@ def detail_all_pelanggaran():
         return "<h2>Masalah pada autentikasi</h2>"
 
 
-@guru_bk.route("/add-pernyataan", methods=["POST", "GET"])
+
+
+@guru_bk.route("add-tata-tertib", methods=["GET", "POST"])
 @login_required
-def add_pernyataan():
-    if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            form = FormTambahPernyataan(request.form)
-
-            if request.method == "POST" and form.validate_on_submit():
-                pernyataan = form.pernyataan.data
-
-                data = TeksModel(teks=pernyataan, ket="bk")
-
-                db.session.add(data)
-                db.session.commit()
-
-                flash("Pernyataan BK telah ditambahkan!", "success")
-
-                return redirect(url_for("guru_bk.get_tata_tertib"))
-            else:
-                return render_template(
-                    "guru_bk/modul/tata_tertib/add_pernyataan.html",
-                    form=form,
-                    guru_bk=get_guru_bk(),
-                )
-
-        else:
-            return abort(404)
-    return "<h2>Masalah pada autentikasi</h2>"
-
-
-@guru_bk.get("/get-one-perynataan")
-@login_required
-def get_one_pernyataan():
-    if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            form = FormEditPernyataan()
-            ket = request.args.get("ket")
-            id = request.args.get("id")
-            data = TeksModel.query.filter_by(id=id, ket=ket).first()
-
-            form.pernyataan.data = data.teks
-
-            return render_template(
-                "guru_bk/modul/tata_tertib/edit_pernyataan.html",
-                form=form,
-                guru_bk=get_guru_bk(),
-                data=data,
-            )
-
-        else:
-            return abort(404)
-    return "<h2>Masalah pada autentikasi</h2>"
-
-
-@guru_bk.route("/update-pernyataan", methods=["GET", "POST"])
-@login_required
-def update_pernyataan():
-    if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            form = FormEditPernyataan(request.form)
-            id = request.args.get("id")
-            data = TeksModel.query.filter_by(id=id).first()
-
-            data.teks = form.pernyataan.data
-
-            db.session.commit()
-
-            flash("Pernyataan BK telah diperbaharui!", "success")
-
-            return redirect(url_for("guru_bk.get_tata_tertib"))
-        return abort(404)
-    return "<h2>Masalah pada autentikasi</h2>"
-
-
-@guru_bk.route("add-tata-tertib-utama", methods=["GET", "POST"])
-@login_required
-def add_tertib_utama():
+def add_tata_tertib():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
             form = FormTambahTTertibUtama(request.form)
 
             if request.method == "POST" and form.validate_on_submit():
                 t_tertib = form.tataTertib.data
-                data = TataTertibModel(tata_tertib=t_tertib)
+                
+                data = TataTertibModel(tata_tertib=" ".join(t_tertib.split()))
 
                 db.session.add(data)
                 db.session.commit()
@@ -590,10 +519,14 @@ def add_tertib_utama():
                 return redirect(url_for("guru_bk.get_tata_tertib"))
 
             return render_template(
-                "guru_bk/modul/tata_tertib/add_tata_tertib_utama.html",
+                "guru_bk/modul/tata_tertib/add_tata_tertib.html",
                 guru_bk=get_guru_bk(),
                 form=form,
             )
+        else:
+            abort(404)
+            
+    return 'Masalah pada autentikasi!'
 
 
 @guru_bk.route("/tata-tertib", methods=["GET", "POST"])
@@ -601,88 +534,36 @@ def add_tertib_utama():
 def get_tata_tertib():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
+            form = FormTambahTTertib()
             utama = TataTertibModel.query.all()
-            data = SubTataTertibModel1.query.all()
-            sub = SubTataTertibModel2.query.all()
-            pernyataan = TeksModel.query.filter_by(ket="bk").first()
+            data = TataTertibModel.query.all()
             alfabet = list(string.ascii_lowercase)
-            len_d = (
-                db.session.query(SubTataTertibModel1)
-                .filter(SubTataTertibModel1.t_tertib_id != 1)
-                .all()
-            )
-            list_d = list(range(1, len(len_d) + 1))
-            print(list_d)
-
+            
+    
             return render_template(
                 "guru_bk/modul/tata_tertib/get_tata_tertib.html",
                 guru_bk=get_guru_bk(),
                 data=data,
-                pernyataan=pernyataan,
-                sub=sub,
                 utama=utama,
                 alfabet=alfabet,
                 enumerate=enumerate,
-                num_d=list_d,
-                len_d=len_d,
+                form=form,
             )
         else:
             return abort(404)
     return "<h2>Masalah pada autentikasi</h2>"
 
-
-@guru_bk.route("/add-tata-tertib", methods=["POST", "GET"])
-@login_required
-def add_sub_tata_tertib1():
-    if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            data_t = TataTertibModel.query.all()
-            form = FormTambahTTertib(request.form)
-
-            for index, i in enumerate(data_t, start=1):
-                form.pilihTTertib.choices.append(
-                    (
-                        i.id,
-                        f"{index} - {truncate(i.tata_tertib, length=40, killwords=True)}",
-                    )
-                )
-
-            t_tertib = form.tataTertib.data
-            t_id = form.pilihTTertib.data
-
-            if request.method == "POST" and form.validate_on_submit():
-                data = SubTataTertibModel1(tata_tertib=t_tertib, t_tertib_id=t_id)
-
-                db.session.add(data)
-                db.session.commit()
-                flash(
-                    message="Sub tata tertib-1 telah ditambahkan.", category="success"
-                )
-                return redirect(url_for("guru_bk.get_tata_tertib"))
-
-            else:
-                return render_template(
-                    "guru_bk/modul/tata_tertib/sub_tata_tertib1/add_tata_tertib.html",
-                    guru_bk=get_guru_bk(),
-                    form=form,
-                )
-        else:
-            return abort(404)
-
-    return "<h2>Masalah pada autentikasi</h2>"
-
-
 @guru_bk.route("/get-sub-1", methods=["GET", "POST"])
 @login_required
-def get_one_sub1():
+def get_one_tata_tertib():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
-            form = FormEditTTertib(request.form)
+            form = FormTambahTTertib(request.form)
             t_ = TataTertibModel.query
             for i in t_.all():
                 form.pilihTTertib.choices.append((i.id, f"{i.id} - {i.tata_tertib}"))
             id = request.args.get("id")
-            data = SubTataTertibModel2.query.filter_by(id=id).first()
+            data = TataTertibModel.query.filter_by(id=id).first()
 
             form.tataTertib.data = data.tata_tertib
 
@@ -710,49 +591,92 @@ def get_one_sub1():
     return "<h2>Masalah pada autentikasi</h2>"
 
 
-@guru_bk.route("/add-sub-tata-tertib", methods=["GET", "POST"])
-@login_required
-def add_sub_ttertib2():
-    if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            form = FormTambahSubTTertib(request.form)
-            data_tertib = SubTataTertibModel1.query.all()
-            for i, item in enumerate(data_tertib, start=1):
-                form.pilihTTertib.choices.append(
-                    (
-                        item.id,
-                        truncate(
-                            s=f"{i}. {item.tata_tertib}",
-                            length=50,
-                            killwords=True,
-                        ),
-                    )
-                )
+# @guru_bk.route("/add-tata-tertib", methods=["POST", "GET"])
+# @login_required
+# def add_sub_tata_tertib1():
+#     if current_user.is_authenticated:
+#         if current_user.id == get_guru_bk().guru_id:
+#             data_t = TataTertibModel.query.all()
+#             form = FormTambahTTertib(request.form)
 
-            if request.method == "POST":
-                ttertib_id = form.pilihTTertib.data
-                s_ttertib = form.subTataTertib.data
+#             for index, i in enumerate(data_t, start=1):
+#                 form.pilihTTertib.choices.append(
+#                     (
+#                         i.id,
+#                         f"{index} - {truncate(i.tata_tertib, length=40, killwords=True)}",
+#                     )
+#                 )
 
-                data = SubTataTertibModel2(
-                    sub1_id=int(ttertib_id), tata_tertib=s_ttertib
-                )
+#             t_tertib = form.tataTertib.data
+#             t_id = form.pilihTTertib.data
 
-                db.session.add(data)
-                db.session.commit()
+#             if request.method == "POST" and form.validate_on_submit():
+#                 data = SubTataTertibModel1(tata_tertib=t_tertib, t_tertib_id=t_id)
 
-                flash(
-                    message="Sub tata tertib-2 telah ditambahkan!", category="success"
-                )
-                return redirect(url_for("guru_bk.get_tata_tertib"))
-            return render_template(
-                "guru_bk/modul/tata_tertib/sub_tata_tertib2/add_sub_tata_tertib.html",
-                guru_bk=get_guru_bk(),
-                form=form,
-            )
-        else:
-            return abort(404)
+#                 db.session.add(data)
+#                 db.session.commit()
+#                 flash(
+#                     message="Sub tata tertib-1 telah ditambahkan.", category="success"
+#                 )
+#                 return redirect(url_for("guru_bk.get_tata_tertib"))
 
-    return "<h2>Masalah pada autentikasi</h2>"
+#             else:
+#                 return render_template(
+#                     "guru_bk/modul/tata_tertib/sub_tata_tertib1/add_tata_tertib.html",
+#                     guru_bk=get_guru_bk(),
+#                     form=form,
+#                 )
+#         else:
+#             return abort(404)
+
+#     return "<h2>Masalah pada autentikasi</h2>"
+
+
+
+
+# @guru_bk.route("/add-sub-tata-tertib", methods=["GET", "POST"])
+# @login_required
+# def add_sub_ttertib2():
+#     if current_user.is_authenticated:
+#         if current_user.id == get_guru_bk().guru_id:
+#             form = FormTambahSubTTertib(request.form)
+#             data_tertib = SubTataTertibModel1.query.all()
+#             for i, item in enumerate(data_tertib, start=1):
+#                 form.pilihTTertib.choices.append(
+#                     (
+#                         item.id,
+#                         truncate(
+#                             s=f"{i}. {item.tata_tertib}",
+#                             length=50,
+#                             killwords=True,
+#                         ),
+#                     )
+#                 )
+
+#             if request.method == "POST":
+#                 ttertib_id = form.pilihTTertib.data
+#                 s_ttertib = form.subTataTertib.data
+
+#                 data = SubTataTertibModel2(
+#                     sub1_id=int(ttertib_id), tata_tertib=s_ttertib
+#                 )
+
+#                 db.session.add(data)
+#                 db.session.commit()
+
+#                 flash(
+#                     message="Sub tata tertib-2 telah ditambahkan!", category="success"
+#                 )
+#                 return redirect(url_for("guru_bk.get_tata_tertib"))
+#             return render_template(
+#                 "guru_bk/modul/tata_tertib/sub_tata_tertib2/add_sub_tata_tertib.html",
+#                 guru_bk=get_guru_bk(),
+#                 form=form,
+#             )
+#         else:
+#             return abort(404)
+
+#     return "<h2>Masalah pada autentikasi</h2>"
 
 
 @guru_bk.route("/laporan-kehadiran", methods=["GET", "POST"])

@@ -78,50 +78,70 @@
         </div>
       </div>
       <div class="card-body pt-2">
-        <div class="row">
-          <table class="table table-bordered table-striped table-sm display nowrap" style="width: 100%;">
-            <tr>
-              <th colspan="3"><i class="fas fa-user mr-1"></i>Data Siswa</th>
+        <table class="table table-bordered table-striped table-sm display nowrap" style="width: 100%;">
+          <tr>
+            <th colspan="3"><i class="fas fa-user mr-1"></i>Data Siswa</th>
+          </tr>
+          <tr>
+            <td style="width: 200px;">NISN</td>
+            <td style="width: 20px; text-align: center;">:</td>
+            <td>{{ form.siswa.data.user.username}}</td>
+          </tr>
+          <tr>
+            <td style="width: 200px;">Nama Siswa</td>
+            <td style="width: 20px; text-align: center;">:</td>
+            <td>{{ form.siswa.data.first_name.title()}} {{ form.siswa.data.last_name.title()}}</td>
+          </tr>
+          <tr>
+            <td style="width: 200px;">Jenis Kelamin</td>
+            <td style="width: 20px; text-align: center;">:</td>
+            <td>{{ form.siswa.data.gender.title()}}</td>
+          </tr>
+          <tr>
+            <td style="width: 200px;">Kelas - Nama Wali</td>
+            <td style="width: 20px; text-align: center;">:</td>
+            <td>{{ form.siswa.data.kelas.kelas}} - {{ wali.guru.first_name.title() }} {{ wali.guru.last_name.title()
+              }}</td>
+          </tr>
+          <tr>
+            <td style="width: 200px;">Alamat</td>
+            <td style="width: 20px; text-align: center;">:</td>
+            <td>{{'-' if not form.siswa.data.alamat else form.siswa.data.alamat.title() }}</td>
+          </tr>
+          <tr>
+            <td style="width: 200px;">Orang Tua/Wali</td>
+            <td style="width: 20px; text-align: center;">:</td>
+            <td>{{'-' if not form.siswa.data.nama_ortu_or_wali else form.siswa.data.nama_ortu_or_wali.title() }}
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 200px;">No. Telp/HP</td>
+            <td style="width: 20px; text-align: center;">:</td>
+            <td>{{'-' if not form.siswa.data.no_telp or form.siswa.data.no_telp == '' else form.siswa.data.no_telp
+              }}
+            </td>
+          </tr>
+        </table>
+        <table class="table table-bordered table-sm table-striped mt-3">
+          <thead>
+            <tr class="text-center align-items-center">
+              <th class="align-items-center">No.</th>
+              <th>Pelanggaran</th>
+              <th>Catatan</th>
+              <th>Dilaporkan Pada</th>
             </tr>
+          </thead>
+          <tbody>
+            {% for i in pelanggaran%}
             <tr>
-              <td style="width: 200px;">NISN</td>
-              <td style="width: 20px; text-align: center;">:</td>
-              <td>{{ form.siswa.data.user.username}}</td>
+              <td class="text-center align-items-center">{{loop.index}}.</td>
+              <td>{{i.jenis_pelanggaran.jenis_pelanggaran.title()}}</td>
+              <td>{{i.note.title()}}</td>
+              <td class="text-center">{{i.tgl_report | format_indo}}</td>
             </tr>
-            <tr>
-              <td style="width: 200px;">Nama Siswa</td>
-              <td style="width: 20px; text-align: center;">:</td>
-              <td>{{ form.siswa.data.first_name.title()}} {{ form.siswa.data.last_name.title()}}</td>
-            </tr>
-            <tr>
-              <td style="width: 200px;">Jenis Kelamin</td>
-              <td style="width: 20px; text-align: center;">:</td>
-              <td>{{ form.siswa.data.gender.title()}}</td>
-            </tr>
-            <tr>
-              <td style="width: 200px;">Kelas - Nama Wali</td>
-              <td style="width: 20px; text-align: center;">:</td>
-              <td>{{ form.siswa.data.kelas.kelas}} - {{ wali.guru.first_name.title() }} {{ wali.guru.last_name.title()
-                }}</td>
-            </tr>
-            <tr>
-              <td style="width: 200px;">Alamat</td>
-              <td style="width: 20px; text-align: center;">:</td>
-              <td>{{'-' if not form.siswa.data.alamat else form.siswa.data.alamat.title() }}</td>
-            </tr>
-            <tr>
-              <td style="width: 200px;">Orang Tua/Wali</td>
-              <td style="width: 20px; text-align: center;">:</td>
-              <td>{{'-' if not form.siswa.data.nama_ortu_or_wali else form.siswa.data.nama_ortu_or_wali.title() }}</td>
-            </tr>
-            <tr>
-              <td style="width: 200px;">No. Telp/HP</td>
-              <td style="width: 20px; text-align: center;">:</td>
-              <td>{{'-' if not form.siswa.data.no_telp or form.siswa.data.no_telp == '' else form.siswa.data.no_telp }}
-              </td>
-            </tr>
-          </table>
-        </div>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

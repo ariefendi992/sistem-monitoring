@@ -683,11 +683,14 @@ def laporan_pelanggaran():
                     siswa_id=form.siswa.data.user_id if form.siswa.data else None
                 )
                 # .group_by(PelanggaranModel.siswa_id)
-                .all()
             )
             sql_wali = WaliKelasModel.query.filter_by(
                 kelas_id=form.siswa.data.kelas_id if form.siswa.data else None
             ).first()
+
+            count_pembinaan = PembinaanModel.query.filter_by(
+                siswa_id=form.siswa.data.user_id if form.siswa.data else None
+            ).count()
 
             if form.validate_on_submit():
                 # print(form.kelas.data.id)
@@ -700,7 +703,9 @@ def laporan_pelanggaran():
                     "laporan/laporan_pelanggaran.html",
                     guru_bk=get_guru_bk(),
                     form=form,
-                    pelanggaran=sql_pelanggaran,
+                    pelanggaran=sql_pelanggaran.all(),
+                    count_pelanggaran=sql_pelanggaran.count(),
+                    count_pembinaan=count_pembinaan,
                     wali=sql_wali,
                 )
 
@@ -708,7 +713,9 @@ def laporan_pelanggaran():
                 "laporan/laporan_pelanggaran.html",
                 guru_bk=get_guru_bk(),
                 form=form,
-                pelanggaran=sql_pelanggaran,
+                pelanggaran=sql_pelanggaran.all(),
+                count_pelanggaran=sql_pelanggaran.count(),
+                count_pembinaan=count_pembinaan,
                 wali=sql_wali,
             )
 

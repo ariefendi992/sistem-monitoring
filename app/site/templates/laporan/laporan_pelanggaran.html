@@ -72,9 +72,11 @@
       <div class="card-header">
         <div class="row justify-content-between align-items-center">
           <h6 class="m-0 text-bold">Laporan Pelanggaran Siswa</h6>
+          {% if count_pembinaan >= 3 %}
           <a href="{{ url_for('.result_pelanggaran', siswa=form.siswa.data.user_id ) }}" target="_blank"
             class="btn btn-danger btn-sm"><i class="fas fa-file-pdf mr-1"></i>
             Cetak PDF</a>
+          {% endif %}
         </div>
       </div>
       <div class="card-body pt-2">
@@ -140,6 +142,15 @@
               <td class="text-center">{{i.tgl_report | format_indo}}</td>
             </tr>
             {% endfor %}
+            <tr>
+              <td class="text-bold" colspan="2">Total Pelanggaran</td>
+              <td class="text-bold text-center" colspan="2">{{ count_pelanggaran }}x Melanggar</td>
+            </tr>
+            <tr>
+              <td class="text-bold" colspan="2">Total Pembinaan</td>
+              <td class="text-bold text-center" colspan="2">{{ count_pembinaan }}{{'x' if count_pembinaan != 0 else ''}}
+                Pembinaan</td>
+            </tr>
           </tbody>
         </table>
       </div>

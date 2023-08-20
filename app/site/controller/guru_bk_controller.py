@@ -899,7 +899,7 @@ def result_pelanggaran():
             
 
             rendered = render_template(
-                "laporan/result_pelanggaran.html",
+                "laporan/result_pelanggaran2.html",
                 siswa=siswa,
                 bina=count_pembinaan,
                 pelanggaran=result_pelanggaran,

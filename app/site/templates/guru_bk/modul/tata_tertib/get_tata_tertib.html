@@ -14,7 +14,7 @@
         <h6>Form Tata-Tertib </h6>
       </div>
       <form
-        action="{{ url_for('.add_tata_tertib') if request.url_rul | string == url_for('.get_tata_tertib') else url_for('.get_one_tata_tertib', tataTertib=id)}}"
+        action="{{ url_for('.add_tata_tertib') if request.url_rule | string == url_for('.get_tata_tertib') else url_for('.get_one_tata_tertib', tataTertib=id)}}"
         method="post">
         <div class="card-body">
           {{ form.csrf_token}}
@@ -58,21 +58,24 @@
               <td class="text-center">{{loop.index}}.</td>
               <td>{{i.tata_tertib | title | truncate(67, False, '...',0)}}</td>
               <td class="text-center">
-                <a href="#" class="btn btn-outline-info btn-xs" data-toggle="tooltip" data-placement="left"
-                  title="Detail Tata Tertib">
+                <button class="btn btn-outline-info btn-xs" data-toggle="modal" data-placement="left"
+                  data-target="#modal-detail{{i.id}}" title="Detail Tata Tertib">
                   <i class="fas fa-eye"></i>
-                </a>
+                </button>
                 <a href="{{ url_for('guru_bk.get_one_tata_tertib', tataTertib=i.id)}}"
                   class="ml-1 btn btn-outline-warning btn-xs" data-toggle="tooltip" data-placement="right"
                   title="Edit Tata Tertib">
                   <i class="fas fa-edit"></i>
                 </a>
-                <a href="#" class="ml-1 btn btn-outline-danger btn-xs" data-toggle="tooltip" data-placement="left"
-                  title="Delete Tata Tertib">
+                <a href="#" class="ml-1 btn btn-outline-danger btn-xs" data-toggle="modal"
+                  data-target="#delete-{{i.id}}" data-placement="left" title="Delete Tata Tertib">
                   <i class="fas fa-trash"></i>
                 </a>
               </td>
             </tr>
+
+            {% include 'modal/guru_bk/detail_tata_tertib.html' %}
+            {% include 'modal/guru_bk/delete_tata_tertib.html' %}
             {% endfor %}
           </tbody>
         </table>

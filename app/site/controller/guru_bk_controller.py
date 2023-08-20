@@ -504,8 +504,10 @@ def detail_all_pelanggaran():
 @login_required
 def add_tata_tertib():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            form = FormTambahTTertibUtama(request.form)
+        if current_user.group == 'bk':
+            form = FormTambahTTertib(request.form)
+            
+            data = TataTertibModel.query.all()
 
             if request.method == "POST" and form.validate_on_submit():
                 t_tertib = form.tataTertib.data
@@ -517,11 +519,13 @@ def add_tata_tertib():
                 flash("Tata tertib telah ditambahkan!", "success")
 
                 return redirect(url_for("guru_bk.get_tata_tertib"))
+            # return redirect(url_for("guru_bk.get_tata_tertib", form=form))
 
             return render_template(
-                "guru_bk/modul/tata_tertib/add_tata_tertib.html",
+               "guru_bk/modul/tata_tertib/get_tata_tertib.html",
                 guru_bk=get_guru_bk(),
                 form=form,
+                data=data,
             )
         else:
             abort(404)
@@ -534,6 +538,7 @@ def add_tata_tertib():
 def get_tata_tertib():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
+            
             form = FormTambahTTertib()
             utama = TataTertibModel.query.all()
             data = TataTertibModel.query.all()
@@ -566,7 +571,9 @@ def get_one_tata_tertib():
             
             sql_update = TataTertibModel.query.filter_by(id=id).first()
             
-            form.tataTertib.data = sql_update.tata_tertib
+            if sql_update:
+                
+                form.tataTertib.data = sql_update.tata_tertib
 
            
 
@@ -592,6 +599,26 @@ def get_one_tata_tertib():
     return "<h2>Masalah pada autentikasi</h2>"
 
 
+@guru_bk.route('/tata-tertib/delete')
+@login_required
+def delete_tata_tertib():
+    if current_user.is_authenticated:
+        if current_user.group == 'bk':
+            tata_tertib_id = request.args.get('tata_tertib', type=int)
+            sql_data = TataTertibModel.query.filter_by(id=tata_tertib_id).first()
+            
+            if not sql_data:
+                flash('Data yang dimaksud tidak ditemuka.', 'error')
+            
+            db.session.delete(sql_data)
+            db.session.commit()
+            flash('Data telah dihapus dari database.', 'success')
+            redirect_ = redirect(url_for('.get_tata_tertib'))
+            response = make_response(redirect_)
+            return response
+        else:
+            abort(404)
+    return 'Terjadi masalah pada autentikasi.'
 # @guru_bk.route("/add-tata-tertib", methods=["POST", "GET"])
 # @login_required
 # def add_sub_tata_tertib1():

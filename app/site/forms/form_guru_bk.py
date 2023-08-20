@@ -3,7 +3,7 @@ from wtforms import StringField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import ValidationError, data_required
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms_sqlalchemy.orm import validators
-from app.models.data_model import JenisPelanggaranModel2
+from app.models.data_model import JenisPelanggaranModel2, TataTertibModel
 from app.models.user_details_model import GuruModel
 
 
@@ -90,27 +90,20 @@ class FormEditJenisPelanggaran(FlaskForm):
     #         raise ValidationError("*Silahkan input data dengan benar!")
 
 
-class FormTambahTTertibUtama(FlaskForm):
-    tataTertib = TextAreaField(label="Tata tertib")
-    submit = SubmitField(label="Submit")
-
-    def validate_tataTertib(self, field: str) -> str:
-        if field.data == "":
-            raise ValidationError("*Tata tertib tidak boleh kosong!")
-
-
 class FormTambahTTertib(FlaskForm):
     tataTertib = TextAreaField(label="Tata tertib")
     submit = SubmitField(label="Submit")
 
-    def validate_pilihTTertib(self, field: str) -> str:
-        if field.data == "":
-            raise ValidationError("*Pilih terlebih dahulu! form tidak boleh kosong!")
-
     def validate_tataTertib(self, field: str) -> str:
         if field.data == "":
-            raise ValidationError("*Tata tertib tidak boleh kosong!")
+            raise ValidationError("*Form tata-tertib wajib  diisi!")
 
+        data = TataTertibModel.query.filter_by(tata_tertib=field.data).first()
+        
+        if data:
+            raise ValidationError('*Data tata tertib sudah ada.')
+
+        
 
 class FormEditTTertib(FlaskForm):
     pilihTTertib = SelectField(label="Pilih Tata Tertib", choices=[("", "- Pilih -")])
@@ -126,40 +119,3 @@ class FormEditTTertib(FlaskForm):
             raise ValidationError("*Tata tertib tidak boleh kosong!")
 
 
-class FormTambahSubTTertib(FlaskForm):
-    pilihTTertib = SelectField(label="Pilih Tata Tertib", choices=[("", "- Pilih -")])
-    subTataTertib = TextAreaField(label="Sub tata tertib")
-    submit = SubmitField(label="Submit")
-
-    def validate_pilihTTertib(self, field: str) -> str:
-        if field.data == "":
-            raise ValidationError("*Tata tertib tidak boleh kosong!")
-
-    def validate_subTataTertib(self, field: str) -> str:
-        if field.data == "":
-            raise ValidationError("*Tata tertib tidak boleh kosong!")
-
-
-class FormTambahPernyataan(FlaskForm):
-    # style = {"style": "display: none;"}
-    pernyataan = TextAreaField(
-        label="Pernyataan",
-        # render_kw=style,
-    )
-    submit = SubmitField(label="Submit")
-
-    def validate_pernyataan(self, field):
-        if field.data == "":
-            raise ValidationError("*Tata tertib tidak boleh kosong!")
-
-
-class FormEditPernyataan(FlaskForm):
-    pernyataan = TextAreaField(label="Pernyataan")
-    submit = SubmitField(label="Submit")
-
-    def __init(self, pernyatan: TextAreaField = None) -> FlaskForm:
-        self.pernyataan = pernyatan
-
-    def validate_pernyataan(self, field):
-        if field.data == "":
-            raise ValidationError("*Tata tertib tidak boleh kosong!")

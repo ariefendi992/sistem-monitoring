@@ -74,8 +74,8 @@
           <h6 class="m-0 text-bold">Laporan Pelanggaran Siswa</h6>
           {% if count_pembinaan >= 3 %}
           <a href="{{ url_for('.result_pelanggaran', siswa=form.siswa.data.user_id ) }}" target="_blank"
-            class="btn btn-danger btn-sm"><i class="fas fa-file-pdf mr-1"></i>
-            Cetak PDF</a>
+            class="btn btn-danger btn-sm"><i class="fas fa-print mr-1"></i>
+            Cetak Surat Pernyataan</a>
           {% endif %}
         </div>
       </div>

@@ -45,68 +45,25 @@ def get_guru_bk() -> GuruBKModel:
 @login_required
 def index():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
+            count_siswa = SiswaModel.query.count()
+            count_siswa_melanggar = PelanggaranModel.query.group_by(
+                PelanggaranModel.siswa_id
+            ).count()
+            count_binaan = PembinaanModel.query.group_by(
+                PembinaanModel.siswa_id
+            ).count()
             response = make_response(
-                render_template("guru_bk/index_bk.html", guru_bk=get_guru_bk())
+                render_template(
+                    "guru_bk/index_bk.html",
+                    siswa=count_siswa,
+                    melanggar=count_siswa_melanggar,
+                    pembinaan=count_binaan,
+                )
             )
             return response
         else:
             return abort(404)
-
-
-# @guru_bk.route("data-pelanggaran", methods=["GET", "POST"])
-# @login_required
-# def data_pelanggar():
-#     if current_user.is_authenticated:
-#         if current_user.id == get_guru_bk().guru_id:
-#             # sql_pelanggar = (
-#             #     db.session.query(PelanggaranModel)
-#             #     .order_by(PelanggaranModel.id.desc())
-#             #     .all()
-#             # )
-#             sql_pelanggar = (
-#                 db.session.query(
-#                     PelanggaranModel,
-#                     func.sum(JenisPelanggaranModel.poin_pelanggaran),
-#                 )
-#                 .join(JenisPelanggaranModel)
-#                 .join(SiswaModel)
-#                 .filter(
-#                     or_(PelanggaranModel.status == None, PelanggaranModel.status == "")
-#                 )
-#                 .group_by(PelanggaranModel.siswa_id)
-#                 # .order_by(func.sum(JenisPelanggaranModel.poin_pelanggaran.desc))
-#                 .order_by(PelanggaranModel.id.desc())
-#                 # .limit(6)
-#             )
-#             # $terbanyak = mysqli_query($connect, "SELECT detail_poin.nis, SUM(pelanggaran.poin) AS poin, siswa.nama_siswa FROM detail_poin JOIN pelanggaran ON detail_poin.id_pelanggaran=pelanggaran.id_pelanggaran JOIN siswa ON detail_poin.nis=siswa.nis GROUP BY detail_poin.nis ORDER BY SUM(pelanggaran.poin) DESC LIMIT 6");
-
-#             sql_poin = (
-#                 db.session.query(
-#                     PelanggaranModel,
-#                     func.sum(JenisPelanggaranModel.poin_pelanggaran),
-#                 )
-#                 .join(JenisPelanggaranModel)
-#                 .join(SiswaModel)
-#                 .group_by(PelanggaranModel.siswa_id)
-#                 .order_by(func.sum(JenisPelanggaranModel.poin_pelanggaran.desc))
-#                 .limit(6)
-#             )
-
-#             response = make_response(
-#                 render_template(
-#                     "guru_bk/modul/pelanggaran/daftar-pelanggar.html",
-#                     guru_bk=get_guru_bk(),
-#                     sql_pelanggar=sql_pelanggar,
-#                     PelanggaranModel=PelanggaranModel,
-#                     db=db,
-#                     format=format_indo,
-#                     sql_poin=sql_poin,
-#                 )
-#             )
-#             return response
-#         else:
-#             return abort(404)
 
 
 @guru_bk.route("/data-pelanggaran", methods=methods)
@@ -271,13 +228,8 @@ def atur_pelanggaran():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
             form = FormJenisPelanggaran(request.form)
-
             model = JenisPelanggaranModel2
-            # print(str(request.url_rule))
-            # print(url_for("guru_bk.atur_pelanggaran"))
-            # print(str(request.url_rule) == str(url_for("guru_bk.atur_pelanggaran")))
             data = model.fetchAll()
-
             return render_template(
                 "guru_bk/modul/pelanggaran/atur_pelanggaran.html",
                 guru_bk=get_guru_bk(),
@@ -335,16 +287,12 @@ def get_one_jenis_pelanggaran():
             form.jenisPelanggaran.data = fetch_one.jenis_pelanggaran.title()
             form.status.data = "0" if fetch_one.status == "" else fetch_one.status
 
-            # print(f"{request.url_rule.rule}")
-
             if request.method == "POST" and form.validate_on_submit():
                 fetch_one.jenis_pelanggaran = request.form.get("jenisPelanggaran")
                 fetch_one.status = request.form.get("status")
 
                 db.session.commit()
-
                 flash("Jenis Pelanggaran telah diperbaharui!", "success")
-
                 return redirect(url_for("guru_bk.atur_pelanggaran"))
 
             return render_template(
@@ -366,6 +314,7 @@ def delete_jenis_pelanggaran():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
             id = request.args.get("id", type=int)
+
             model = JenisPelanggaranModel2
             query = model.fetchOne(id=id)
 
@@ -498,20 +447,18 @@ def detail_all_pelanggaran():
         return "<h2>Masalah pada autentikasi</h2>"
 
 
-
-
 @guru_bk.route("add-tata-tertib", methods=["GET", "POST"])
 @login_required
 def add_tata_tertib():
     if current_user.is_authenticated:
-        if current_user.group == 'bk':
+        if current_user.group == "bk":
             form = FormTambahTTertib(request.form)
-            
+
             data = TataTertibModel.query.all()
 
             if request.method == "POST" and form.validate_on_submit():
                 t_tertib = form.tataTertib.data
-                
+
                 data = TataTertibModel(tata_tertib=" ".join(t_tertib.split()))
 
                 db.session.add(data)
@@ -522,15 +469,15 @@ def add_tata_tertib():
             # return redirect(url_for("guru_bk.get_tata_tertib", form=form))
 
             return render_template(
-               "guru_bk/modul/tata_tertib/get_tata_tertib.html",
+                "guru_bk/modul/tata_tertib/get_tata_tertib.html",
                 guru_bk=get_guru_bk(),
                 form=form,
                 data=data,
             )
         else:
             abort(404)
-            
-    return 'Masalah pada autentikasi!'
+
+    return "Masalah pada autentikasi!"
 
 
 @guru_bk.route("/tata-tertib", methods=["GET", "POST"])
@@ -538,13 +485,11 @@ def add_tata_tertib():
 def get_tata_tertib():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
-            
             form = FormTambahTTertib()
             utama = TataTertibModel.query.all()
             data = TataTertibModel.query.all()
             alfabet = list(string.ascii_lowercase)
-            
-    
+
             return render_template(
                 "guru_bk/modul/tata_tertib/get_tata_tertib.html",
                 guru_bk=get_guru_bk(),
@@ -559,23 +504,21 @@ def get_tata_tertib():
             return abort(404)
     return "<h2>Masalah pada autentikasi</h2>"
 
+
 @guru_bk.route("/get-single-tata-tertib", methods=["GET", "POST"])
 @login_required
 def get_one_tata_tertib():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
             form = FormTambahTTertib(request.form)
-            
+
             id = request.args.get("tataTertib")
             data = TataTertibModel.query.all()
-            
-            sql_update = TataTertibModel.query.filter_by(id=id).first()
-            
-            if sql_update:
-                
-                form.tataTertib.data = sql_update.tata_tertib
 
-           
+            sql_update = TataTertibModel.query.filter_by(id=id).first()
+
+            if sql_update:
+                form.tataTertib.data = sql_update.tata_tertib
 
             if request.method == "POST" and form.validate_on_submit():
                 tata_tertib = form.tataTertib.data
@@ -587,11 +530,11 @@ def get_one_tata_tertib():
                 return redirect(url_for("guru_bk.get_tata_tertib"))
 
             return render_template(
-               "guru_bk/modul/tata_tertib/get_tata_tertib.html",
+                "guru_bk/modul/tata_tertib/get_tata_tertib.html",
                 guru_bk=get_guru_bk(),
                 form=form,
                 data=data,
-                id=id
+                id=id,
             )
         else:
             return abort(404)
@@ -599,112 +542,26 @@ def get_one_tata_tertib():
     return "<h2>Masalah pada autentikasi</h2>"
 
 
-@guru_bk.route('/tata-tertib/delete')
+@guru_bk.route("/tata-tertib/delete")
 @login_required
 def delete_tata_tertib():
     if current_user.is_authenticated:
-        if current_user.group == 'bk':
-            tata_tertib_id = request.args.get('tata_tertib', type=int)
+        if current_user.group == "bk":
+            tata_tertib_id = request.args.get("tata_tertib", type=int)
             sql_data = TataTertibModel.query.filter_by(id=tata_tertib_id).first()
-            
+
             if not sql_data:
-                flash('Data yang dimaksud tidak ditemuka.', 'error')
-            
+                flash("Data yang dimaksud tidak ditemuka.", "error")
+
             db.session.delete(sql_data)
             db.session.commit()
-            flash('Data telah dihapus dari database.', 'success')
-            redirect_ = redirect(url_for('.get_tata_tertib'))
+            flash("Data telah dihapus dari database.", "success")
+            redirect_ = redirect(url_for(".get_tata_tertib"))
             response = make_response(redirect_)
             return response
         else:
             abort(404)
-    return 'Terjadi masalah pada autentikasi.'
-# @guru_bk.route("/add-tata-tertib", methods=["POST", "GET"])
-# @login_required
-# def add_sub_tata_tertib1():
-#     if current_user.is_authenticated:
-#         if current_user.id == get_guru_bk().guru_id:
-#             data_t = TataTertibModel.query.all()
-#             form = FormTambahTTertib(request.form)
-
-#             for index, i in enumerate(data_t, start=1):
-#                 form.pilihTTertib.choices.append(
-#                     (
-#                         i.id,
-#                         f"{index} - {truncate(i.tata_tertib, length=40, killwords=True)}",
-#                     )
-#                 )
-
-#             t_tertib = form.tataTertib.data
-#             t_id = form.pilihTTertib.data
-
-#             if request.method == "POST" and form.validate_on_submit():
-#                 data = SubTataTertibModel1(tata_tertib=t_tertib, t_tertib_id=t_id)
-
-#                 db.session.add(data)
-#                 db.session.commit()
-#                 flash(
-#                     message="Sub tata tertib-1 telah ditambahkan.", category="success"
-#                 )
-#                 return redirect(url_for("guru_bk.get_tata_tertib"))
-
-#             else:
-#                 return render_template(
-#                     "guru_bk/modul/tata_tertib/sub_tata_tertib1/add_tata_tertib.html",
-#                     guru_bk=get_guru_bk(),
-#                     form=form,
-#                 )
-#         else:
-#             return abort(404)
-
-#     return "<h2>Masalah pada autentikasi</h2>"
-
-
-
-
-# @guru_bk.route("/add-sub-tata-tertib", methods=["GET", "POST"])
-# @login_required
-# def add_sub_ttertib2():
-#     if current_user.is_authenticated:
-#         if current_user.id == get_guru_bk().guru_id:
-#             form = FormTambahSubTTertib(request.form)
-#             data_tertib = SubTataTertibModel1.query.all()
-#             for i, item in enumerate(data_tertib, start=1):
-#                 form.pilihTTertib.choices.append(
-#                     (
-#                         item.id,
-#                         truncate(
-#                             s=f"{i}. {item.tata_tertib}",
-#                             length=50,
-#                             killwords=True,
-#                         ),
-#                     )
-#                 )
-
-#             if request.method == "POST":
-#                 ttertib_id = form.pilihTTertib.data
-#                 s_ttertib = form.subTataTertib.data
-
-#                 data = SubTataTertibModel2(
-#                     sub1_id=int(ttertib_id), tata_tertib=s_ttertib
-#                 )
-
-#                 db.session.add(data)
-#                 db.session.commit()
-
-#                 flash(
-#                     message="Sub tata tertib-2 telah ditambahkan!", category="success"
-#                 )
-#                 return redirect(url_for("guru_bk.get_tata_tertib"))
-#             return render_template(
-#                 "guru_bk/modul/tata_tertib/sub_tata_tertib2/add_sub_tata_tertib.html",
-#                 guru_bk=get_guru_bk(),
-#                 form=form,
-#             )
-#         else:
-#             return abort(404)
-
-#     return "<h2>Masalah pada autentikasi</h2>"
+    return "Terjadi masalah pada autentikasi."
 
 
 @guru_bk.route("/laporan-kehadiran", methods=["GET", "POST"])
@@ -889,21 +746,16 @@ def result_pelanggaran():
             siswa = SiswaModel.query.filter_by(user_id=siswa_id).first()
             today = datetime.date(datetime.today())
 
-            result_pelanggaran = (
-                db.session.query(
-                   PelanggaranModel
-                )
-                .filter_by(siswa_id=siswa_id)
+            result_pelanggaran = db.session.query(PelanggaranModel).filter_by(
+                siswa_id=siswa_id
             )
-
-            
 
             rendered = render_template(
                 "laporan/result_pelanggaran2.html",
                 siswa=siswa,
                 bina=count_pembinaan,
                 pelanggaran=result_pelanggaran,
-                today=today
+                today=today,
             )
 
             response = make_response(rendered)

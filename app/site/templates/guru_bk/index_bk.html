@@ -6,8 +6,75 @@
 {% block nama_user %}Selamat Datang, <strong>{{ session.first_name}} {{ session.last_name}} </strong> {% endblock %}
 {% block content %}
 <div class="row">
+  <div class="col">
+    <div class="callout callout-info">
+      <h5>
+        <i class="fas fa-info"></i>
+        Note:
+      </h5>
+      <p class="text-bold text-info">Jika Siswa dibina lebih dari 2X, maka akan diberikan Surat Teguran!</p>
+    </div>
+  </div>
+</div>
+<div class="row">
   <div class="col-md">
-    
+    <div class="card card-blue card-outline">
+      <!-- <div class="card-header">
+        <h6></h6>
+      </div> -->
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <div class="small-box bg-gradient-red">
+              <div class="inner">
+                <h3>{{siswa}}</h3>
+                <p class="mt-2">Siswa Aktif</p>
+              </div>
+              <div class="icon align-middle">
+                <i class="fas fa-users"></i>
+              </div>
+              <p></p>
+              {# <a href="{{ url_for('admin2.getSiswa') }}" class="small-box-footer">
+                "More Data"
+                <i class="fas fa-arrow-alt-circle-right"></i>
+              </a> #}
+            </div>
+          </div>
+          <div class="col">
+            <div class="small-box bg-gradient-cyan">
+              <div class="inner">
+                <h3>{{ melanggar }}</h3>
+                <p class="mt-2">Siswa Melanggar</p>
+              </div>
+              <div class="icon align-middle">
+                <i class="fas fa-users"></i>
+              </div>
+              <p></p>
+              <!-- <a href="{{ url_for('.fetch_data_pelanggaran') }}" class="small-box-footer">
+                "More Data"
+                <i class="fas fa-arrow-alt-circle-right"></i>
+              </a> -->
+            </div>
+          </div>
+          <div class="col">
+            <div class="small-box bg-gradient-fuchsia">
+              <div class="inner">
+                <h3>{{ pembinaan }}</h3>
+                <p class="mt-2">Pembinaan Siswa</p>
+              </div>
+              <div class="icon align-middle">
+                <i class="fas fa-users"></i>
+              </div>
+              <p></p>
+              <!-- <a href="{{ url_for('.fetch_data_pelanggaran') }}" class="small-box-footer">
+                "More Data"
+                <i class="fas fa-arrow-alt-circle-right"></i>
+              </a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="col-md-3">
     <div class="card card-primary card-outline">

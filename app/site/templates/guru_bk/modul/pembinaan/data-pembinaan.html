@@ -14,7 +14,7 @@
         <i class="fas fa-info"></i>
         <span>Note:</span>
       </h5>
-      <p class="text-bold text-blue">Jika telah melakukan Pembinaan terhadpa Siswa, Klik Tombol pada Kolom Aksi untuk
+      <p class="text-bold text-gray-dark">Jika telah melakukan Pembinaan terhadpa Siswa, Klik Tombol pada Kolom Aksi untuk
         meruba status.</p>
     </div>
   </div>
@@ -51,12 +51,13 @@
               </thead>
               <tbody>
                 {% for i, bina in data %}
-                <tr>
+                <tr class="align-items-center">
                   <td class="text-center ">{{ loop.index}}</td>
                   <td>{{ i.pelanggaran.siswa.first_name }} {{ i.pelanggaran.siswa.last_name }}</td>
                   <td class="text-center">{{ i.pelanggaran.siswa.kelas.kelas }}</td>
                   <td class="text-center"><a href="{{ url_for('.detail_all_pelanggaran', id=i.siswa_id ) }}"
-                      class="btn btn-sm btn-outline-danger border-0">Lihat
+                      class="btn btn-link btn-sm" data-toggle="tooltip" data-placement="top"
+                      title="Semua Pelanggaran">Lihat
                       Pelanggaran</a></td>
                   {#<td class="text-center">{{ i.pelanggaran.jenis_pelanggaran.jenis_pelanggaran}}</td>#}
                   <td class="text-center">{{ i.tgl_bina |format_indo }}</td>

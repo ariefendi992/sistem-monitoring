@@ -44,41 +44,53 @@
   </div>
 </div>
 <div class="row">
-  {% for item in riwayat %}
-  <div class="col-md-3">
-    <div class="card card-danger card-outline">
-      <div class="card-body box-profile">
-        <div class="row justify-content-between">
-          <p class="text-center text-danger mb-2 font-weight-bold">
-            Pelanggaran Ke-{{loop.index}}
-          </p>
-          <div class="row">
-            <a href="#" class="btn btn-sm btn-outline-warning border-0 " data-toggle="tooltip" data-placement="left"
-              title="Edit data?">
-              <i class="fas fa-edit"></i>
-            </a>
-            <a href="#" class="btn btn-sm btn-outline-danger border-0" data-toggle="tooltip" data-placement="right"
-              title="Delete data?">
-              <i class="fas fa-trash"></i>
-            </a>
+  <div class="col">
+    <div class="card card-outline card-red">
+      <div class="card-header">
+        <button class="btn btn-sm btn-info float-right" onclick="history.back()"><i
+            class="fas fa-arrow-left mr-1"></i>Kembali</button>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% for item in riwayat %}
+          <div class="col-md-3">
+            <div class="card card-danger card-outline">
+              <div class="card-body box-profile">
+                <div class="row justify-content-between">
+                  <p class="text-center text-danger mb-2 font-weight-bold">
+                    Pelanggaran Ke-{{loop.index}}
+                  </p>
+                  <div class="row">
+                    <a href="#" class="btn btn-sm btn-outline-warning border-0 " data-toggle="tooltip"
+                      data-placement="left" title="Edit data?">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-danger border-0" data-toggle="tooltip"
+                      data-placement="right" title="Delete data?">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </div>
+                <ul class="list-group list-group-unbordered">
+                  <li class="list-group-item">
+                    <b class="text-dark">Tgl</b>
+                    <a class="float-right">{{ format(item.tgl_report) }}</a>
+                  </li>
+                </ul>
+                <p class="text-bold text-dark mb-0">Keterangan :</p>
+                <div class="ml-1 mr-1">
+                  <p class="text-dark text-justify font-weight-normal mb-0">
+                    {{ item.jenis_pelanggaran.jenis_pelanggaran.capitalize() }}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <ul class="list-group list-group-unbordered">
-          <li class="list-group-item">
-            <b class="text-dark">Tgl</b>
-            <a class="float-right">{{ format(item.tgl_report) }}</a>
-          </li>
-        </ul>
-        <p class="text-bold text-dark mb-0">Keterangan :</p>
-        <div class="ml-1 mr-1">
-          <p class="text-dark text-justify font-weight-normal mb-0">
-            {{ item.jenis_pelanggaran.jenis_pelanggaran.capitalize() }}
-          </p>
+          {% endfor %}
         </div>
       </div>
     </div>
   </div>
-  {% endfor %}
 </div>
 {% endblock content %}
 {% block js %}

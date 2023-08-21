@@ -145,7 +145,7 @@
                     </a>
 
                     {% if countx >= 3 %}
-                    <a href="{{ url_for('guru_bk.add_proses_pembinaan', pel_id=id)}}"
+                    <a href="{{ url_for('guru_bk.add_proses_pembinaan', pelanggaran=id, siswa=i.siswa_id)}}"
                       class="btn btn-outline-danger btn-xs" data-toggle="tooltip" data-placement="left"
                       title="Lakukan Pembinaan">
                       <i class="fas fa-plus-circle"></i>

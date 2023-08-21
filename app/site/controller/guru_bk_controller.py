@@ -12,6 +12,7 @@ from flask import (
     make_response,
     url_for,
 )
+from pytz import utc
 from app.models.user_details_model import SiswaModel
 from flask_login import login_required, current_user
 from app.models.master_model import GuruBKModel
@@ -19,7 +20,7 @@ from app.models.data_model import *
 from app.site.forms.form_absen import FormSelectAbsensi
 from app.site.forms.form_guru_bk import *
 from sqlalchemy import func, or_, and_
-from app.lib.date_time import format_indo
+from app.lib.date_time import format_indo, utc_makassar
 from app.lib.filters import *
 from builtins import enumerate
 from app.site.forms.form_laporan import FormLaporanPelanggaran
@@ -328,7 +329,7 @@ def delete_jenis_pelanggaran():
     return "<h2>Masalah pada autentikasi</h2>"
 
 
-@guru_bk.route("/data-binaan", methods=["GET"])
+@guru_bk.route("/data-pembinaan", methods=["GET"])
 @login_required
 def data_pembinaan():
     if current_user.is_authenticated:
@@ -357,12 +358,14 @@ def data_pembinaan():
         return "<h2>Masalah pada autentikasi</h2>"
 
 
-@guru_bk.route("/add-pembinaan", methods=["POST", "GET"])
+@guru_bk.route("/data-pembinaan/add", methods=["POST", "GET"])
 @login_required
 def add_proses_pembinaan():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
-            pel_id = request.args.get("pel_id")
+            pel_id = request.args.get("pelanggaran")
+            siswa_id = request.args.get("siswa")
+            status = str(object="0")
 
             check_ = PembinaanModel.query.filter_by(pelanggaran_id=pel_id)
 
@@ -371,7 +374,9 @@ def add_proses_pembinaan():
 
             else:
                 bina = 1
-            payload = PembinaanModel(bina, pelanggaran_id=pel_id)
+            payload = PembinaanModel(
+                bina, pelanggaran_id=pel_id, siswa_id=siswa_id, status=status
+            )
             db.session.add(payload)
             db.session.commit()
 
@@ -385,6 +390,31 @@ def add_proses_pembinaan():
 
     else:
         return "Masalah pada autentikasi..."
+
+
+@guru_bk.route("/data-pembinaan/update-status", methods=["GET", "POST", "PUT"])
+@login_required
+def pembinaan_update_status():
+    if current_user.is_authenticated:
+        if current_user.group == "bk":
+            id = request.args.get("pembinaan", type=int)
+
+            sql = PembinaanModel.query.filter_by(id=id).first()
+
+            date_format = utc_makassar()
+            sql.status = "1"
+            sql.tgl_bina = date_format
+            db.session.commit()
+            flash("Siswa telah dibina.", "success")
+            direct = redirect(url_for(".data_pembinaan"))
+            response = make_response(direct)
+            return response
+
+        else:
+            abort(404)
+
+    else:
+        return "Terjadi masalah pada autentikasi."
 
 
 @guru_bk.route("/detail-pelanggaran")

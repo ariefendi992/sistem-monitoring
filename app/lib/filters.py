@@ -1,4 +1,6 @@
+from datetime import datetime
 import typing as t
+from click import DateTime
 from markupsafe import Markup
 import re
 
@@ -39,3 +41,13 @@ def safe(s: str) -> Markup:
 def remove_tag(s: str) -> str:
     clean = re.compile("<.*?>")
     return re.sub(clean, "", s)
+
+
+def from_db(date: datetime):
+    str_date = str(date)
+    # new_str = "/".join(str_date.split("-"))
+    new_str = (
+        f"{str_date.split('-')[0]}/{str_date.split('-')[1]}/{str_date.split('-')[2]}"
+    )
+
+    return new_str

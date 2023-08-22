@@ -45,8 +45,8 @@
 </div>
 <div class="row">
   <div class="col">
-    <div class="card card-outline card-red">
-      <div class="card-header">
+    <div class="card">
+      <div class="card-header pt-1 pb-2">
         <button class="btn btn-sm btn-info float-right" onclick="history.back()"><i
             class="fas fa-arrow-left mr-1"></i>Kembali</button>
       </div>
@@ -61,8 +61,8 @@
                     Pelanggaran Ke-{{loop.index}}
                   </p>
                   <div class="row">
-                    <a href="#" class="btn btn-sm btn-outline-warning border-0 " data-toggle="tooltip"
-                      data-placement="left" title="Edit data?">
+                    <a href="#edit-{{item.id}}" class="btn btn-sm btn-outline-warning border-0 " tooltip="true"
+                      data-toggle="modal" data-placement="left" title="Edit data?">
                       <i class="fas fa-edit"></i>
                     </a>
                     <a href="#" class="btn btn-sm btn-outline-danger border-0" data-toggle="tooltip"
@@ -73,19 +73,41 @@
                 </div>
                 <ul class="list-group list-group-unbordered">
                   <li class="list-group-item">
-                    <b class="text-dark">Tgl</b>
-                    <a class="float-right">{{ format(item.tgl_report) }}</a>
+                    <b class="text-dark">Tgl:</b>
+                    <p class="float-right m-0">{{ format(item.tgl_report) }}</p>
                   </li>
                 </ul>
-                <p class="text-bold text-dark mb-0">Keterangan :</p>
-                <div class="ml-1 mr-1">
-                  <p class="text-dark text-justify font-weight-normal mb-0">
-                    {{ item.jenis_pelanggaran.jenis_pelanggaran.capitalize() }}
-                  </p>
+
+                <div style="padding: 12px 0">
+                  <p class="text-bold text-dark m-0">Pelanggaran :</p>
+                  <div class="ml-1 mr-1">
+                    <p class="text-dark text-justify font-weight-normal mb-0">
+                      {{ item.jenis_pelanggaran.jenis_pelanggaran.capitalize() }}
+                    </p>
+                  </div>
                 </div>
+
+                <ul class="list-group list-group-unbordered">
+                  <li class="list-group-item">
+                    <p class="text-bold text-dark m-0">Catatan : {% if item.note | length >= 25 %}
+                      <span class="float-right"><a href="#detail-{{item.id}}" data-toggle="modal" tooltip="true"
+                          data-placement="left" title="Lihat Selengkapnya"><i class=" fas fa-eye"></i></a></span>
+                      {% endif %}
+                    </p>
+                    <div class="ml-1 mr-1">
+                      <p class="text-dark text-left font-weight-normal mb-0">
+                        {{ item.note | capitalize | truncate(20) }}
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+
               </div>
             </div>
           </div>
+
+          {% include 'modal/guru_bk/pelanggaran/detail_pelanggaran.html' %}
+          {% include 'modal/guru_bk/pelanggaran/edit_pelanggaran.html' %}
           {% endfor %}
         </div>
       </div>
@@ -97,6 +119,26 @@
 <script>
   $(function () {
     $('[data-toggle="tooltip"]').tooltip();
+    $('[tooltip=true]').tooltip()
+    '{% for i in riwayat %}'
+
+    $('#tgl-{{loop.index}}').daterangepicker({
+      singleDatePicker: true,
+      showDropdowns: true,
+      //timePicker: true,
+      //timePicker24Hour: true,
+      //timePickerSeconds: true,
+      // startDate: "2020-01-01 12:00:00",
+      //startDate: moment().startOf('hour:minute:second'),
+      locale: {
+        format: 'YYYY-MM-DD'
+      }
+    });
+    '{% endfor %}'
+
+
   });
+
+
 </script>
 {% endblock %}

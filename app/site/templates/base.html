@@ -36,6 +36,9 @@
   <link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/adminlte.min.css') }}" />
   <!-- favicon -->
   <link rel="icon" type="image/x-icon" href="{{ url_for('admin2.static', filename='img/icon/favicon.ico') }}" />
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{{ url_for('.static', filename='plugins/daterangepicker/daterangepicker.css') }}">
+
   {% endblock %}
   <!-- end block -->
 </head>
@@ -115,6 +118,8 @@
   <!-- Moment js -->
   <script src="{{ url_for('admin2.static', filename='plugins/moment/moment.min.js') }}"></script>
 
+  <!-- date-range-picker -->
+  <script src="{{ url_for('.static', filename='plugins/daterangepicker/daterangepicker.js') }}"></script>
   {% block js %}{% endblock js %}
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}

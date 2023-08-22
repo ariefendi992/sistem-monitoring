@@ -1,0 +1,67 @@
+<div class="modal fade" id="edit-{{item.id}}">
+  <div class="modal-dialog overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">.::Edit Pelanggaran::.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ url_for('.edit_pelanggaran', pelanggaran=item.id, siswa=item.siswa_id) }}" method="post">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nama Siswa:</label>
+            <input disabled class="form-control" type="text"
+              value="{{ item.siswa.first_name.title()}} {{item.siswa.last_name.title()}}">
+          </div>
+          <div class="form-group">
+            <label for="">Jenis Pelangaran:</label>
+            <select name="jenisPelanggaran" id="" class="custom-select form-control-border">
+              <option>- Pilih -</option>
+              {% for i in jp %}
+              <option value="{{i.id}}" {{'selected' if i.id==item.jenis_pelanggaran_id else None }}>
+                {{i.jenis_pelanggaran}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="">Tanggal Lapor:</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="far fa-calendar-alt"></i>
+                </span>
+              </div>
+              <input type="text" name="tgl" class="form-control float-right" id="tgl-{{loop.index}}"
+                value="{{ item.tgl_report | date_from_db}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="">Pelapor:</label>
+            <select name="pelapor" id="" class="custom-select form-control-border">
+              <option>- Pilih -</option>
+              {% for i in pelapor %}
+              <option value="{{i.user_id}}" {{'selected' if i.user_id==item.guru_id else None }}>
+                {{i.first_name.title()}} {{ i.last_name.title()}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="">Catatan:</label>
+            <textarea class="form-control" name="catatan" id="" cols="2" rows="2">{{item.note | title}}</textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer justify-content-end">
+          <button type="button" class="btn btn-warning btn-sm align-items-center" data-dismiss="modal"><i
+              class="fas fa-times mr-1"></i>
+            Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm align-items-center"> Submit <i
+              class="fas fa-arrow-right ml-1"></i></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

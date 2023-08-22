@@ -284,14 +284,20 @@ def edit_pelanggaran():
 def delete_data_pelanggaran():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
-            id = request.args.get("idx")
+            id = request.args.get("pelanggaran")
+            siswa_id = request.args.get("siswa", type=int)
             sql_pelanggaran = PelanggaranModel.query.filter_by(id=id).first()
 
+            sql_pembinaan = PembinaanModel.query.filter_by(pelanggaran_id=id).first()
+
+            db.session.delete(sql_pembinaan)
             db.session.delete(sql_pelanggaran)
             db.session.commit()
 
-            response = make_response(redirect(url_for("guru_bk.data_pelanggar")))
-            flash(f"Data Telah Di Hapus!", "error")
+            flash(f"Data Telah Di Hapus!", "success")
+            response = make_response(
+                redirect(url_for(".detail_all_pelanggaran", id=siswa_id))
+            )
             return response
         else:
             return abort(404)

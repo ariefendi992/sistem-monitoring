@@ -67,7 +67,10 @@ class PelanggaranModel(db.Model):
     note = sa.Column(sa.Text(), nullable=True)
     tgl_report = sa.Column(sa.Date, nullable=False)
     status = sa.Column(sa.String(128), nullable=True)
-    pembinaan = relationship("PembinaanModel", back_populates="pelanggaran")
+    # pembinaan = relationship(
+    #     "PembinaanModel",
+    #     back_populates="pelanggaran",
+    # )
 
     def __init__(
         self,
@@ -129,7 +132,10 @@ class PembinaanModel(db.Model):
         sa.ForeignKey("data_pelanggaran.id", ondelete="CASCADE", onupdate="CASCADE"),
         nullable=False,
     )
-    pelanggaran = db.relationship("PelanggaranModel", back_populates="pembinaan")
+    pelanggaran = db.relationship(
+        "PelanggaranModel",
+        backref="pembinaan",
+    )
     siswa_id = db.Column(
         sa.ForeignKey("detail_siswa.id", ondelete="CASCADE", onupdate="CASCADE"),
         nullable=False,

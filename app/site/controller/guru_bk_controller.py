@@ -87,11 +87,10 @@ def fetch_data_pelanggaran():
                     func.count(PelanggaranModel.jenis_pelanggaran_id)
                     # func.max(PelanggaranModel.status),
                     # func.max(PelanggaranModel.id),
-                ).group_by(PelanggaranModel.siswa_id)
+                )
+                .group_by(PelanggaranModel.siswa_id)
                 .order_by(PelanggaranModel.siswa_id.desc())
             )
-
-            data2 = db.session.query()
 
             return render_template(
                 "guru_bk/modul/pelanggaran/data-pelanggar.html",
@@ -412,11 +411,9 @@ def data_pembinaan():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
             data = (
-                db.session.query(PembinaanModel, func.max(PembinaanModel.bina))
-                .join(PelanggaranModel)
-                .filter(PembinaanModel.pelanggaran_id == PelanggaranModel.id)
-                .group_by(PelanggaranModel.siswa_id)
-                .order_by(PembinaanModel.bina.asc())
+                db.session.query(PembinaanModel)
+                .group_by(PembinaanModel.siswa_id)
+                .order_by(PembinaanModel.siswa_id.desc())
                 .all()
             )
             response = make_response(
@@ -448,6 +445,7 @@ def add_proses_pembinaan():
 
             if check.filter_by(pelanggaran_id=pel_id).first():
                 flash("Data siswa dengan pelanggaran tersebut telah dibina.", "error")
+                return redirect(url_for(".fetch_data_pelanggaran"))
             else:
                 if not check.filter_by(siswa_id=siswa_id).first():
                     bina = 1
@@ -456,21 +454,25 @@ def add_proses_pembinaan():
 
                 tgl_bina = datetime.date(datetime.today())
 
-                if check.filter_by(status="0").first():
+                if check.filter_by(status="0", siswa_id=siswa_id).first():
                     flash(
-                        "Ma'af selesaikan terlebih dahulu binaan sebelumnya!", "error"
+                        "Ma'af tidak bisa menambahkan data, selesaikan terlebih dahulu binaan sebelumnya!",
+                        "error",
                     )
 
-                payload = PembinaanModel(
-                    bina,
-                    pelanggaran_id=pel_id,
-                    siswa_id=siswa_id,
-                    status=status,
-                    tgl_bina=tgl_bina,
-                )
+                    return redirect(url_for(".fetch_data_pelanggaran"))
 
-                db.session.add(payload)
-                db.session.commit()
+                else:
+                    payload = PembinaanModel(
+                        bina,
+                        pelanggaran_id=pel_id,
+                        siswa_id=siswa_id,
+                        status=status,
+                        tgl_bina=tgl_bina,
+                    )
+
+                    db.session.add(payload)
+                    db.session.commit()
 
                 flash("Data pembinaan telah ditambahkan", "success")
             page = url_for("guru_bk.data_pembinaan")

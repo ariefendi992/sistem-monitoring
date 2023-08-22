@@ -51,7 +51,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for i, bina in data %}
+                {% for i in data %}
                 <tr class="align-items-center">
                   <td class="text-center ">{{ loop.index}}</td>
                   <td>{{ i.pelanggaran.siswa.first_name }} {{ i.pelanggaran.siswa.last_name }}</td>
@@ -61,7 +61,7 @@
                       title="Semua Pelanggaran">Lihat
                       Pelanggaran</a></td>
                   {#<td class="text-center">{{ i.pelanggaran.jenis_pelanggaran.jenis_pelanggaran}}</td>#}
-                  <td class="text-center">Ke-{{ bina}}</td>
+                  <td class="text-center">Ke-{{ i.bina}}</td>
                   <td class="text-center">{{ i.tgl_bina |format_indo }}</td>
                   <td class="text-center"> <span
                       class="badge {{'badge-warning' if i.status == '0' or i.status == None else 'badge-success'}}">{{

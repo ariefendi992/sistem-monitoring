@@ -14,7 +14,8 @@
         <i class="fas fa-info"></i>
         <span>Note:</span>
       </h5>
-      <p class="text-bold text-gray-dark">Jika telah melakukan Pembinaan terhadpa Siswa, Klik Tombol pada Kolom Aksi untuk
+      <p class="text-bold text-gray-dark">Jika telah melakukan Pembinaan terhadpa Siswa, Klik Tombol pada Kolom Aksi
+        untuk
         meruba status.</p>
     </div>
   </div>
@@ -60,8 +61,8 @@
                       title="Semua Pelanggaran">Lihat
                       Pelanggaran</a></td>
                   {#<td class="text-center">{{ i.pelanggaran.jenis_pelanggaran.jenis_pelanggaran}}</td>#}
-                  <td class="text-center">{{ i.tgl_bina |format_indo }}</td>
                   <td class="text-center">Ke-{{ bina}}</td>
+                  <td class="text-center">{{ i.tgl_bina |format_indo }}</td>
                   <td class="text-center"> <span
                       class="badge {{'badge-warning' if i.status == '0' or i.status == None else 'badge-success'}}">{{
                       'Proses' if i.status == '0' or i.status == None else 'Dibina'}}</span></td>

@@ -130,22 +130,21 @@
                 </tr>
               </thead>
               <tbody>
-                {% for i, countx, status, id in data %}
+                {% for i, countx in data %}
                 <tr>
                   <td class="text-center">{{ loop.index }}</td>
                   <td>{{ i.siswa.first_name | title }} {{ i.siswa.last_name | title }}</td>
                   <td class="text-center">{{ i.siswa.kelas.kelas }}</td>
                   <td>{{ i.jenis_pelanggaran.jenis_pelanggaran | truncate}}</td>
-                  <td>{{ 'Belum dibina' if status == None or status == '' else status }}</td>
+                  <td>{{ i.status }}</td>
                   <td class="text-justify">
                     <a href="{{ url_for('guru_bk.detail_all_pelanggaran', id=i.siswa_id) }}"
                       class="ml-1 btn btn-outline-info btn-xs" data-toggle="tooltip" data-placement="top"
                       title="Detail">
                       <i class="fas fa-eye"></i>
                     </a>
-
                     {% if countx >= 3 %}
-                    <a href="{{ url_for('guru_bk.add_proses_pembinaan', pelanggaran=id, siswa=i.siswa_id)}}"
+                    <a href="{{ url_for('guru_bk.add_proses_pembinaan', pelanggaran=i.id, siswa=i.siswa_id)}}"
                       class="btn btn-outline-danger btn-xs" data-toggle="tooltip" data-placement="left"
                       title="Lakukan Pembinaan">
                       <i class="fas fa-plus-circle"></i>

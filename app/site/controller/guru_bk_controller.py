@@ -442,7 +442,6 @@ def add_proses_pembinaan():
             pel_id = request.args.get("pelanggaran")
             siswa_id = request.args.get("siswa")
             status = str(object="0")
-
             check_ = PembinaanModel.query.filter_by(pelanggaran_id=pel_id)
 
             if check_.first() and check_.first().pelanggaran.siswa_id:
@@ -450,8 +449,13 @@ def add_proses_pembinaan():
 
             else:
                 bina = 1
+            tgl_bina = datetime.date(datetime.today())
             payload = PembinaanModel(
-                bina, pelanggaran_id=pel_id, siswa_id=siswa_id, status=status
+                bina,
+                pelanggaran_id=pel_id,
+                siswa_id=siswa_id,
+                status=status,
+                tgl_bina=tgl_bina,
             )
             db.session.add(payload)
             db.session.commit()

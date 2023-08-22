@@ -138,12 +138,18 @@ class PembinaanModel(db.Model):
     status = db.Column(db.String(2))
 
     def __init__(
-        self, bina: int, pelanggaran_id: int, siswa_id: int, status: str
-    ) -> any:
+        self,
+        bina: int,
+        pelanggaran_id: int,
+        siswa_id: int,
+        status: str,
+        tgl_bina: datetime,
+    ) -> str:
         self.bina = bina
         self.pelanggaran_id = pelanggaran_id
         self.siswa_id = siswa_id
         # self.tgl_bina = datetime.date(datetime.today())
+        self.tgl_bina = tgl_bina
         self.status = status
 
     def __repr__(self):

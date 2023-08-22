@@ -84,13 +84,14 @@ def fetch_data_pelanggaran():
             data = (
                 db.session.query(
                     PelanggaranModel,
-                    func.count(PelanggaranModel.jenis_pelanggaran_id),
-                    func.max(PelanggaranModel.status),
-                    func.max(PelanggaranModel.id),
-                )
-                .group_by(PelanggaranModel.siswa_id)
-                .order_by(PelanggaranModel.id.asc())
+                    func.count(PelanggaranModel.jenis_pelanggaran_id)
+                    # func.max(PelanggaranModel.status),
+                    # func.max(PelanggaranModel.id),
+                ).group_by(PelanggaranModel.siswa_id)
+                .order_by(PelanggaranModel.siswa_id.desc())
             )
+
+            data2 = db.session.query()
 
             return render_template(
                 "guru_bk/modul/pelanggaran/data-pelanggar.html",
@@ -442,25 +443,36 @@ def add_proses_pembinaan():
             pel_id = request.args.get("pelanggaran")
             siswa_id = request.args.get("siswa")
             status = str(object="0")
-            check_ = PembinaanModel.query.filter_by(pelanggaran_id=pel_id)
+            bina = int
+            check = PembinaanModel.query
 
-            if check_.first() and check_.first().pelanggaran.siswa_id:
-                bina = f"{check_.count() + 1}"
-
+            if check.filter_by(pelanggaran_id=pel_id).first():
+                flash("Data siswa dengan pelanggaran tersebut telah dibina.", "error")
             else:
-                bina = 1
-            tgl_bina = datetime.date(datetime.today())
-            payload = PembinaanModel(
-                bina,
-                pelanggaran_id=pel_id,
-                siswa_id=siswa_id,
-                status=status,
-                tgl_bina=tgl_bina,
-            )
-            db.session.add(payload)
-            db.session.commit()
+                if not check.filter_by(siswa_id=siswa_id).first():
+                    bina = 1
+                else:
+                    bina = check.filter_by(siswa_id=siswa_id).count() + 1
 
-            flash("Data pembinaan telah ditambahkan", "success")
+                tgl_bina = datetime.date(datetime.today())
+
+                if check.filter_by(status="0").first():
+                    flash(
+                        "Ma'af selesaikan terlebih dahulu binaan sebelumnya!", "error"
+                    )
+
+                payload = PembinaanModel(
+                    bina,
+                    pelanggaran_id=pel_id,
+                    siswa_id=siswa_id,
+                    status=status,
+                    tgl_bina=tgl_bina,
+                )
+
+                db.session.add(payload)
+                db.session.commit()
+
+                flash("Data pembinaan telah ditambahkan", "success")
             page = url_for("guru_bk.data_pembinaan")
 
             resp = make_response(redirect(page))

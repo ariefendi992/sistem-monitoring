@@ -1,5 +1,6 @@
 from calendar import monthrange
 import string
+import click
 from flask import (
     Blueprint,
     abort,
@@ -12,6 +13,7 @@ from flask import (
     make_response,
     url_for,
 )
+from jinja2 import TemplateNotFound
 from pytz import utc
 from app.models.user_details_model import SiswaModel
 from flask_login import login_required, current_user
@@ -31,10 +33,17 @@ guru_bk = Blueprint(
     static_folder="../static/",
     template_folder="../templates/",
     url_prefix="/guru-bk",
+    cli_group="bk",
 )
 
 
 methods = ["GET", "POST"]
+
+
+@guru_bk.cli.command("create")
+@click.argument("name")
+def create(name):
+    ...
 
 
 def get_guru_bk() -> GuruBKModel:
@@ -165,42 +174,109 @@ def add_data_pelanggar():
             return abort(404)
 
 
-@guru_bk.route("/data-pelanggaran/edit", methods=["GET", "POST"])
+@guru_bk.route("/detail-pelanggaran")
 @login_required
-def edit_data_pelanggaran():
+def detail_pelanggaran():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
-            form = FormEditPelanggar()
+            siswa_id = request.args.get("siswa")
+            pelanggaran_id = request.args.get("pelanggaran")
 
-            id = request.args.get("idx")
-            sql_pelanggaran = (
-                db.session.query(PelanggaranModel).filter_by(id=id).first()
+            identitas = PelanggaranModel.query.filter_by(siswa_id=siswa_id).first()
+            data = (
+                db.session.query(PelanggaranModel)
+                .filter(PelanggaranModel.siswa_id == siswa_id)
+                .filter(PelanggaranModel.jenis_pelanggaran_id == pelanggaran_id)
+                .all()
             )
-            sql_jenis = JenisPelanggaranModel2.query.filter_by(status="1").all()
-            form.siswa.data = f"{sql_pelanggaran.siswa.first_name.title()} {sql_pelanggaran.siswa.last_name.title()}"
-            form.keterangan.data = sql_pelanggaran.note
-            if request.method == "POST":
-                # siswa_id = request.form.get("siswa")
-                # jenis_pelanggaran_id = request.form.get("jenisPelanggaran")
-                note = request.form.get("keterangan")
 
-                # sql_pelanggaran.jenis_pelanggaran_id = jenis_pelanggaran_id
-                sql_pelanggaran.note = note
+            page = render_template(
+                "guru_bk/modul/pelanggaran/detail-pelanggaran.html",
+                guru_bk=get_guru_bk(),
+                data=data,
+                detail=identitas,
+                format=format_indo,
+            )
+            return page
+
+        else:
+            abort(404)
+    else:
+        return "Masalah pada autentikasi..."
+
+
+@guru_bk.get("/data-pelanggaran/detail-all")
+@login_required
+def detail_all_pelanggaran():
+    try:
+        if current_user.is_authenticated:
+            if current_user.id == get_guru_bk().guru_id:
+                id = request.args.get("id")
+
+                detail_data = PelanggaranModel.query.filter_by(siswa_id=id).first()
+                sql_jenisP = JenisPelanggaranModel2.query.all()
+                sql_pelapor = GuruModel.query.all()
+                riwayat_pelanggaran = (
+                    db.session.query(PelanggaranModel)
+                    .filter(PelanggaranModel.siswa_id == detail_data.siswa_id)
+                    .all()
+                )
+
+                return render_template(
+                    "guru_bk/modul/pelanggaran/detail-all-pelanggaran.html",
+                    detail=detail_data,
+                    riwayat=riwayat_pelanggaran,
+                    format=format_indo,
+                    guru_bk=get_guru_bk(),
+                    jp=sql_jenisP,
+                    pelapor=sql_pelapor,
+                )
+
+            else:
+                return abort(404)
+        else:
+            return "<h2>Masalah pada autentikasi</h2>"
+
+    except TemplateNotFound:
+        abort(404)
+
+
+@guru_bk.route("/data-pelanggaran/edit", methods=["GET", "POST"])
+@login_required
+def edit_pelanggaran():
+    if current_user.is_authenticated:
+        if current_user.group == "bk":
+            id = request.args.get("pelanggaran")
+            siswa_id = request.args.get("siswa")
+
+            jp = request.form.get("jenisPelanggaran")
+            tgl = request.form.get("tgl")
+            pelapor = request.form.get("pelapor")
+            note = request.form.get("catatan")
+
+            sql_update = PelanggaranModel.query.filter_by(id=id).first()
+
+            if request.method == "POST":
+                # print(jp)
+                # print(tgl)
+                # print(pelapor)
+                # print(note)
+                sql_update.jenis_pelanggaran_id = jp
+                sql_update.tgl_report = tgl
+                sql_update.guru_id = pelapor
+                sql_update.note = note.lower()
 
                 db.session.commit()
-                response = make_response(redirect(url_for("guru_bk.data_pelanggar")))
-                flash(f"Data Telah Di Perbaharui.", "info")
-                return response
 
-            return render_template(
-                "guru_bk/modul/pelanggaran/edit-pelanggar.html",
-                form=form,
-                guru_bk=get_guru_bk(),
-                sql_jenis=sql_jenis,
-                sql_pelanggaran=sql_pelanggaran,
-            )
+                flash("Data pelanggaran telah diperbaharui.", "success")
+                direct = redirect(url_for(".detail_all_pelanggaran", id=siswa_id))
+                response = make_response(direct)
+                return response
         else:
-            return abort(404)
+            abort(404)
+
+    else:
+        return "Terjadi masalah login akun."
 
 
 @guru_bk.route("/data-pelanggaran/delete", methods=["GET", "POST"])
@@ -415,66 +491,6 @@ def pembinaan_update_status():
 
     else:
         return "Terjadi masalah pada autentikasi."
-
-
-@guru_bk.route("/detail-pelanggaran")
-@login_required
-def detail_pelanggaran():
-    if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            siswa_id = request.args.get("siswa")
-            pelanggaran_id = request.args.get("pelanggaran")
-
-            identitas = PelanggaranModel.query.filter_by(siswa_id=siswa_id).first()
-            data = (
-                db.session.query(PelanggaranModel)
-                .filter(PelanggaranModel.siswa_id == siswa_id)
-                .filter(PelanggaranModel.jenis_pelanggaran_id == pelanggaran_id)
-                .all()
-            )
-
-            page = render_template(
-                "guru_bk/modul/pelanggaran/detail-pelanggaran.html",
-                guru_bk=get_guru_bk(),
-                data=data,
-                detail=identitas,
-                format=format_indo,
-            )
-            return page
-
-        else:
-            abort(404)
-    else:
-        return "Masalah pada autentikasi..."
-
-
-@guru_bk.get("/detail-all-data")
-@login_required
-def detail_all_pelanggaran():
-    if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            id = request.args.get("id")
-
-            detail_data = PelanggaranModel.query.filter_by(siswa_id=id).first()
-
-            riwayat_pelanggaran = (
-                db.session.query(PelanggaranModel)
-                .filter(PelanggaranModel.siswa_id == detail_data.siswa_id)
-                .all()
-            )
-
-            return render_template(
-                "guru_bk/modul/pelanggaran/detail-all-pelanggaran.html",
-                detail=detail_data,
-                riwayat=riwayat_pelanggaran,
-                format=format_indo,
-                guru_bk=get_guru_bk(),
-            )
-
-        else:
-            return abort(404)
-    else:
-        return "<h2>Masalah pada autentikasi</h2>"
 
 
 @guru_bk.route("add-tata-tertib", methods=["GET", "POST"])

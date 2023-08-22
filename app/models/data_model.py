@@ -79,7 +79,7 @@ class PelanggaranModel(db.Model):
     ):
         self.siswa_id = siswaId
         self.jenis_pelanggaran_id = jenisPelanggaran_id
-        self.pelapor = pelapor_id
+        self.guru_id = pelapor_id
         self.note = note
         self.tgl_report = datetime.date(datetime.today())
         self.status = status

@@ -1,8 +1,11 @@
+import calendar
 from datetime import datetime
 import typing as t
 from click import DateTime
 from markupsafe import Markup
 import re
+
+WEEKDAYSLIST = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
 
 
 def truncate(
@@ -51,3 +54,21 @@ def from_db(date: datetime):
     )
 
     return new_str
+
+
+def hari_sabtu(date: datetime):
+    week_day = calendar.weekday(date.year, date.month, date.day)
+
+    if week_day == 5:
+        return WEEKDAYSLIST[week_day]
+
+    return None
+
+
+def hari_minggu(date: datetime):
+    week_day = calendar.weekday(date.year, date.month, date.day)
+
+    if week_day == 6:
+        return WEEKDAYSLIST[week_day]
+
+    return None

@@ -59,10 +59,7 @@ class PelanggaranModel(db.Model):
     jenis_pelanggaran = sql.relationship(
         "JenisPelanggaranModel2", backref="jenisPelanggaran"
     )
-    # pelapor = sa.Column(sa.String(128), nullable=False)
-    guru_id = sa.Column(
-        sa.ForeignKey("detail_guru.id", ondelete="CASCADE", onupdate="CASCADE")
-    )
+    guru_id = sa.Column(sa.ForeignKey("detail_guru.user_id"))
     guru = relationship("GuruModel", backref="pelanggaran")
     note = sa.Column(sa.Text(), nullable=True)
     tgl_report = sa.Column(sa.Date, nullable=False)

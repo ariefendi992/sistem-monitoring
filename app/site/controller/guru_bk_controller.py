@@ -13,7 +13,7 @@ from flask import (
     make_response,
     url_for,
 )
-from jinja2 import TemplateNotFound
+from jinja2 import TemplateError, TemplateNotFound
 from pytz import utc
 from app.models.user_details_model import SiswaModel
 from flask_login import login_required, current_user
@@ -593,15 +593,6 @@ def get_one_tata_tertib():
             if sql_update:
                 form.tataTertib.data = sql_update.tata_tertib
 
-            if request.method == "POST" and form.validate_on_submit():
-                tata_tertib = form.tataTertib.data
-                sql_update.tata_tertib = tata_tertib
-                db.session.commit()
-
-                flash("Tata-Tertib telah diperbaharui!", "success")
-
-                return redirect(url_for("guru_bk.get_tata_tertib"))
-
             return render_template(
                 "guru_bk/modul/tata_tertib/get_tata_tertib.html",
                 guru_bk=get_guru_bk(),
@@ -613,6 +604,36 @@ def get_one_tata_tertib():
             return abort(404)
 
     return "<h2>Masalah pada autentikasi</h2>"
+
+
+@guru_bk.route("/tata-tertib/update", methods=methods)
+@login_required
+def update_tata_tertib():
+    try:
+        if current_user.is_authenticated:
+            if current_user.group == "bk":
+                id = request.args.get("tataTertib", type=int)
+                tata_tertib = request.form.get("tataTertib")
+                print(f"Tata Tertib == {tata_tertib}")
+                sql_update = TataTertibModel.query.filter_by(id=id).first()
+
+                if sql_update:
+                    sql_update.tata_tertib = tata_tertib
+                    db.session.commit()
+                    flash("Tata tertib telah diperbaharui.", "success")
+                else:
+                    flash("Terjadi kesalahan, tata tertib gagal diperbaharui.", "error")
+
+                direct = redirect(url_for(".get_tata_tertib"))
+                response = make_response(direct)
+
+                return response
+
+            else:
+                return abort(404)
+
+    except TemplateError:
+        return abort(401)
 
 
 @guru_bk.route("/tata-tertib/delete")

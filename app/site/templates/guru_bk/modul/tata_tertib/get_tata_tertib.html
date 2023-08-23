@@ -14,7 +14,7 @@
         <h6>Form Tata-Tertib </h6>
       </div>
       <form
-        action="{{ url_for('.add_tata_tertib') if request.url_rule | string == url_for('.get_tata_tertib') else url_for('.get_one_tata_tertib', tataTertib=id)}}"
+        action="{{ url_for('.add_tata_tertib') if request.url_rule | string == url_for('.get_tata_tertib') else url_for('.update_tata_tertib', tataTertib=id)}}"
         method="post">
         <div class="card-body">
           {{ form.csrf_token}}

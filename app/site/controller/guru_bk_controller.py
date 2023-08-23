@@ -391,20 +391,23 @@ def get_one_jenis_pelanggaran():
     return "<h2>Masalah pada autentikasi</h2>"
 
 
-@guru_bk.route("/data-pelanggaran/delete-jenis-pelanggaran")
+@guru_bk.route("/data-pelanggaran/delete-jenis-pelanggaran", methods=methods)
 @login_required
 def delete_jenis_pelanggaran():
     if current_user.is_authenticated:
         if current_user.id == get_guru_bk().guru_id:
-            id = request.args.get("id", type=int)
+            id = request.args.get("jp", type=int)
 
-            model = JenisPelanggaranModel2
-            query = model.fetchOne(id=id)
+            sql = JenisPelanggaranModel2.query.filter_by(id=id).first()
 
-            db.session.delete(query)
-            db.session.commit()
+            if not sql:
+                flash("Data tidak ditemukan. Status 404", "error")
+            else:
+                db.session.delete(sql)
+                db.session.commit()
 
-            flash("Jenis Pelanggaran telah dihapus!", "success")
+                flash("Jenis Pelanggaran telah dihapus!", "success")
+                return redirect(url_for("guru_bk.atur_pelanggaran"))
             return redirect(url_for("guru_bk.atur_pelanggaran"))
         else:
             abort(404)

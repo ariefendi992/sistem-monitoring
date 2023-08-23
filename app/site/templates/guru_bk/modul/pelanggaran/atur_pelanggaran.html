@@ -75,8 +75,8 @@
                   title="Edit JenisPelanggaran">
                   <i class="fas fa-edit"></i>
                 </a>
-                <a href="#" class="ml-1 btn btn-outline-danger btn-xs" data-toggle="tooltip" data-placement="left"
-                  title="Delete JenisPelanggaran">
+                <a href="{{ url_for('.delete_jenis_pelanggaran', jp=i.id) }}" class="ml-1 btn btn-outline-danger btn-xs"
+                  data-toggle="tooltip" data-placement="left" title="Delete JenisPelanggaran">
                   <i class="fas fa-trash"></i>
                 </a>
               </td>

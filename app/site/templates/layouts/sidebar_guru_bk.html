@@ -42,16 +42,16 @@
           </a>
         </li>#}
         <li class="nav-item">
+          <a href="{{ url_for('guru_bk.atur_pelanggaran')}}"
+            class="nav-link {{'active' if filename == 'atur' else ''}}"><i class="nav-icon fas fa-layer-group"></i>
+            <p>Jenis Pelanggaran</p>
+          </a>
+        </li>
+        <li class="nav-item">
           <a href="{{ url_for('guru_bk.fetch_data_pelanggaran') }}"
             class="nav-link {{ 'active' if filename=='daftar-pelanggar' or filename=='detail-pelanggaran' else '' }}">
             <i class="nav-icon fas fa-layer-group"></i>
             <p>Data Pelanggar</p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ url_for('guru_bk.atur_pelanggaran')}}"
-            class="nav-link {{'active' if filename == 'atur' else ''}}"><i class="nav-icon fas fa-layer-group"></i>
-            <p>Jenis Pelanggaran</p>
           </a>
         </li>
         <li class="nav-item">

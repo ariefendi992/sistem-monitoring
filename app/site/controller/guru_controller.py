@@ -141,7 +141,7 @@ def profile_guru():
         form.telp.data = guru.telp
         sqlToday = get_kelas_today()
         return render_template(
-            "guru/modul/akun/profile_guru.html",
+            "akun/profile_guru.html",
             sql=guru,
             form=form,
             sqlJadwal=mengajar,
@@ -210,7 +210,7 @@ def update_pswd():
 
                 return redirect(url_for("guru2.index"))
         return render_template(
-            "guru/modul/akun/update_password.html", form=form, wali_kelas=check_wali()
+            "akun/update_password.html", form=form, wali_kelas=check_wali()
         )
     else:
         return abort(404)

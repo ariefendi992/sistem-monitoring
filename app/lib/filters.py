@@ -56,19 +56,27 @@ def from_db(date: datetime):
     return new_str
 
 
-def hari_sabtu(date: datetime):
-    week_day = calendar.weekday(date.year, date.month, date.day)
+def hari_sabtu(date: datetime = None, year=None, month=None, day=None):
+    week_day = None
+    if not date:
+        week_day = calendar.weekday(int(year), int(month), int(day))
+    else:
+        week_day = calendar.weekday(date.year, date.month, date.day)
 
     if week_day == 5:
         return WEEKDAYSLIST[week_day]
 
-    return None
+    # return None
 
 
-def hari_minggu(date: datetime):
-    week_day = calendar.weekday(date.year, date.month, date.day)
+def hari_minggu(date: datetime = None, year=None, month=None, day=None):
+    week_day = None
+    if not date:
+        week_day = calendar.weekday(int(year), int(month), int(day))
+    else:
+        week_day = calendar.weekday(date.year, date.month, date.day)
 
     if week_day == 6:
         return WEEKDAYSLIST[week_day]
 
-    return None
+    # return None

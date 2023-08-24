@@ -138,11 +138,12 @@
                 {% for v in range(1, data.month_range + 1) %}
                 <td class="text-center">
                   {# {% set sql_ket = db.session.query(AbsensiModel)
-                    .filter(AbsensiModel.siswa_id==i.siswa_id)
-                    .filter(func.day(AbsensiModel.tgl_absen)==v)
-                    .filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month) %} #}
+                  .filter(AbsensiModel.siswa_id==i.siswa_id)
+                  .filter(func.day(AbsensiModel.tgl_absen)==v)
+                  .filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month) %} #}
                   {% for ket in sql_ket %}
-                  {% if ket.tgl_absen.day == v and ket.siswa_id==i.siswa_id and ket.tgl_absen.year == i.tgl_absen.year %}
+                  {% if ket.tgl_absen.day == v and ket.siswa_id==i.siswa_id and ket.tgl_absen.year == i.tgl_absen.year
+                  %}
                   {# {{ ket.ket }} #}
                   {% if ket.ket == 'S' %}
                   <div style="color: #ffc107; font-weight: 600;">{{ ket.ket }}</div>
@@ -159,17 +160,23 @@
                 {% endfor %}
                 <td class="text-center">
                   <div style="color: #ffc107; font-weight: 600;">
-                    {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='S').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count() }}
+                    {{
+                    sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='S').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count()
+                    }}
                   </div>
                 </td>
                 <td class="text-center">
                   <div style="color: #007bff; font-weight: 600;">
-                    {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='I').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count() }}
+                    {{
+                    sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='I').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count()
+                    }}
                   </div>
                 </td>
                 <td class="text-center">
                   <div style="color: #dc3545; font-weight: 600;">
-                    {{ sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='A').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count() }}
+                    {{
+                    sql_ket.filter(AbsensiModel.siswa_id==i.siswa_id).filter(AbsensiModel.ket=='A').filter(func.month(AbsensiModel.tgl_absen)==i.tgl_absen.month).filter(func.year(AbsensiModel.tgl_absen)==i.tgl_absen.year).count()
+                    }}
                   </div>
                 </td>
               </tr>
@@ -230,7 +237,8 @@
               </td> #}
               <td style="padding-top: 85px;">
                 <div style="font-weight: 600; display: block;"><span
-                    style="padding-bottom: 2px; border-bottom: 1px solid #000; line-height: 25px;">{{ data.wali_kelas }}</span>
+                    style="padding-bottom: 2px; border-bottom: 1px solid #000; line-height: 25px;">{{ data.wali_kelas
+                    }}</span>
                 </div>
               </td>
               {# <td style="padding-top: 85px;">

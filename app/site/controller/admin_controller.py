@@ -1639,6 +1639,10 @@ class JadwalMengajara:
             kodeMengajar = "MPL-" + str(time.time()).rsplit(".", 1)[1]
             urlSemester = base_url + "api/v2/master/semester/get-all"
             respSemester = req.get(urlSemester)
+            ta = None
+            sms = None
+            ta_id = None
+            sms_id = None
             for i in respSemester.json()["data"]:
                 if i["status"] == True:
                     sms = i["semester"]

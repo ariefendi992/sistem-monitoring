@@ -217,7 +217,7 @@ class NamaBulanModel(db.Model):
         self.nama_bulan = bulan
 
     def __repr__(self) -> str:
-        return self.nama_bulan
+        return self.nama_bulan.title()
 
 
 class TahunModel(db.Model):

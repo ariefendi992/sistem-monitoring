@@ -1,6 +1,13 @@
 from flask_wtf import FlaskForm
+from sqlalchemy import func
 from wtforms import SelectField
-from wtforms.validators import ValidationError
+from wtforms.validators import ValidationError, DataRequired
+from wtforms_sqlalchemy.fields import QuerySelectField
+from app.lib.date_time import nama_bulan
+from app.models.data_model import AbsensiModel
+
+
+from app.models.master_model import KelasModel, NamaBulanModel
 
 
 class FormSelectKelas(FlaskForm):
@@ -58,3 +65,32 @@ class FormSelectMapel(FlaskForm):
     def validate_tahun(self, field):
         if field.data == "" or field.data == None:
             raise ValidationError(f"* Harap {field.label.text}!")
+
+
+class FormRekapAbsen(FlaskForm):
+    kelas = QuerySelectField(
+        "Kelas",
+        query_factory=lambda: KelasModel.query.all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        validators=[DataRequired(message="Pilihan tidak boleh kosong.")],
+    )
+
+    bulan = QuerySelectField(
+        "Nama Bulan",
+        query_factory=lambda: NamaBulanModel.query.all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        validators=[DataRequired(message="Pilihan tidak boleh kosong.")],
+    )
+
+    tahun = QuerySelectField(
+        "Tahun",
+        query_factory=lambda: AbsensiModel.query.group_by(
+            func.year(AbsensiModel.tgl_absen)
+        ).all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        get_label="tgl_absen.year",
+        validators=[DataRequired(message="Pilihan tidak boleh kosong.")],
+    )

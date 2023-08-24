@@ -4,7 +4,6 @@ import click
 from flask import (
     Blueprint,
     abort,
-    app,
     render_template,
     request,
     redirect,
@@ -14,18 +13,18 @@ from flask import (
     url_for,
 )
 from jinja2 import TemplateError, TemplateNotFound
-from pytz import utc
+from app.api.controller.master_controller import Kelas
 from app.models.user_details_model import SiswaModel
 from flask_login import login_required, current_user
 from app.models.master_model import GuruBKModel
 from app.models.data_model import *
-from app.site.forms.form_absen import FormSelectAbsensi
 from app.site.forms.form_guru_bk import *
-from sqlalchemy import func, or_, and_
+from sqlalchemy import func, and_
 from app.lib.date_time import format_indo, utc_makassar
 from app.lib.filters import *
 from builtins import enumerate
 from app.site.forms.form_laporan import FormLaporanPelanggaran
+from app.site.forms.form_letter_report import FormRekapAbsen
 
 guru_bk = Blueprint(
     "guru_bk",
@@ -662,93 +661,105 @@ def delete_tata_tertib():
 @login_required
 def laporan_kehadiran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
-            form = FormSelectAbsensi()
-            dt_kelas = KelasModel.query.all()
-            dt_bulan = NamaBulanModel.query.all()
-            dt_year = AbsensiModel.query.group_by(
-                func.year(AbsensiModel.tgl_absen)
-            ).all()
-
-            for i in dt_kelas:
-                form.kelas.choices.append((i.id, i.kelas))
-
-            for i in dt_bulan:
-                form.bulan.choices.append((i.id, i.nama_bulan.title()))
-
-            for i in dt_year:
-                form.tahun.choices.append((i.tgl_absen.year, i.tgl_absen.year))
+        if current_user.group == "bk":
+            form = FormRekapAbsen()
 
             if form.validate_on_submit():
-                kelas = request.form.get("kelas")
-                bulan = request.form.get("bulan")
-                tahun = request.form.get("tahun")
+                sql_wali = WaliKelasModel.query.filter_by(
+                    kelas_id=form.kelas.data.id
+                ).first()
 
-                dt_siswa = (
+                sql_absen = (
                     db.session.query(AbsensiModel)
                     .join(SiswaModel)
-                    .filter(AbsensiModel.siswa_id == SiswaModel.user_id)
-                    .filter(SiswaModel.kelas_id == kelas)
-                    .filter(func.month(AbsensiModel.tgl_absen) == bulan)
-                    .filter(func.year(AbsensiModel.tgl_absen) == tahun)
+                    .filter(
+                        and_(
+                            func.month(AbsensiModel.tgl_absen) == form.bulan.data.id,
+                            func.year(AbsensiModel.tgl_absen)
+                            == form.tahun.data.tgl_absen.year,
+                        )
+                    )
+                    .filter(SiswaModel.kelas_id == form.kelas.data.id)
                     .group_by(AbsensiModel.siswa_id)
                     .order_by(SiswaModel.first_name.asc())
                     .all()
                 )
 
-                if dt_siswa:
-                    dt_wali = WaliKelasModel.query.filter_by(kelas_id=kelas).first()
-                    dt_kepsek = KepsekModel.query.filter_by(status=1).first()
-                    dt_ket = db.session.query(AbsensiModel)
-                    month_range = monthrange(int(tahun), int(bulan))
+                sql_kepsek = KepsekModel.query.filter_by(status="1").first()
 
-                    data = {}
-                    data["bulan"] = (
-                        NamaBulanModel.query.filter_by(id=bulan).first().nama_bulan
-                    )
-                    data["kelas"] = KelasModel.query.filter_by(id=kelas).first().kelas
-                    data[
-                        "wali_kelas"
-                    ] = f"{dt_wali.guru.first_name} {dt_wali.guru.last_name}"
-                    data["nip_wali"] = dt_wali.guru.user.username
-                    data["semester"] = min(
-                        [i.mengajar.semester.semester for i in dt_siswa]
-                    )
-                    data["ta"] = min(
-                        [i.mengajar.tahun_ajaran.th_ajaran for i in dt_siswa]
-                    )
-                    data["month_range"] = month_range[1]
-                    data["today"] = datetime.date(datetime.today())
-                    data[
-                        "kepsek"
-                    ] = f"{dt_kepsek.guru.first_name} {dt_kepsek.guru.last_name}"
+                sql_ket = AbsensiModel.query
+                sql_siswa = SiswaModel.query
 
-                    data["nip_kepsek"] = dt_kepsek.guru.user.username
+                data_absen = []
+                data = dict()
+                if sql_absen:
+                    for i in sql_absen:
+                        data_absen.append(
+                            dict(
+                                id=i.id,
+                                nama=f"{i.siswa.first_name.title()} {i.siswa.last_name.title()}",
+                                semester=i.mengajar.semester.semester.upper(),
+                            )
+                        )
 
-                    return render_template(
-                        "admin/letter_report/result_rekap_bulan.html",
-                        AbsensiModel=AbsensiModel,
-                        sql_siswa=dt_siswa,
-                        data=data,
-                        db=db,
-                        func=func,
-                        sql_ket=dt_ket,
+                    month_range = monthrange(
+                        int(form.tahun.data.tgl_absen.year), int(form.bulan.data.id)
                     )
-
+                    data.update(
+                        kelas=form.kelas.data,
+                        bulan=form.bulan.data,
+                        intBulan=form.bulan.data.id,
+                        tahun=form.tahun.data.tgl_absen.year,
+                        wali=f"{sql_wali.guru.first_name.title()} {sql_wali.guru.last_name.title()}",
+                        nipWali=sql_wali.guru.user.username,
+                        semester=[i.mengajar.semester.semester for i in sql_absen][
+                            0
+                        ].upper(),
+                        tahunAjaran=[
+                            i.mengajar.tahun_ajaran.th_ajaran for i in sql_absen
+                        ][0],
+                        monthRange=month_range[1],
+                        today=datetime.date(datetime.today()),
+                        kepsek=f"{sql_kepsek.guru.first_name.title()} {sql_kepsek.guru.last_name.title()}",
+                        nipKepsek=sql_kepsek.guru.user.username,
+                        countSiswa=sql_siswa.filter_by(
+                            kelas_id=form.kelas.data.id
+                        ).count(),
+                        countSiswaL=sql_siswa.filter_by(
+                            kelas_id=form.kelas.data.id, gender="laki-laki"
+                        ).count(),
+                        countSiswaP=sql_siswa.filter_by(
+                            kelas_id=form.kelas.data.id, gender="perempuan"
+                        ).count(),
+                    )
                 else:
-                    flash("Data tidak ditemukan, harap periksa kembali!", "warning")
+                    flash("Data absensi siswa yang dimaksud tidak ditemukan.", "error")
                     response = make_response(
                         render_template(
-                            "admin/letter_report/rekap_bulan.html", form=form
+                            "laporan/form_rekap_absensi.html",
+                            form=form,
                         )
                     )
                     return response
 
+                render = render_template(
+                    "laporan/result_absensi.html",
+                    data=data,
+                    absen=sql_absen,
+                    ket=sql_ket,
+                    func=func,
+                    AM=AbsensiModel,
+                    and_=and_,
+                    sabtu=hari_sabtu,
+                    minggu=hari_minggu,
+                )
+                response = make_response(render)
+                return render
+
             response = make_response(
                 render_template(
-                    "admin/letter_report/rekap_bulan.html",
+                    "laporan/form_rekap_absensi.html",
                     form=form,
-                    guru_bk=get_guru_bk(),
                 )
             )
             return response

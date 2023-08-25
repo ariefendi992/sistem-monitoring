@@ -955,7 +955,9 @@ def password_bk():
     if current_user.is_authenticated:
         if current_user.group == "bk":
             form = FormUpdatePassword()
-            render = render_template("akun/update_password.html", form=form)
+            render = render_template(
+                "akun/update_password.html", form=form, request=request
+            )
             response = make_response(render)
             return response
         else:
@@ -975,7 +977,6 @@ def update_password():
 
             password = UserModel.generate_pswd(form.password.data)
             sql_update.password = password
-            
 
             db.session.commit()
             direct = redirect(url_for(".index"))

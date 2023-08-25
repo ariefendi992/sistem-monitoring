@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% set filename = 'beranda' %}
-{% block title_header %}E-Monitoring dan Absensi Siswa{% endblock  %}
+{% block title_header %}Sistem Monitoring Siswa{% endblock %}
 {% block title %}Beranda Staff{% endblock %}
-{% block nama_user %}Selamat Datang, <strong>{{ session.first_name}} {{ session.last_name}} </strong> {% endblock  %}
+{% block nama_user %}Selamat Datang, <strong>{{ session.first_name.title()}} {{ session.last_name.title()}} </strong> {%
+endblock %}
 {% block content %}
 <div class="row">
-  <div class="col-md-6">
+  <!-- <div class="col-md-3">
     <div class="card card-info card-outline h-100">
       <div class="card-body">
         <div class="text-center">
@@ -17,8 +18,27 @@
         </div>
       </div>
     </div>
+  </div> -->
+
+  <div class="col-md-3">
+    <div class="card card-primary card-outline">
+      <div class="card-body box-profile">
+        <div class="text-center">
+          <img class="profile-user-img img-fluid img-circle" src="{{ url_for('.static', filename='img/logo.png') }}"
+            alt="">
+        </div>
+        <h3 class="profile-username text-center">UPT SPF SMPN2 MAKASSAR</h3>
+        <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+
+        <p class="text-muted mb-0">Jl. Amanagappa, No. 4 No.4, Baru, Kec. Ujung Pandang,<br> Kota Makassar, Sulawesi
+          Selatan
+          90115</p>
+
+        <hr style="margin: 8px 0;">
+      </div>
+    </div>
   </div>
-  <div class="col-md-6">
+  <!-- <div class="col-md-6">
     <div class="card card-info card-outline">
       <div class="card-body">
         <ul class="nav nav-pills justify-content-center" id="pills-tab-with-icon" role="tablist">
@@ -56,6 +76,6 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>
 {% endblock %}

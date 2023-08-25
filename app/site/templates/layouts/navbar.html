@@ -19,7 +19,7 @@
     <li class="nav-item">
       <a href="#" class="nav-link" data-toggle="dropdown">
         <i class="fas fa-user-cog mr-1"></i>
-        {{ session.first_name }} {{ session.last_name}}
+        {{ session.first_name.title() }} {{ session.last_name.title()}}
         {% if current_user.group == 'admin' %}
         (ADMIN)
         {% elif current_user.group == 'bk' %}

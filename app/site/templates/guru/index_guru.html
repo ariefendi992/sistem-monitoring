@@ -38,44 +38,49 @@ endblock %}
       </div>
     </div>
   </div>
-  <!-- <div class="col-md-6">
-    <div class="card card-info card-outline">
+  <div class="col">
+    <div class="card card-primary card-outline">
       <div class="card-body">
-        <ul class="nav nav-pills justify-content-center" id="pills-tab-with-icon" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link btn btn-app" id="pills-home-tab-icon" data-toggle="tab" href="#pills-home-icon"
-              role="tab" aria-controls="pills-home-icon" aria-selected="true">
-              <i class="fas fa-clipboard-list"></i>
-              Absen
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link btn btn-app" id="pills-profile-tab-icon" data-toggle="tab" href="#pills-profile-icon"
-              role="tab" aria-controls="pills-profile-icon" aria-selected="false">
-              <i class="fas fa-list-alt"></i>
-              Rekap
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link btn btn-app" id="pills-contact-tab-icon" data-toggle="tab" href="#pills-contact-icon"
-              role="tab" aria-controls="pills-contact-icon" aria-selected="false">
-              <i class="fas fa-user-astronaut"></i>
-              About
-            </a>
-          </li>
-        </ul>
-        <div class="tab-content mt-2 mb-3" id="pills-with-icon-tabContent">
-          <div class="tab-pane fade" id="pills-contact-icon">
-            <p>
-              <hr>
-              Aplikasi Absensi siswa ini dibuat untuk mendokumentasikan kehadiran siswa, Aplikasi sangat Mudah
-              digunakan
-              (Berbasis Web)
-            </p>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="small-box bg-gradient-red">
+              <div class="inner">
+                <h3>{{ count_kelas}}</h3>
+                <p class="mt-2">Kelas Ajar</p>
+              </div>
+              <div class="icon align-middle">
+                <i class="fas fa-building"></i>
+              </div>
+
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="small-box bg-gradient-teal">
+              <div class="inner">
+                <h3>{{ count_today }}</h3>
+                <p class="mt-2">Jadwal Hari Ini</p>
+              </div>
+              <div class="icon align-middle">
+                <i class="fas fa-book"></i>
+              </div>
+
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="small-box bg-gradient-navy">
+              <div class="inner">
+                <h3>{{ count_besok }}</h3>
+                <p class="mt-2">Jadwal Besok</p>
+              </div>
+              <div class="icon align-middle">
+                <i class="fas fa-book-open"></i>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
 </div>
 {% endblock %}

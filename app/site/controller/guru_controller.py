@@ -25,6 +25,7 @@ from ...models.master_model import (
     HariModel,
     NamaBulanModel,
     SemesterModel,
+    TahunAjaranModel,
     WaliKelasModel,
 )
 from app.lib.date_time import format_indo, tomorrow_, today_
@@ -112,11 +113,46 @@ def index():
             )
             wali_kelas = check_wali()
 
+            get_one_semester = SemesterModel.query.filter_by(is_active="1").first()
+            get_one_tahun_ajaran = TahunAjaranModel.query.filter_by(
+                is_active="1"
+            ).first()
+
+            count_kelas_ajar = MengajarModel.query.filter_by(
+                guru_id=current_user.id,
+                semester_id=get_one_semester.id,
+                tahun_ajaran_id=get_one_tahun_ajaran.id,
+            ).count()
+
+            count_ajar_today = (
+                MengajarModel.query.filter_by(
+                    guru_id=current_user.id,
+                    semester_id=get_one_semester.id,
+                    tahun_ajaran_id=get_one_tahun_ajaran.id,
+                )
+                .join(HariModel)
+                .filter_by(hari=today_())
+                .count()
+            )
+            count_ajar_besok = (
+                MengajarModel.query.filter_by(
+                    guru_id=current_user.id,
+                    semester_id=get_one_semester.id,
+                    tahun_ajaran_id=get_one_tahun_ajaran.id,
+                )
+                .join(HariModel)
+                .filter_by(hari=tomorrow_())
+                .count()
+            )
+
             return render_template(
                 "guru/index_guru.html",
                 sqlJadwal=mengajar,
                 sqlToday=sqlToday,
                 wali_kelas=wali_kelas,
+                count_kelas=count_kelas_ajar,
+                count_today=count_ajar_today,
+                count_besok=count_ajar_besok,
             )
         else:
             abort(404)

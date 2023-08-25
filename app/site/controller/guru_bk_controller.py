@@ -18,6 +18,11 @@ from app.models.user_details_model import SiswaModel
 from flask_login import login_required, current_user
 from app.models.master_model import GuruBKModel
 from app.models.data_model import *
+from app.site.forms.form_guru import (
+    FormEditGuru,
+    FormGetProfileGuru,
+    FormUpdatePassword,
+)
 from app.site.forms.form_guru_bk import *
 from sqlalchemy import func, and_
 from app.lib.date_time import format_indo, utc_makassar
@@ -879,3 +884,106 @@ def result_pelanggaran():
             abort(404)
 
     return "Masalah pada autentikasi."
+
+
+@guru_bk.route("/akun/profil", methods=methods)
+@login_required
+def profil_bk():
+    if current_user.is_authenticated:
+        if current_user.group == "bk":
+            form = FormGetProfileGuru()
+
+            sql_one = GuruModel.query.filter_by(user_id=current_user.id).first()
+
+            form.nip.data = sql_one.user.username
+            form.fullname.data = (
+                f"{sql_one.first_name.title()} {sql_one.last_name.title()}"
+            )
+            form.gender.data = sql_one.gender
+            form.agama.data = sql_one.agama
+            form.alamat.data = sql_one.alamat.title() if sql_one.alamat else "-"
+            form.telp.data = sql_one.telp if sql_one.telp else "-"
+
+            render = render_template("akun/profile_guru.html", form=form)
+            response = make_response(render)
+            return response
+
+        else:
+            return abort(404)
+    return abort(401)
+
+
+@guru_bk.route("/akun/profil/update", methods=methods)
+@login_required
+def update_profil():
+    if current_user.is_authenticated:
+        if current_user.group == "bk":
+            form = FormGetProfileGuru()
+
+            sql_one = GuruModel.query.filter_by(user_id=current_user.id).first()
+            sql_one.user.username = form.nip.data
+            first_name = ""
+            last_name = ""
+            first_name, *last_name = form.fullname.data.split()
+            if len(last_name) == 0:
+                last_name = first_name
+            elif len(last_name) != 0:
+                last_name = " ".join(last_name)
+            sql_one.first_name = first_name
+            sql_one.last_name = last_name
+            sql_one.agama = form.agama.data
+            sql_one.gender = form.gender.data.lower()
+            sql_one.alamat = form.alamat.data
+            sql_one.telp = form.telp.data
+
+            db.session.commit()
+
+            direct = redirect(url_for(".index"))
+            response = make_response(direct)
+            flash("Data diri telah diperbaharui.", "success")
+
+            return response
+        else:
+            return abort(404)
+    else:
+        return abort(401)
+
+
+@guru_bk.route("/akun/kata-sandi", methods=methods)
+@login_required
+def password_bk():
+    if current_user.is_authenticated:
+        if current_user.group == "bk":
+            form = FormUpdatePassword()
+            render = render_template("akun/update_password.html", form=form)
+            response = make_response(render)
+            return response
+        else:
+            return abort(404)
+
+    return abort(401)
+
+
+@guru_bk.route("/akun/kata-sandi/update", methods=methods)
+@login_required
+def update_password():
+    if current_user.is_authenticated:
+        if current_user.group == "bk":
+            form = FormUpdatePassword()
+
+            sql_update = UserModel.query.filter_by(id=current_user.id).first()
+
+            password = UserModel.generate_pswd(form.password.data)
+            sql_update.password = password
+            
+
+            db.session.commit()
+            direct = redirect(url_for(".index"))
+            response = make_response(direct)
+
+            flash("Passsword telah diperbaharui.", "success")
+            return response
+        else:
+            return abort(404)
+
+    return abort(401)

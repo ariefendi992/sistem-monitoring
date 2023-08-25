@@ -67,12 +67,12 @@
 
         <!-- BK -->
         {% elif current_user.group == 'bk' %}
-        <a href="#" class="dropdown-item">
+        <a href="{{ url_for('guru_bk.profil_bk')}}" class="dropdown-item">
           <i class="fas fa-user-edit mr-1"></i>
           Ubah Data
         </a>
         <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item">
+        <a href="{{ url_for('.password_bk')}}" class="dropdown-item">
           <i class="fas fa-user-lock mr-1"></i>
           Ubah Password
         </a>

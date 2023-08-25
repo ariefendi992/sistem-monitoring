@@ -7,7 +7,9 @@
       <div class="card-header">
         <h3 class="card-title">Profil Guru</h3>
       </div>
-      <form id="myForm" action="{{url_for('guru2.update_profile', id=current_user.id)}}" method="post">
+      <form id="myForm"
+        action="{{url_for('guru2.update_profile', id=current_user.id)  if not url_for('.profil_bk') else url_for('.update_profil')}}"
+        method="post">
         <div class="card-body">
           <div class="row">
             <div class="col-sm-6">

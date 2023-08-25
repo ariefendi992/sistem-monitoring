@@ -8,7 +8,7 @@
         <h3 class="card-title">Profil Guru</h3>
       </div>
       <form id="myForm"
-        action="{{url_for('guru2.update_profile', id=current_user.id)  if url_for('guru_bk.profil_bk') != request.url_rule else url_for('guru_bk.update_profil')}}"
+        action="{{url_for('guru2.update_profile', id=current_user.id)  if url_for('guru_bk.profil_bk') | string != request.url_rule | string else url_for('guru_bk.update_profil')}}"
         method="post">
         <div class="card-body">
           <div class="row">

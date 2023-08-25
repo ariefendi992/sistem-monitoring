@@ -955,9 +955,7 @@ def password_bk():
     if current_user.is_authenticated:
         if current_user.group == "bk":
             form = FormUpdatePassword()
-            render = render_template(
-                "akun/update_password.html", form=form, request=request
-            )
+            render = render_template("akun/update_password.html", form=form)
             response = make_response(render)
             return response
         else:

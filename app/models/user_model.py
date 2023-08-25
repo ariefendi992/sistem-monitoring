@@ -1,7 +1,7 @@
 from app.extensions import db
 import sqlalchemy as sa
 from app.lib.date_time import utc_makassar
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from uuid import uuid4
@@ -31,6 +31,9 @@ class UserModel(db.Model, UserMixin):
 
     def check_pswd(*args, **kwargs):
         return check_password_hash(*args, **kwargs)
+    
+    def generate_pswd(password):
+        return generate_password_hash(password)
 
 
 class TokenBlockList(db.Model):

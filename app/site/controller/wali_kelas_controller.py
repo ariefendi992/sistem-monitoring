@@ -1,4 +1,5 @@
 from calendar import monthrange
+from crypt import methods
 from datetime import datetime
 from flask import (
     Flask,
@@ -12,7 +13,13 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy import func
-from app.models.data_model import AbsensiModel
+from app.lib.date_time import format_indo
+from app.models.data_model import (
+    AbsensiModel,
+    JenisPelanggaranModel2,
+    PelanggaranModel,
+    PembinaanModel,
+)
 from app.models.master_model import (
     KepsekModel,
     MapelModel,
@@ -20,7 +27,7 @@ from app.models.master_model import (
     NamaBulanModel,
     WaliKelasModel,
 )
-from app.models.user_details_model import SiswaModel
+from app.models.user_details_model import GuruModel, SiswaModel
 from app.site.forms.form_letter_report import FormRekapAbsenWali, FormSelectMapel
 from ...extensions import db
 
@@ -47,8 +54,36 @@ def sql_wali_():
 @wali_kelas.route("/index")
 @login_required
 def index():
+    count_siswa = SiswaModel.query.filter_by(kelas_id=sql_wali_().kelas_id).count()
+    count_laki2 = SiswaModel.query.filter_by(
+        kelas_id=sql_wali_().kelas_id, gender="laki-laki"
+    ).count()
+    count_perempuan = SiswaModel.query.filter_by(
+        kelas_id=sql_wali_().kelas_id, gender="perempuan"
+    ).count()
+
+    sql_pelanggaran = (
+        db.session.query(PelanggaranModel)
+        .join(SiswaModel)
+        .filter(SiswaModel.kelas_id == sql_wali_().kelas_id)
+        .group_by(PelanggaranModel.siswa_id)
+        .order_by(SiswaModel.first_name.asc())
+        .all()
+    )
+
+    data = dict(
+        laki2=count_laki2,
+        perempuan=count_perempuan,
+        siswa=count_siswa,
+    )
+
     return render_template(
-        "guru_wali_kelas/index_wali_kelas.html", sql_wali_=sql_wali_()
+        "guru_wali_kelas/index_wali_kelas.html",
+        sql_wali_=sql_wali_(),
+        data=data,
+        pelanggaran=sql_pelanggaran,
+        PM=PelanggaranModel.query,
+        BM=PembinaanModel.query,
     )
 
 
@@ -201,11 +236,13 @@ def rekap_absen_mapel():
                 data[
                     "guru"
                 ] = f"{i.mengajar.guru.first_name} {i.mengajar.guru.last_name}"
-            #########
-            data["today"] = datetime.date(datetime.today())
-            data["kepsek"] = f"{sql_kepsek.guru.first_name} {sql_kepsek.guru.last_name}"
-            data["nip_kepsek"] = sql_kepsek.guru.user.username
-            data["nip_guru"] = f"{i.mengajar.guru.user.username}"
+                #########
+                data["today"] = datetime.date(datetime.today())
+                data[
+                    "kepsek"
+                ] = f"{sql_kepsek.guru.first_name} {sql_kepsek.guru.last_name}"
+                data["nip_kepsek"] = sql_kepsek.guru.user.username
+                data["nip_guru"] = f"{i.mengajar.guru.user.username}"
 
             sql_tgl_absen = (
                 db.session.query(AbsensiModel)
@@ -242,4 +279,30 @@ def rekap_absen_mapel():
             form=form,
         )
     )
+    return response
+
+
+@wali_kelas.route("pelanggaran-siswa")
+@login_required
+def get_pelanggaran_siswa():
+    id = request.args.get("id")
+    detail_data = PelanggaranModel.query.filter_by(siswa_id=id).first()
+    sql_jenisP = JenisPelanggaranModel2.query.all()
+    sql_pelapor = GuruModel.query.all()
+    riwayat_pelanggaran = (
+        db.session.query(PelanggaranModel)
+        .filter(PelanggaranModel.siswa_id == detail_data.siswa_id)
+        .all()
+    )
+
+    render = render_template(
+        "guru_bk/modul/pelanggaran/detail-all-pelanggaran.html",
+        sql_wali_=sql_wali_(),
+        detail=detail_data,
+        riwayat=riwayat_pelanggaran,
+        format=format_indo,
+        jp=sql_jenisP,
+        pelapor=sql_pelapor,
+    )
+    response = make_response(render)
     return response

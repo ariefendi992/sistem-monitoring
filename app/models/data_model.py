@@ -85,7 +85,7 @@ class PelanggaranModel(db.Model):
         self.status = status
 
     def __repr__(self):
-        return self.pelapor
+        return f"{self.id}"
 
 
 class JenisPelanggaranModel2(db.Model):

@@ -21,12 +21,12 @@
         <!-- Add icons to the links using the .nav-icon class
               with font-awesome or any other icon font library -->
         <li class="nav-item">
-          <a href="{{url_for('wali_kelas.index')}}" class="nav-link {{ 'active' if filename=='index_wali' else None }}">
+          <a href="{{url_for('wali_kelas.index')}}"
+            class="nav-link {{ 'active' if filename=='index_wali' or name=='wali' else None }}">
             <i class="nav-icon fas fa-tachometer-alt"></i>
             <p>Beranda</p>
           </a>
         </li>
-        <li class="nav-header">Main Menu</li>
         <li class="nav-item">
           <a href="{{ url_for('wali_kelas.data_siswa') }}"
             class="nav-link {{ 'active' if filename=='data-siswa' else '' }}">

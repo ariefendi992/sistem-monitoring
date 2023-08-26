@@ -1,5 +1,4 @@
 from calendar import monthrange
-from crypt import methods
 from datetime import datetime
 from flask import (
     Flask,

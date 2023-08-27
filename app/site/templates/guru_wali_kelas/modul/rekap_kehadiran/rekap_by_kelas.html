@@ -5,11 +5,11 @@
 {% set filename='rekap-absen' %}
 {% block content %}
 <div class="row">
-  <div class="col col-md-4">
+  <div class="col col-md-6">
     <div class="card card-info card-outline">
-      <div class="card-body">
-        <form action="" method="post" target="_blank">
-          {{ form.csrf_token() }}
+      <form id="myForm" action="" method="post" target="_blank">
+        {{ form.csrf_token() }}
+        <div class="card-body">
           <div class="row">
             <div class="col col-md-12">
               <div class="row">
@@ -44,17 +44,16 @@
                   </div>
                 </div>
               </div>
-              <div class="row mt-2 mb-0">
-                <div class="col col-md-12">
-                  <div class="form-group">
-                    <input type="submit" class="btn btn-primary" value="Result Data">
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-        </form>
-      </div>
+        </div>
+        <div class="card-footer">
+          <div class="row float-right">
+            <input type="reset" class="btn btn-danger float-right mr-2" value="Reset">
+            <input type="submit" class="btn btn-primary float-right" value="Submit">
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -62,4 +61,30 @@
 {% block js %}
 <!-- bs-custom-file-input -->
 <script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var formElement = document.getElementById('myForm');
+
+    formElement.addEventListener('submit', function (event) {
+      var allSelectFilled = true;
+
+      var selectElements = formElement.querySelectorAll("select");
+      var selectID = formElement.querySelectorAll('#error')
+
+
+      for (var i = 0; i < selectElements.length; i++) {
+        var selectElement = selectElements[i];
+        var selectedValue = selectElement.value;
+
+        if (selectedValue !== "__None") {
+          formElement.target = "_blank";
+        } else {
+          formElement.removeAttribute("target");
+        }
+      }
+    });
+
+  });
+</script>
 {% endblock js %}

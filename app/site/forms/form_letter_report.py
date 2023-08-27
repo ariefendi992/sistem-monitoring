@@ -37,16 +37,33 @@ class FormSelectKehadiranSiswa(FlaskForm):
 
 
 class FormRekapAbsenWali(FlaskForm):
-    bulan = SelectField(label="*Pilih Bulan", choices=[("", "- Pilih -")])
-    tahun = SelectField(label="*Pilih Tahun", choices=[("", "- Pilih -")])
+    bulan = QuerySelectField(
+        "Bulan",
+        query_factory=lambda: NamaBulanModel.query.all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        validators=[DataRequired(message="* Pilihan tidak boleh kosong!")],
+    )
+    tahun = QuerySelectField(
+        "Tahun",
+        query_factory=lambda: AbsensiModel.query.group_by(
+            func.year(AbsensiModel.tgl_absen)
+        ).all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        get_label="tgl_absen.year",
+        validators=[DataRequired(message="* Pilihan tidak boleh kosong!")],
+    )
+    # bulan = SelectField(label="*Pilih Bulan", choices=[("", "- Pilih -")])
+    # tahun = SelectField(label="*Pilih Tahun", choices=[("", "- Pilih -")])
 
-    def validate_bulan(self, field):
-        if field.data == "":
-            raise ValidationError("* Harap Pilih Bulan!")
+    # def validate_bulan(self, field):
+    #     if field.data == "":
+    #         raise ValidationError("* Harap Pilih Bulan!")
 
-    def validate_tahun(self, field):
-        if field.data == "":
-            raise ValidationError("* Harap Pilih Tahun!")
+    # def validate_tahun(self, field):
+    #     if field.data == "":
+    #         raise ValidationError("* Harap Pilih Tahun!")
 
 
 class FormSelectMapel(FlaskForm):

@@ -135,6 +135,7 @@
                   width="20" style="padding: 2px; font-weight: 600; text-align: center; font-size: 14px;">{{ loop.index
                   }}</th>
                 {% endfor %}
+                <th class="text-center" width="20" style="color: #28a745;">H</th>
                 <th class="text-center" width="20" style="color: #ffc107;">S</th>
                 <th class="text-center" width="20" style="color: #007bff;">I</th>
                 <th class="text-center" width="20" style="color: #dc3545;">A</th>
@@ -174,22 +175,31 @@
                 </td>
                 {% endfor %}
                 <td class="text-center">
+                  <div style="color: #28a745; font-weight: 600;">
+                    {{ ket.filter(and_(AM.siswa_id==i.siswa_id, AM.ket=='H',
+                    func.month(AM.tgl_absen)==i.tgl_absen.month,
+                    func.year(AM.tgl_absen)==i.tgl_absen.year)).group_by(AM.tgl_absen).count()}}
+                  </div>
+                </td>
+                <td class="text-center">
                   <div style="color: #ffc107; font-weight: 600;">
-
                     {{ ket.filter(and_(AM.siswa_id==i.siswa_id, AM.ket=='S',
-                    func.month(AM.tgl_absen)==i.tgl_absen.month, func.year(AM.tgl_absen)==i.tgl_absen.year)).count()}}
+                    func.month(AM.tgl_absen)==i.tgl_absen.month,
+                    func.year(AM.tgl_absen)==i.tgl_absen.year)).group_by(AM.tgl_absen).count()}}
                   </div>
                 </td>
                 <td class="text-center">
                   <div style="color: #007bff; font-weight: 600;">
                     {{ ket.filter(and_(AM.siswa_id==i.siswa_id, AM.ket=='I',
-                    func.month(AM.tgl_absen)==i.tgl_absen.month, func.year(AM.tgl_absen)==i.tgl_absen.year)).count()}}
+                    func.month(AM.tgl_absen)==i.tgl_absen.month,
+                    func.year(AM.tgl_absen)==i.tgl_absen.year)).group_by(AM.tgl_absen).count()}}
                   </div>
                 </td>
                 <td class="text-center">
                   <div style="color: #dc3545; font-weight: 600;">
                     {{ ket.filter(and_(AM.siswa_id==i.siswa_id, AM.ket=='A',
-                    func.month(AM.tgl_absen)==i.tgl_absen.month, func.year(AM.tgl_absen)==i.tgl_absen.year)).count()}}
+                    func.month(AM.tgl_absen)==i.tgl_absen.month,
+                    func.year(AM.tgl_absen)==i.tgl_absen.year)).group_by(AM.tgl_absen).count()}}
                   </div>
                 </td>
               </tr>

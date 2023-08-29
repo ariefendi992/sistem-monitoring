@@ -33,7 +33,7 @@
                 <tr>
                   <td>Hari</td>
                   <td>:</td>
-                  <td>{{today | date_indo }}</td>
+                  <td>{{today | format_indo }}</td>
                 </tr>
                 <tr>
                   <td width="110">Mata Pelajaran</td>
@@ -48,7 +48,8 @@
               </table>
             </div>
             <div class="col-md-6">
-              {{form.today(class="form-control form-control-sm form-control-border text-bold", value=today, hidden=true )}}
+              {{form.today(class="form-control form-control-sm form-control-border text-bold", value=today, hidden=true
+              )}}
             </div>
           </div>
           <table id="tabel" class="table table-bordered table-striped table-sm table-responsive-sm">

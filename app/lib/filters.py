@@ -6,6 +6,42 @@ from markupsafe import Markup
 import re
 
 WEEKDAYSLIST = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+MONTHLISTSHORT = (
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des",
+)
+
+MONTHLIST = (
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+)
+
+
+def tgl_absen(datetime: datetime) -> datetime:
+    day = datetime.day
+    month = MONTHLISTSHORT[datetime.month - 1]
+    date = f"{day}-{month}"
+    return date
 
 
 def truncate(

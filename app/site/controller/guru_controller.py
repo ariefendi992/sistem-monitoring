@@ -464,7 +464,7 @@ def absensi(mengajar_id):
 
 @guru2.route("update-absensi/<int:mengajar_id>", methods=["GET", "POST"])
 @login_required
-async def update_absen(mengajar_id):
+def update_absen(mengajar_id):
     if current_user.group == "guru":
         data = {}
         """

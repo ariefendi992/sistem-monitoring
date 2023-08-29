@@ -15,126 +15,130 @@
   <div class="col-md-8">
     <div class="card card-blue">
       <div class="card-header">
-        <h3 class="card-title">Update Absensi Kelas: {{ data.kelas if data.kelas else '-' }}</h3>
+        <div class="row align-items-center justify-content-between">
+
+          <h3 class="card-title">Update Absensi Kelas: {{ data.kelas if data.kelas else '-' }}</h3>
+          <button class="btn btn-warning btn-sm" onclick="history.back()">
+            <i class="fas fa-undo"></i>
+            <span>Kembali</span>
+          </button>
+        </div>
       </div>
-      {% if not sql_absensi  %}
+      {% if not sql_absensi %}
       <div class="card-body">
         <p class="card-text text-center">Silahkan lakukan absensi untuk hari ini terlebih dahulu!</p>
       </div>
-      {# {% elif sql_absensi|length  < sql_siswa|length %}
-      <div class="card-body">
+      {# {% elif sql_absensi|length < sql_siswa|length %} <div class="card-body">
         <p class="card-text text-center">
           <span class="bg-danger p-1 rounded-bottom rounded-top">Absensi belum lengkap. Silahkan lakukan kembali
             absensi.!</span>
         </p>
-      </div> #}
-      {% else %}
-      <form action method="post">
-        <div class="card-body">
-          <div class="row mb-0 align-items-center">
-            <div class="col-md-6">
-              {# <h6 class="text-bold">Kelas : {{data.kelas}}</h6> #}
-              <h6 class="text-bold">Mapel : {{data.mapel}}</h6>
-            </div>
-            <div class="col-md-4">
-              {# {{form.pertemuan(value=data.pertemuan)}}
-                            <h6 class="text-bold">Pertemuan Ke : {{data.pertemuan}}</h6>
-                            <h6 class="text-bold ">Hari : {{today | date_indo }}</h6>
-                            {{form.today(class="form-control form-control-sm form-control-border text-bold", value=today, hidden=true )}} #}
-            </div>
+    </div> #}
+    {% else %}
+    <form action method="post">
+      <div class="card-body">
+        <div class="row mb-0 align-items-center">
+          <div class="col-md-6">
+            {# <h6 class="text-bold">Kelas : {{data.kelas}}</h6> #}
+            <h6 class="text-bold">Mapel : {{data.mapel}}</h6>
+
           </div>
-          <table id="tabel" class="table table-bordered table-striped table-sm table-responsive-sm">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nama Siswa</th>
-                <th class="text-center">Kehadiran</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for i in sql_absensi %}
-              <div class="from-group">
-                <input type="hidden" value="{{data.mengajar_id}}" name="mengajarId">
-                <input type="hidden" value="{{i.siswa_id}}" name="siswaID-{{loop.index}}">
-              </div>
-              <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ i.siswa.first_name | title }} {{ i.siswa.last_name | title }}</td>
-                <td class="text-center ">
-                  <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-outline-success rounded-circle btn-sm text-center mr-2">
-                      <input type="radio" name="ket-{{loop.index}}" value="H"
-                        {{'checked' if i.ket == 'H' else '' }}>&nbsp;H&nbsp;
-                    </label>
-                    <label class="btn btn-outline-warning rounded-circle btn-sm text-center mr-2">
-                      <input type="radio" name="ket-{{loop.index}}" value="S"
-                        {{'checked' if i.ket == 'S' else '' }}>&nbsp;S&nbsp;
-                    </label>
-                    <label class="btn btn-outline-info rounded-circle btn-sm text-center mr-2">
-                      <input type="radio" name="ket-{{loop.index}}" value="I"
-                        {{'checked' if i.ket == 'I' else '' }}>&nbsp;I&nbsp;
-                    </label>
-                    <label class="btn btn-outline-danger rounded-circle btn-sm text-center">
-                      <input type="radio" name="ket-{{loop.index}}" value="A"
-                        {{'checked' if i.ket == 'A' else '' }}>&nbsp;A&nbsp;
-                    </label>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          <div class="col-md-4">
+            {# {{form.pertemuan(value=data.pertemuan)}}
+            <h6 class="text-bold">Pertemuan Ke : {{data.pertemuan}}</h6>
+            <h6 class="text-bold ">Hari : {{today | date_indo }}</h6>
+            {{form.today(class="form-control form-control-sm form-control-border text-bold", value=today, hidden=true
+            )}} #}
+          </div>
+        </div>
+        <table id="tabel" class="table table-bordered table-striped table-sm table-responsive-sm">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama Siswa</th>
+              <th class="text-center">Kehadiran</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in sql_absensi %}
+            <div class="from-group">
+              <input type="hidden" value="{{data.mengajar_id}}" name="mengajarId">
+              <input type="hidden" value="{{i.siswa_id}}" name="siswaID-{{loop.index}}">
+            </div>
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ i.siswa.first_name | title }} {{ i.siswa.last_name | title }}</td>
+              <td class="text-center ">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label class="btn btn-outline-success rounded-circle btn-sm text-center mr-2">
+                    <input type="radio" name="ket-{{loop.index}}" value="H" {{'checked' if i.ket=='H' else ''
+                      }}>&nbsp;H&nbsp;
+                  </label>
+                  <label class="btn btn-outline-warning rounded-circle btn-sm text-center mr-2">
+                    <input type="radio" name="ket-{{loop.index}}" value="S" {{'checked' if i.ket=='S' else ''
+                      }}>&nbsp;S&nbsp;
+                  </label>
+                  <label class="btn btn-outline-info rounded-circle btn-sm text-center mr-2">
+                    <input type="radio" name="ket-{{loop.index}}" value="I" {{'checked' if i.ket=='I' else ''
+                      }}>&nbsp;I&nbsp;
+                  </label>
+                  <label class="btn btn-outline-danger rounded-circle btn-sm text-center">
+                    <input type="radio" name="ket-{{loop.index}}" value="A" {{'checked' if i.ket=='A' else ''
+                      }}>&nbsp;A&nbsp;
+                  </label>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+      <div class="card-footer ">
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary mr-2">
+            <i class="fas fa-check"></i>
+            <span>Update Absen</span>
+          </button>
 
         </div>
-        <div class="card-footer ">
-          <div class="d-flex justify-content-center">
-            <button type="submit" class="btn btn-primary mr-2">
-              <i class="fas fa-check"></i>
-              <span>Update Absen</span>
-            </button>
-            <button class="btn btn-warning" onclick="history.back()">
-              <i class="fas fa-edit"></i>
-              <span>Kembali</span>
-            </button>
-          </div>
-
-        </div>
-      </form>
-      {% endif %}
-    </div>
+      </div>
+    </form>
+    {% endif %}
   </div>
+</div>
 
-  {% endblock content %}
-  {% block js %}
-  <!-- DataTables  & Plugins -->
-  <script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
-  </script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
-  </script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
-  <script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-  <!-- Page specific script -->
-  <script>
-    $(function () {
-      $('#example1').DataTable({
-        "paging": true,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": true,
+{% endblock content %}
+{% block js %}
+<!-- DataTables  & Plugins -->
+<script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/dataTables.responsive.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}">
+</script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ url_for('.static', filename='plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+    $('#example1').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
 
-      });
     });
+  });
 
-    function ref() {
-      window.location = window.location;
-    }
-  </script>
-  {% endblock js %}
+  function ref() {
+    window.location = window.location;
+  }
+</script>
+{% endblock js %}

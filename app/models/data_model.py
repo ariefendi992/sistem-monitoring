@@ -20,13 +20,13 @@ class AbsensiModel(db.Model):
         ),
     )
     mengajar = sql.relationship(
-        "MengajarModel", backref=backref("mengajar_guru", cascade="all, delete-orphan")
+        "MengajarModel", backref=backref("absen", cascade="all, delete-orphan")
     )
     siswa_id = sa.Column(
         sa.Integer,
         sa.ForeignKey("detail_siswa.user_id", ondelete="CASCADE", onupdate="CASCADE"),
     )
-    siswa = sql.relationship("SiswaModel", backref="data_siswa")
+    siswa = sql.relationship("SiswaModel", backref="absen")
     tgl_absen = sa.Column(sa.Date)
     ket = sa.Column(sa.String(16), nullable=True)
     # pertemuan_ke = sa.Column(sa.String(2), nullable=True)

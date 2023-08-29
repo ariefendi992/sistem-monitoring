@@ -7,7 +7,7 @@ from app.lib.date_time import nama_bulan
 from app.models.data_model import AbsensiModel
 
 
-from app.models.master_model import KelasModel, NamaBulanModel
+from app.models.master_model import KelasModel, MapelModel, NamaBulanModel
 
 
 class FormSelectKelas(FlaskForm):
@@ -67,21 +67,47 @@ class FormRekapAbsenWali(FlaskForm):
 
 
 class FormSelectMapel(FlaskForm):
-    mapel = SelectField(label="Pilih Mata Pelajaran", choices=[("", "- Pilih -")])
-    bulan = SelectField(label="Pilih Bulan", choices=[("", "- Pilih -")])
-    tahun = SelectField(label="Pilih Tahun", choices=[("", "- Pilih -")])
+    mapel = QuerySelectField(
+        "Mata Pelajaran",
+        query_factory=lambda: MapelModel.query.all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        validators=[DataRequired(message="*Pilihan tidak boleh kosong!")],
+        get_label="mapel",
+    )
+    bulan = QuerySelectField(
+        "Bulan",
+        query_factory=lambda: NamaBulanModel.query.all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        validators=[DataRequired(message="* Pilihan tidak boleh kosong!")],
+    )
+    tahun = QuerySelectField(
+        "Tahun",
+        query_factory=lambda: AbsensiModel.query.group_by(
+            func.year(AbsensiModel.tgl_absen)
+        ).all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        get_label="tgl_absen.year",
+        validators=[DataRequired(message="* Pilihan tidak boleh kosong!")],
+    )
 
-    def validate_mapel(self, field):
-        if field.data == "" or field.data == None:
-            raise ValidationError(f"* Harap {field.label.text}!")
+    # mapel = SelectField(label="Pilih Mata Pelajaran", choices=[("", "- Pilih -")])
+    # bulan = SelectField(label="Pilih Bulan", choices=[("", "- Pilih -")])
+    # tahun = SelectField(label="Pilih Tahun", choices=[("", "- Pilih -")])
 
-    def validate_bulan(self, field):
-        if field.data == "" or field.data == None:
-            raise ValidationError(f"* Harap {field.label.text}!")
+    # def validate_mapel(self, field):
+    #     if field.data == "" or field.data == None:
+    #         raise ValidationError(f"* Harap {field.label.text}!")
 
-    def validate_tahun(self, field):
-        if field.data == "" or field.data == None:
-            raise ValidationError(f"* Harap {field.label.text}!")
+    # def validate_bulan(self, field):
+    #     if field.data == "" or field.data == None:
+    #         raise ValidationError(f"* Harap {field.label.text}!")
+
+    # def validate_tahun(self, field):
+    #     if field.data == "" or field.data == None:
+    #         raise ValidationError(f"* Harap {field.label.text}!")
 
 
 class FormRekapAbsen(FlaskForm):

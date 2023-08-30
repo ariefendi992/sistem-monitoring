@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super() }}
+<style>
+  #fadeIn.htmx-added {
+    opacity: 0;
+  }
+
+  #fadeIn {
+    opacity: 1;
+    transition: opacity 1s ease-out;
+  }
+</style>
+
+{% endblock head %}
+{% set filename = 'absensi-'+data.id | string %}
+{% set page ='daftar-hadir' %}
+{% block title_header %}
+Data Kehadiran Siswa
+{% endblock title_header %}
+{% block content %}
+
+<div id="fadeIn" class="row" hx-get="{{ url_for('guru2.get_data_kehadiran', mengajar=data.id)}}" hx-trigger="every 1s"
+  hx-swap="innerHTML settle:1s">
+  <!-- <div class="col-md-3">
+    <div class="card card-widget widget-user">
+      <div class="widget-user-header bg-info">
+        <h3 class="widget-user-username">Nama Siswa</h3>
+        <h5 id="no"></h5>
+        <h5 class="widget-user-desc">Kelas</h5>
+      </div>
+
+      <div class="widget-user-image">
+        <img class="img-circle elevation-2" src="{{ url_for('static', filename='images/siswa.png') }}" alt="foto siswa">
+      </div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="col-sm-6 border-right">
+            <div class="description-block">
+              <h5 class="description-header">Pertemuan</h5>
+              <span class="description-text">3x</span>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="description-block">
+              <h5 class="description-header">Tanggal</h5>
+              <span class="description-text">17-Agus</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</div>
+
+<div>
+  <p id="h5"></p>
+</div>
+{% endblock content %}
+
+{% block js %}
+<!-- <script>
+  $(document).ready(function () {
+    $('#h5').load("{{ url_for('guru2.get_data_kehadiran')}}");
+    setInterval(function () {
+      $('#h5').load("{{ url_for('guru2.get_data_kehadiran')}}").fadeIn('slow')
+    }, 1000);
+  });
+</script> -->
+<script src="{{url_for('static', filename='js/htmx.min.js')}}"></script>
+<!-- <script>
+  setInterval(async function () {
+    const url = "{{ url_for('guru2.get_data_kehadiran')}}";
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log(data)
+  }, 1000);
+</script> -->
+<script>
+  setInterval(function () {
+
+  }, 1000);
+</script>
+{% endblock %}

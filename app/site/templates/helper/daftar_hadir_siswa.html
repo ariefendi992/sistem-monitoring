@@ -1,0 +1,42 @@
+{% for i in data %}
+<div class="col-md-3">
+  <div class="card card-widget widget-user">
+    <div class="widget-user-header bg-info">
+      <h3 class="widget-user-username" style="font-size: 16px; font-weight: 600;">{{i.siswa.first_name.title()}}
+        {{i.siswa.last_name.title()}}</h3>
+      <h5 id="no"></h5>
+      <h5 class="widget-user-desc">Kelas {{i.siswa.kelas.kelas}}</h5>
+    </div>
+
+    <div class="widget-user-image">
+      <img class="img-circle elevation-2"
+        src="{{ url_for('static', filename='images/siswa.png') if not i.siswa.pic else url_for('guru.static', filename='img/siswa/foto/'+i.siswa.pic) }}"
+        alt="foto siswa"
+        style="width: 90px; height: 90px; align-items: center; vertical-align: middle; align-items: center;">
+    </div>
+    <div class="card-footer">
+      <div class="row">
+        <div class="col-sm-4 border-right" style="padding: 0 1px;">
+          <div class="description-block">
+            <h5 class="description-header">Pert-Ke</h5>
+            <span class="description-text">{{i.pertemuan_ke}}</span>
+          </div>
+        </div>
+        <div class="col-sm-4 border-right" style="padding: 0 1px;">
+          <div class="description-block">
+            <h5 class="description-header">Semester</h5>
+            <span class="description-text">{{i.mengajar.semester.semester}}</span>
+          </div>
+        </div>
+        <div class="col-sm-4" style="padding: 0 1px;">
+          <div class="description-block">
+            <h5 class="description-header">Tanggal</h5>
+            <span class="description-text">{{ i.tgl_absen | tglAbsen}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endfor %}

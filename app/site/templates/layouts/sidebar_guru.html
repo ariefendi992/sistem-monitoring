@@ -13,7 +13,6 @@
   <!-- Sidebar -->
   {% block sideBar %}
   <div class="sidebar">
-
     <!-- Sidebar Menu -->
     <nav class="mt-3">
       <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact" data-widget="treeview" role="menu"
@@ -61,12 +60,49 @@
             {% endif %}
           </ul>
         </li>
+        <li class="nav-item {{'menu-open' if page=='daftar-hadir' else None}}">
+          <a href="#" class="nav-link {{'active' if page=='daftar-hadir' else None}}">
+            <i class="nav-icon fas fa-clipboard-check "></i>
+            <p>Data Kehadiran Siswa</p>
+            <i class="right fa fa-angle-left"></i>
+          </a>
+          <ul class="nav nav-treeview">
+            {% if sqlToday %}
+            {% for i in sqlToday %}
+            <li class="nav-item">
+              <a href="{{ url_for('guru2.data_kehadiran', mengajar=i.id) }}" class="nav-link
+                {{ 'active' if filename=='absensi-'+i.id | string else ''  }}
+                ">
+                <i
+                  class="nav-icon far fa-circle {{'fa-dot-circle'if filename=='absensi-'+i.id | string else '' }} "></i>
+                <p>{{ i.kelas}}</p>
+              </a>
+            </li>
+            {% endfor %}
+            {% else %}
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon mr-2"></i>
+                <p>Tidak Ada Jadwal</p>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </li>
+        <!-- <li class="nav-item">
+          <a href="{{ url_for('guru2.daftar_kehadiran') }}"
+            class="nav-link {{ 'active' if filename=='daftar-hadir' else None }}">
+            <i class="nav-icon fas fa-file-export"></i>
+            <p>Daftar Hadir</p>
+          </a>
+        </li> -->
+
         <li
           class="nav-item {{ 'menu-open' if filename=='daftar-hadir' or filename=='rekap-data' or filename=='result-absen' else None }}">
           <a href="#"
             class="nav-link {{ 'active' if filename=='daftar-hadir' or filename=='rekap-data'  or filename=='result-absen' else None }} ">
-            <i class="nav-icon fas fa-list-alt"></i>
-            <p>Data Kehadiran</p>
+            <i class="nav-icon fas fa-file-export"></i>
+            <p>Laporan Kehadiran</p>
             <i class="right fa fa-angle-left"></i>
 
           </a>
@@ -79,58 +115,17 @@
                 <p>Daftar Hadir</p>
               </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a href="{{ url_for('guru2.rekap_kehadiran') }}"
                 class="nav-link {{ 'active' if filename=='rekap-data' else '' }}">
                 <i class="nav-icon far fa-circle {{ 'fa-dot-circle' if filename=='rekap-data' else '' }} "></i>
                 <p>Rekap Kehadiran</p>
               </a>
-            </li>
+            </li> -->
           </ul>
         </li>
 
-        {# <!---- RPORT --->
-        <li class="nav-header">Report</li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-print"></i>
-            <p>Rekap Absen</p>
-          </a>
-        </li> #}
-        {# <li class="nav-header">Authentication</li>
-        <li class="nav-item {{'menu-open' if filename=='update_profile' or filename=='password' else None}}">
-          <a href="#" class="nav-link {{'active' if filename=='update_profile' or filename=='password' else  None}}">
-            <i class="nav-icon fas fa-user-cog"> </i>
-            <p>
-              Pengaturan Akun
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="{{ url_for('guru2.profile_guru') }}"
-                class="nav-link {{'active' if filename=='update_profile' else ''}}">
-                <i class="far nav-icon fa-circle {{'fa-dot-circle' if filename=='update_profile' else ''}}"></i>
-                <p>Profil</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ url_for('guru2.update_pswd') }}"
-                class="nav-link {{'active' if filename=='password' else None}}">
-                <i class="far fa-circle nav-icon {{'fa-dot-circle' if filename=='password' else None}}"></i>
-                <p>Ubah Password</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a href="{{ url_for('login.logout') }}" class="nav-link">
-            <i class="nav-icon fas fa-sign-out-alt"></i>
-            <p>Logout</p>
-          </a>
-        </li>
-      </ul> #}
-
+      </ul>
     </nav>
     <!-- /.sidebar-menu -->
   </div>

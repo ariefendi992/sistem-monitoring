@@ -1,5 +1,7 @@
+from urllib import response
 from flask import (
     abort,
+    jsonify,
     make_response,
     request,
     Blueprint,
@@ -10,7 +12,8 @@ from flask import (
 )
 import asyncio
 from flask_login import current_user, login_required
-from sqlalchemy import func
+from sqlalchemy import and_, func
+from app.lib.status_code import HTTP_200_OK
 from app.site.forms.form_absen import AbsensiForm, FormSelectKehadiranSemester
 from app.site.forms.form_letter_report import FormSelectKehadiranSiswa, FormSelectKelas
 from ...extensions import db
@@ -335,6 +338,27 @@ def absensi(mengajar_id):
         base_mengajar = BaseModel(MengajarModel)
         mengajar = base_mengajar.get_all_filter_by(id=mengajar_id)
 
+        sql_pertemuan = (
+            db.session.query(AbsensiModel)
+            .join(MengajarModel)
+            .join(SemesterModel)
+            .join(TahunAjaranModel)
+            .filter(
+                and_(
+                    MengajarModel.guru_id == current_user.id,
+                    MengajarModel.id == mengajar,
+                    SemesterModel.is_active == "1",
+                    TahunAjaranModel.is_active == "1",
+                )
+            )
+            .count()
+        )
+        pertemuan = 0
+        if sql_pertemuan == 0:
+            pertemuan += 1
+        else:
+            pertemuan = sql_pertemuan + 1
+        print(pertemuan)
         data_mengajar = {}
         for i in mengajar:
             data_mengajar["kelas_id"] = i.kelas_id
@@ -425,6 +449,7 @@ def absensi(mengajar_id):
                         siswa_id=siswa_id,
                         tgl_absen=tgl_absen,
                         ket=ket,
+                        pertemuanKe=pertemuan,
                     )
                 )
 
@@ -720,4 +745,84 @@ def rekap_kehadiran():
             wali_kelas=check_wali(),
         )
     )
+    return response
+
+
+@guru2.route("data-kehadiran-siswa")
+@login_required
+def data_kehadiran():
+    if current_user.is_authenticated:
+        if current_user.group == "guru":
+            hari = today_()
+            data = dict()
+            mengajar_id = request.args.get("mengajar", type=int)
+            sql_mengajar = (
+                db.session.query(MengajarModel).filter_by(id=mengajar_id).all()
+            )
+
+            for i in sql_mengajar:
+                data.update(id=i.id)
+
+            sql_daftar_kelas = (
+                db.session.query(MengajarModel)
+                .join(HariModel)
+                .join(SemesterModel)
+                .filter(
+                    and_(
+                        MengajarModel.guru_id == current_user.id,
+                        SemesterModel.is_active == "1",
+                        HariModel.hari == hari,
+                    )
+                )
+                .order_by(MengajarModel.jam_ke.asc())
+            )
+
+            render = render_template(
+                "guru/modul/absen/daftar_hadir_harian.html",
+                wali_kelas=check_wali(),
+                data=data,
+                sqlToday=sql_daftar_kelas.all(),
+            )
+
+            response = make_response(render)
+            return response
+        else:
+            abort(404)
+
+    else:
+        return abort(401)
+
+
+@guru2.route("get-data-kehadiran")
+@login_required
+def get_data_kehadiran():
+    today = datetime.date(datetime.today())
+    data = dict()
+    mengajar_id = request.args.get("mengajar", type=int)
+
+    sql_absen = (
+        db.session.query(AbsensiModel).join(MengajarModel)
+        # .join(HariModel)
+        .filter(
+            and_(
+                AbsensiModel.mengajar_id == mengajar_id,
+                AbsensiModel.tgl_absen == today,
+                MengajarModel.guru_id == current_user.id,
+                # HariModel.hari == hari,
+            ),
+        )
+    )
+
+    # data = list()
+
+    # for i in sql_absen.all():
+    #     data.append(dict(i.id))
+
+    # payload = jsonify(data)
+    # response = make_response(payload)
+    # response.status_code == HTTP_200_OK
+    # return response
+
+    render = render_template("helper/daftar_hadir_siswa.html", data=sql_absen)
+    response = make_response(render)
     return response

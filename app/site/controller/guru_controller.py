@@ -257,7 +257,6 @@ def update_pswd():
 def jadwal_mengajar():
     if current_user.is_authenticated:
         if current_user.group == "guru":
-            base = BaseModel(MengajarModel)
             # mengajar = base.get_all_filter_by(
             #     base.model.hari_id.asc(), guru_id=current_user.id
             # )
@@ -266,9 +265,9 @@ def jadwal_mengajar():
                 .join(SemesterModel)
                 .filter(SemesterModel.is_active == 1)
                 .filter(MengajarModel.guru_id == current_user.id)
-                .order_by(MengajarModel.hari_id.asc())
-                .order_by(MengajarModel.jam_mulai.asc())
-                .all()
+                # .order_by(MengajarModel.hari_id.asc())
+                # .order_by(MengajarModel.jam_mulai.asc())
+                # .all()
             )
             """GET WITH GENERAL FUNCTION"""
             # sqlToday = get_kelas_today()
@@ -301,6 +300,15 @@ def jadwal_mengajar():
                 )
             )
 
+            sql_hari = (
+                db.session.query(MengajarModel)
+                .join(SemesterModel)
+                .filter(SemesterModel.is_active == "1")
+                .filter(MengajarModel.guru_id == current_user.id)
+                .group_by(MengajarModel.hari_id)
+                .order_by(MengajarModel.hari_id.asc())
+            )
+
             return render_template(
                 "guru/modul/jadwal_mengajar/jadwal_mengajar.html",
                 # sqlJadwal=mengajar,
@@ -308,6 +316,8 @@ def jadwal_mengajar():
                 sqlToday=sqlToday,
                 sqlTomorrow=sqlTomorrow,
                 wali_kelas=check_wali(),
+                sqlHari=sql_hari,
+                MM=MengajarModel,
             )
         else:
             return abort(404)

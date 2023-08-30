@@ -22,7 +22,9 @@ from app.models.user_model import UserModel
 from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
-guru = Blueprint("guru", __name__, url_prefix="/api/v2/guru")
+guru = Blueprint(
+    "guru", __name__, url_prefix="/api/v2/guru", static_folder="../static/"
+)
 
 
 dic_data = lambda **args: args
@@ -247,7 +249,7 @@ def get_single_siswa():
 
         if sql_mengajar:
             data = dic_data(
-                siswa_id=sql_siswa.id,
+                siswa_id=sql_siswa.user_id,
                 nisn=sql_user.username,
                 first_name=sql_siswa.first_name.title(),
                 last_name=sql_siswa.last_name.title(),
@@ -255,7 +257,7 @@ def get_single_siswa():
                 kelas=sql_siswa.kelas.kelas,
                 picture=url_for(".static", filename=f"img/siswa/foto/{sql_siswa.pic}")
                 if sql_siswa.pic
-                else sql_siswa.pic,
+                else None,
                 semester=sql_semester.semester.title(),
                 today=today,
                 kelas_id=sql_siswa.kelas_id,
@@ -504,16 +506,24 @@ def absen_siswa_guru_mapel():
     )
 
     if request.method == "POST":
-        base = BaseModel(
-            AbsensiModel(
-                mengajar_id=mengajar_id, siswa_id=siswa_id, tgl_absen=tgl_absen, ket=ket
-            )
-        )
-
+        pertemuan = 0
+        if sql_pertemuan == 0:
+            pertemuan += 1
+        else:
+            pertemuan = sql_pertemuan + 1
         if sql_pertemuan > 0:
             return jsonify(msg="Telah melakukan absensi hari ini."), HTTP_409_CONFLICT
 
         else:
+            base = BaseModel(
+                AbsensiModel(
+                    mengajar_id=mengajar_id,
+                    siswa_id=siswa_id,
+                    tgl_absen=tgl_absen,
+                    ket=ket,
+                    pertemuanKe=pertemuan,
+                )
+            )
             base.create()
 
             return (

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% set filename = 'jadwal-siswa' %}
+{% block title_header %}
+Jadwal Pelajaran Siswa
+{% endblock title_header %}
+{% block content %}
+<div class="row">
+  {% for hari in sqlHari %}
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Hari {{hari.hari.title()}}</h3>
+      </div>
+      <div class="card-body">
+        {% for i in jadwal.filter_by(hari_id=hari.id).order_by(MM.jam_ke.asc()) %}
+        <div class="callout callout-success">
+          <div class="row">
+
+            <dt class="col-sm-4">Jam-Ke <span class="float-right">:</span></dt>
+            <dd class="col-sm-8">{{i.jam_ke}}</dd>
+
+            <dt class="col-sm-4">Mapel <span class="float-right">:</span></dt>
+            <dd class="col-sm-8">{{i.mapel.mapel.title()}}</dd>
+
+            <dt class="col-sm-4">Semester <span class="float-right">:</span></dt>
+            <dd class="col-sm-8">{{i.semester.semester.title()}}</dd>
+
+            <dt class="col-sm-4">Waktu <span class="float-right">:</span></dt>
+            <dd class="col-sm-8">{{i.jam_mulai}} {{i.jam_selesai}}</dd>
+
+            <dt class="col-sm-4">Guru <span class="float-right">:</span></dt>
+            <dd class="col-sm-8">{{i.guru.first_name.title()}} {{i.guru.last_name.title()}}</dd>
+          </div>
+        </div>
+        <!-- <div class="dropdown-divider mt-2"></div> -->
+        {% endfor %}
+        <!-- <table>
+          <tr style="vertical-align: baseline;">
+            <td style="width: 75px;">Mapel</td>
+            <td style="width: 10px;">:</td>
+            <td>Pendidikan Jasmani, Olahraga & Kebudayaan</td>
+          </tr>
+          <tr>
+            <td>Guru</td>
+            <td>:</td>
+          </tr>
+          <tr>
+            <td>Semester</td>
+            <td>:</td>
+          </tr>
+          <tr>
+            <td>Jam-Ke</td>
+            <td>:</td>
+          </tr>
+          <tr>
+            <td>Waktu</td>
+            <td>:</td>
+          </tr>
+        </table> -->
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}

@@ -1,14 +1,9 @@
 from calendar import monthrange
 from datetime import datetime
-from flask import (
-    make_response,
-    request,
-    flash,
-    render_template,
-    Blueprint,
-)
+from flask import make_response, request, flash, render_template, Blueprint, abort
 from flask_login import current_user, login_required
 from sqlalchemy import func, and_
+from app.api.controller.master_controller import JadwalMengajar
 from app.lib.date_time import format_indo
 from app.lib.filters import hari_minggu, hari_sabtu
 from app.models.data_model import (
@@ -18,10 +13,13 @@ from app.models.data_model import (
     PembinaanModel,
 )
 from app.models.master_model import (
+    HariModel,
     KepsekModel,
     MapelModel,
     MengajarModel,
     NamaBulanModel,
+    SemesterModel,
+    TahunAjaranModel,
     WaliKelasModel,
 )
 from app.models.user_details_model import GuruModel, SiswaModel
@@ -378,5 +376,31 @@ def get_pelanggaran_siswa():
         jp=sql_jenisP,
         pelapor=sql_pelapor,
     )
+    response = make_response(render)
+    return response
+
+
+@wali_kelas.route("/jadwal-pelajaran-siswa")
+@login_required
+def get_jadwal_siswa():
+    sql_semester = SemesterModel.query.filter_by(is_active="1").first()
+    sql_tahun_ajaran = TahunAjaranModel.query.filter_by(is_active="1").first()
+
+    sql_jadwal = db.session.query(MengajarModel).filter_by(
+        semester_id=sql_semester.id,
+        tahun_ajaran_id=sql_tahun_ajaran.id,
+        kelas_id=sql_wali_().kelas_id,
+    )
+
+    sql_hari = db.session.query(HariModel).all()
+
+    render = render_template(
+        "guru_wali_kelas/modul/jadwal/jadwal_siswa.html",
+        sql_wali_=sql_wali_(),
+        sqlHari=sql_hari,
+        jadwal=sql_jadwal,
+        MM=MengajarModel,
+    )
+
     response = make_response(render)
     return response

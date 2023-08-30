@@ -35,7 +35,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="" class="nav-link">
+          <a href="{{ url_for('wali_kelas.get_jadwal_siswa')}}"
+            class="nav-link {{'active' if filename == 'jadwal-siswa' else None}}">
             <i class="nav-icon fas fa-calendar-day"></i>
             <p>JadwalPelajaran Siswa</p>
           </a>

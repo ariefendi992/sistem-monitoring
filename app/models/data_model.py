@@ -29,14 +29,22 @@ class AbsensiModel(db.Model):
     siswa = sql.relationship("SiswaModel", backref="absen")
     tgl_absen = sa.Column(sa.Date)
     ket = sa.Column(sa.String(16), nullable=True)
+    pertemuan_Ke = sa.Column(sa.Integer, nullable=True)
     # pertemuan_ke = sa.Column(sa.String(2), nullable=True)
 
-    def __init__(self, mengajar_id=None, siswa_id=None, tgl_absen=None, ket=None):
+    def __init__(
+        self,
+        mengajar_id=None,
+        siswa_id=None,
+        tgl_absen=None,
+        ket=None,
+        pertemuanKe: int = None,
+    ):
         self.mengajar_id = mengajar_id
         self.siswa_id = siswa_id
         self.tgl_absen = tgl_absen
         self.ket = ket
-        # self.pertemuan_ke = pertemuan
+        self.pertemuan_ke = pertemuanKe
 
     def __repr__(self):
         return "{}".format(self.ket)

@@ -29,7 +29,7 @@ class AbsensiModel(db.Model):
     siswa = sql.relationship("SiswaModel", backref="absen")
     tgl_absen = sa.Column(sa.Date)
     ket = sa.Column(sa.String(16), nullable=True)
-    pertemuan_Ke = sa.Column(sa.Integer, nullable=True)
+    pertemuan_ke = sa.Column(sa.Integer, nullable=True)
     # pertemuan_ke = sa.Column(sa.String(2), nullable=True)
 
     def __init__(

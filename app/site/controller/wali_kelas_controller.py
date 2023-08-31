@@ -211,58 +211,64 @@ def rekap_absen_mapel():
             .all()
         )
 
-        sql_kepsek = KepsekModel.query.filter_by(status="1").first()
-
-        sql_tgl_pertemuan = (
-            db.session.query(AbsensiModel)
-            .join(SiswaModel)
-            .join(MengajarModel)
-            .filter(
-                and_(
-                    MengajarModel.mapel_id == mapel.id,
-                    func.month(AbsensiModel.tgl_absen) == bulan.id,
-                    func.year(AbsensiModel.tgl_absen) == tahun.tgl_absen.year,
-                    SiswaModel.kelas_id == sql_wali_().kelas_id,
-                )
+        if not sql_absen:
+            flash(
+                "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
+                "error",
             )
-            .group_by(AbsensiModel.tgl_absen)
-            .order_by(AbsensiModel.tgl_absen.asc())
-        )
+        else:
+            sql_kepsek = KepsekModel.query.filter_by(status="1").first()
 
-        sql_siswa = SiswaModel.query.filter_by(kelas_id=sql_wali_().kelas_id)
+            sql_tgl_pertemuan = (
+                db.session.query(AbsensiModel)
+                .join(SiswaModel)
+                .join(MengajarModel)
+                .filter(
+                    and_(
+                        MengajarModel.mapel_id == mapel.id,
+                        func.month(AbsensiModel.tgl_absen) == bulan.id,
+                        func.year(AbsensiModel.tgl_absen) == tahun.tgl_absen.year,
+                        SiswaModel.kelas_id == sql_wali_().kelas_id,
+                    )
+                )
+                .group_by(AbsensiModel.tgl_absen)
+                .order_by(AbsensiModel.tgl_absen.asc())
+            )
 
-        data.update(
-            kepsek=f"{sql_kepsek.guru.first_name.title()} {sql_kepsek.guru.last_name.title()}",
-            nipKepsek=sql_kepsek.guru.user.username,
-            guru=[
-                f"{i.mengajar.guru.first_name.title()} {i.mengajar.guru.last_name.title()}"
-                for i in sql_absen
-            ][0],
-            nipGuru=[i.mengajar.guru.user.username for i in sql_absen][0],
-            tahunAjaran=[i.mengajar.tahun_ajaran.th_ajaran for i in sql_tgl_pertemuan][
-                0
-            ],
-            semester=[i.mengajar.semester.semester.title() for i in sql_tgl_pertemuan][
-                0
-            ],
-            bulan=bulan.nama_bulan.title(),
-            today=datetime.date(datetime.today()),
-            kelas=sql_wali_().kelas.kelas,
-            mapel=mapel,
-            countPertemuan=sql_tgl_pertemuan.count(),
-            countSiswa=sql_siswa.count(),
-            countSiswaL=sql_siswa.filter_by(gender="laki-laki").count(),
-            countSiswaP=sql_siswa.filter_by(gender="perempuan").count(),
-        )
-        render = render_template(
-            "laporan/result_absen_mapel.html",
-            data=data,
-            absen=sql_absen,
-            tglPertemuan=sql_tgl_pertemuan,
-            AM=AbsensiModel,
-        )
-        response = make_response(render)
-        return response
+            sql_siswa = SiswaModel.query.filter_by(kelas_id=sql_wali_().kelas_id)
+
+            data.update(
+                kepsek=f"{sql_kepsek.guru.first_name.title()} {sql_kepsek.guru.last_name.title()}",
+                nipKepsek=sql_kepsek.guru.user.username,
+                guru=[
+                    f"{i.mengajar.guru.first_name.title()} {i.mengajar.guru.last_name.title()}"
+                    for i in sql_absen
+                ][0],
+                nipGuru=[i.mengajar.guru.user.username for i in sql_absen][0],
+                tahunAjaran=[
+                    i.mengajar.tahun_ajaran.th_ajaran for i in sql_tgl_pertemuan
+                ][0],
+                semester=[
+                    i.mengajar.semester.semester.title() for i in sql_tgl_pertemuan
+                ][0],
+                bulan=bulan.nama_bulan.title(),
+                today=datetime.date(datetime.today()),
+                kelas=sql_wali_().kelas.kelas,
+                mapel=mapel,
+                countPertemuan=sql_tgl_pertemuan.count(),
+                countSiswa=sql_siswa.count(),
+                countSiswaL=sql_siswa.filter_by(gender="laki-laki").count(),
+                countSiswaP=sql_siswa.filter_by(gender="perempuan").count(),
+            )
+            render = render_template(
+                "laporan/result_absen_mapel.html",
+                data=data,
+                absen=sql_absen,
+                tglPertemuan=sql_tgl_pertemuan,
+                AM=AbsensiModel,
+            )
+            response = make_response(render)
+            return response
 
     response = make_response(
         render_template(

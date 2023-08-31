@@ -12,6 +12,7 @@ from flask import (
 )
 import asyncio
 from flask_login import current_user, login_required
+from jinja2 import TemplateError
 from sqlalchemy import and_, func
 from app.lib.status_code import HTTP_200_OK
 from app.site.forms.form_absen import AbsensiForm, FormSelectKehadiranSemester
@@ -569,87 +570,188 @@ def update_absen(mengajar_id):
 @guru2.route("/daftar-hadir", methods=["GET", "POST"])
 @login_required
 def daftar_kehadiran():
-    data = {}
-    data["filename"] = "daftar-hadir"
-    form = FormSelectKehadiranSiswa()
-    sql_kelas = KelasModel.query.all()
-    sql_bulan = NamaBulanModel.query.all()
-    sql_tahun = AbsensiModel.query.group_by(func.year(AbsensiModel.tgl_absen)).all()
-    for i in sql_kelas:
-        form.kelas.choices.append((i.id, i.kelas))
-    for i in sql_bulan:
-        form.bulan.choices.append((i.id, i.nama_bulan.upper()))
+    if current_user.is_authenticated:
+        if current_user.group == "guru":
+            form = FormSelectKehadiranSiswa()
+            data = dict()
 
-    for i in sql_tahun:
-        form.tahun.choices.append((i.tgl_absen.year, i.tgl_absen.year))
+            if form.validate_on_submit():
+                bulan = form.bulan.data
+                tahun = form.tahun.data
+                kelas = form.kelas.data
 
-    if form.validate_on_submit():
-        kelas = request.form.get("kelas")
-        bulan = request.form.get("bulan")
-        tahun = request.form.get("tahun")
-        sql_kehadiran = (
-            db.session.query(AbsensiModel)
-            .join(MengajarModel)
-            .join(SiswaModel)
-            .filter(AbsensiModel.mengajar_id == MengajarModel.id)
-            .filter(func.month(AbsensiModel.tgl_absen) == bulan)
-            .filter(func.year(AbsensiModel.tgl_absen) == tahun)
-            .filter(MengajarModel.kelas_id == kelas)
-            .filter(MengajarModel.guru_id == current_user.id)
-            .group_by(AbsensiModel.siswa_id)
-            .order_by(SiswaModel.first_name.asc())
-        )
-
-        for i in sql_kehadiran.all():
-            data["kelas"] = i.siswa.kelas.kelas
-            data["mapel"] = i.mengajar.mapel.mapel
-            data["semester"] = i.mengajar.semester.semester
-            data["tahun_ajaran"] = i.mengajar.tahun_ajaran.th_ajaran
-            data["mengajar_id"] = i.mengajar_id
-            data["bulan"] = min(
-                [k.nama_bulan for k in sql_bulan if k.id == i.tgl_absen.month]
-            )
-
-        sql_tgl_absen = (
-            db.session.query(AbsensiModel)
-            .filter(AbsensiModel.mengajar_id == MengajarModel.id)
-            .filter(MengajarModel.guru_id == current_user.id)
-            .filter(MengajarModel.kelas_id == kelas)
-            .filter(func.month(AbsensiModel.tgl_absen) == bulan)
-            .filter(func.year(AbsensiModel.tgl_absen) == tahun)
-            .group_by(func.day(AbsensiModel.tgl_absen))
-        )
-
-        if sql_kehadiran.all():
-            response = make_response(
-                render_template(
-                    "guru/modul/absen/result_daftar_hadir.html",
-                    sqlToday=get_kelas_today(),
-                    sql_kehadiran=sql_kehadiran,
-                    data=data,
-                    sql_tgl_absen=sql_tgl_absen,
-                    AbsensiModel=AbsensiModel,
-                    func=func,
-                    wali_kelas=check_wali(),
+                sql_absen = (
+                    db.session.query(AbsensiModel)
+                    .join(SiswaModel)
+                    .join(MengajarModel)
+                    .filter(
+                        and_(
+                            SiswaModel.kelas_id == kelas.id,
+                            func.month(AbsensiModel.tgl_absen) == bulan.id,
+                            func.year(AbsensiModel.tgl_absen) == tahun.tgl_absen.year,
+                            MengajarModel.guru_id == current_user.id,
+                        )
+                    )
+                    .group_by(AbsensiModel.siswa_id)
+                    .order_by(SiswaModel.first_name.asc())
+                    .all()
                 )
+
+                if not sql_absen:
+                    flash(
+                        "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
+                        "error",
+                    )
+                else:
+                    sql_kepsek = KepsekModel.query.filter_by(status="1").first()
+
+                    sql_tgl_pertemuan = (
+                        db.session.query(AbsensiModel)
+                        .join(SiswaModel)
+                        .join(MengajarModel)
+                        .filter(
+                            and_(
+                                func.month(AbsensiModel.tgl_absen) == bulan.id,
+                                func.year(AbsensiModel.tgl_absen)
+                                == tahun.tgl_absen.year,
+                                SiswaModel.kelas_id == kelas.id,
+                                MengajarModel.guru_id == current_user.id,
+                            )
+                        )
+                        .group_by(AbsensiModel.tgl_absen)
+                        .order_by(AbsensiModel.tgl_absen.asc())
+                    )
+
+                    sql_siswa = SiswaModel.query.filter_by(kelas_id=kelas.id)
+
+                    data.update(
+                        kepsek=f"{sql_kepsek.guru.first_name.title()} {sql_kepsek.guru.last_name.title()}",
+                        nipKepsek=sql_kepsek.guru.user.username,
+                        guru=[
+                            f"{i.mengajar.guru.first_name.title()} {i.mengajar.guru.last_name.title()}"
+                            for i in sql_absen
+                        ][0],
+                        nipGuru=[i.mengajar.guru.user.username for i in sql_absen][0],
+                        tahunAjaran=[
+                            i.mengajar.tahun_ajaran.th_ajaran for i in sql_tgl_pertemuan
+                        ][0],
+                        semester=[
+                            i.mengajar.semester.semester.title()
+                            for i in sql_tgl_pertemuan
+                        ][0],
+                        bulan=bulan.nama_bulan.title(),
+                        today=datetime.date(datetime.today()),
+                        kelas=[i.siswa.kelas.kelas for i in sql_absen][0],
+                        mapel=[i.mengajar.mapel.mapel.title() for i in sql_absen][0],
+                        countPertemuan=sql_tgl_pertemuan.count(),
+                        countSiswa=sql_siswa.count(),
+                        countSiswaL=sql_siswa.filter_by(gender="laki-laki").count(),
+                        countSiswaP=sql_siswa.filter_by(gender="perempuan").count(),
+                    )
+
+                    render = render_template(
+                        "laporan/result_absen_mapel.html",
+                        data=data,
+                        absen=sql_absen,
+                        tglPertemuan=sql_tgl_pertemuan,
+                        AM=AbsensiModel,
+                    )
+                    response = make_response(render)
+                    return response
+
+            render = render_template(
+                "guru/modul/absen/daftar_hadir.html",
+                wali_kelas=check_wali(),
+                form=form,
             )
+            response = make_response(render)
             return response
         else:
-            flash(
-                "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
-                "error",
-            )
+            abort(404)
+    else:
+        abort(401)
 
-    response = make_response(
-        render_template(
-            "guru/modul/absen/daftar_hadir.html",
-            form=form,
-            sqlToday=get_kelas_today(),
-            data=data,
-            wali_kelas=check_wali(),
-        )
-    )
-    return response
+    # data = {}
+    # data["filename"] = "daftar-hadir"
+    # form = FormSelectKehadiranSiswa()
+    # sql_kelas = KelasModel.query.all()
+    # sql_bulan = NamaBulanModel.query.all()
+    # sql_tahun = AbsensiModel.query.group_by(func.year(AbsensiModel.tgl_absen)).all()
+    # for i in sql_kelas:
+    #     form.kelas.choices.append((i.id, i.kelas))
+    # for i in sql_bulan:
+    #     form.bulan.choices.append((i.id, i.nama_bulan.upper()))
+
+    # for i in sql_tahun:
+    #     form.tahun.choices.append((i.tgl_absen.year, i.tgl_absen.year))
+
+    # if form.validate_on_submit():
+    #     kelas = request.form.get("kelas")
+    #     bulan = request.form.get("bulan")
+    #     tahun = request.form.get("tahun")
+    #     sql_kehadiran = (
+    #         db.session.query(AbsensiModel)
+    #         .join(MengajarModel)
+    #         .join(SiswaModel)
+    #         .filter(AbsensiModel.mengajar_id == MengajarModel.id)
+    #         .filter(func.month(AbsensiModel.tgl_absen) == bulan)
+    #         .filter(func.year(AbsensiModel.tgl_absen) == tahun)
+    #         .filter(MengajarModel.kelas_id == kelas)
+    #         .filter(MengajarModel.guru_id == current_user.id)
+    #         .group_by(AbsensiModel.siswa_id)
+    #         .order_by(SiswaModel.first_name.asc())
+    #     )
+
+    #     for i in sql_kehadiran.all():
+    #         data["kelas"] = i.siswa.kelas.kelas
+    #         data["mapel"] = i.mengajar.mapel.mapel
+    #         data["semester"] = i.mengajar.semester.semester
+    #         data["tahun_ajaran"] = i.mengajar.tahun_ajaran.th_ajaran
+    #         data["mengajar_id"] = i.mengajar_id
+    #         data["bulan"] = min(
+    #             [k.nama_bulan for k in sql_bulan if k.id == i.tgl_absen.month]
+    #         )
+
+    #     sql_tgl_absen = (
+    #         db.session.query(AbsensiModel)
+    #         .filter(AbsensiModel.mengajar_id == MengajarModel.id)
+    #         .filter(MengajarModel.guru_id == current_user.id)
+    #         .filter(MengajarModel.kelas_id == kelas)
+    #         .filter(func.month(AbsensiModel.tgl_absen) == bulan)
+    #         .filter(func.year(AbsensiModel.tgl_absen) == tahun)
+    #         .group_by(func.day(AbsensiModel.tgl_absen))
+    #     )
+
+    #     if sql_kehadiran.all():
+    #         response = make_response(
+    #             render_template(
+    #                 "guru/modul/absen/result_daftar_hadir.html",
+    #                 sqlToday=get_kelas_today(),
+    #                 sql_kehadiran=sql_kehadiran,
+    #                 data=data,
+    #                 sql_tgl_absen=sql_tgl_absen,
+    #                 AbsensiModel=AbsensiModel,
+    #                 func=func,
+    #                 wali_kelas=check_wali(),
+    #             )
+    #         )
+    #         return response
+    #     else:
+    #         flash(
+    #             "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
+    #             "error",
+    #         )
+
+    # response = make_response(
+    #     render_template(
+    #         "guru/modul/absen/daftar_hadir.html",
+    #         form=form,
+    #         sqlToday=get_kelas_today(),
+    #         data=data,
+    #         wali_kelas=check_wali(),
+    #     )
+    # )
+    # return response
 
 
 @guru2.route("/rekap-kehadiran", methods=["GET", "POST"])

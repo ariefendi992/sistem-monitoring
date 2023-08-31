@@ -19,21 +19,45 @@ class FormSelectKelas(FlaskForm):
 
 
 class FormSelectKehadiranSiswa(FlaskForm):
-    kelas = SelectField("Pilih Kelas", choices=[("", "- Pilih -")])
-    bulan = SelectField("Pilih Bulan", choices=[("", "- Pilih -")])
-    tahun = SelectField("Pilih Tahun", choices=[("", "- Pilih -")])
+    kelas = QuerySelectField(
+        "Kelas",
+        query_factory=lambda: KelasModel.query.all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        validators=[DataRequired(message="* Pilihan tidak boleh kosong!")],
+    )
+    bulan = QuerySelectField(
+        "Bulan",
+        query_factory=lambda: NamaBulanModel.query.all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        validators=[DataRequired(message="* Pilihan tidak boleh kosong!")],
+    )
+    tahun = QuerySelectField(
+        "Tahun",
+        query_factory=lambda: AbsensiModel.query.group_by(
+            func.year(AbsensiModel.tgl_absen)
+        ).all(),
+        allow_blank=True,
+        blank_text="- Pilih -",
+        get_label="tgl_absen.year",
+        validators=[DataRequired(message="* Pilihan tidak boleh kosong!")],
+    )
+    # kelas = SelectField("Pilih Kelas", choices=[("", "- Pilih -")])
+    # bulan = SelectField("Pilih Bulan", choices=[("", "- Pilih -")])
+    # tahun = SelectField("Pilih Tahun", choices=[("", "- Pilih -")])
 
-    def validate_kelas(self, field):
-        if field.data == "":
-            raise ValidationError("*Harap pilih kelas")
+    # def validate_kelas(self, field):
+    #     if field.data == "":
+    #         raise ValidationError("*Harap pilih kelas")
 
-    def validate_bulan(self, field):
-        if field.data == "":
-            raise ValidationError("*Harap Pilih Bulan")
+    # def validate_bulan(self, field):
+    #     if field.data == "":
+    #         raise ValidationError("*Harap Pilih Bulan")
 
-    def validate_tahun(self, field):
-        if field.data == "":
-            raise ValidationError("*Harap Pilih Tahun")
+    # def validate_tahun(self, field):
+    #     if field.data == "":
+    #         raise ValidationError("*Harap Pilih Tahun")
 
 
 class FormRekapAbsenWali(FlaskForm):

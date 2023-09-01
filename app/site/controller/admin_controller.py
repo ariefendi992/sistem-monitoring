@@ -287,69 +287,200 @@ class PenggunaSiswa:
                 abort(404)
 
     # NOTE:  UPDATE DATA SISWA
-    @admin2.route("/update-siswa/<int:id>", methods=["GET", "POST", "PUT"])
+    @admin2.route("/update-siswa/<int:siswa>", methods=["GET", "POST", "PUT"])
     @login_required
-    def update_siswa(id):
+    def get_object_siswa(siswa):
         if current_user.is_authenticated:
             if current_user.group == "admin":
-                form = FormEditSiswa()
-                # GET KELAS
-                url_kelas = base_url + f"/api/v2/master/kelas/get-all"
-                get_kelas = req.get(url_kelas)
-                list_kelas = get_kelas.json()["data"]
-                choices = [("", "- Pilih -")]
-                for _ in list_kelas:
-                    # form.kelas.choices.append((_["id"], _["kelas"]))
-                    choices.append((_["id"], _["kelas"]))
-                form.kelas.choices = choices
+                form = FormEditSiswa(request.form)
 
-                url_obj = base_url + f"api/v2/student/single/{id}"
+                sql_kelas = KelasModel.query.all()
+                sql_siswa = (
+                    db.session.query(SiswaModel).filter_by(user_id=siswa).first()
+                )
+                for i in sql_kelas:
+                    form.kelas.choices.append((i.id, i.kelas))
 
-                resp_obj = req.get(url=url_obj)
-                json_resp = resp_obj.json()
-                kelasId = json_resp["kelas_id"]
-                form.nisn.default = json_resp["nisn"]
-                form.fullname.default = (
-                    json_resp["first_name"] + " " + json_resp["last_name"]
+                ### NOTE: Definisi form data
+                form.nisn.data = sql_siswa.user.username
+                form.fullname.data = (
+                    f"{sql_siswa.first_name.title()} {sql_siswa.last_name.title()}"
                 )
-                form.kelas.default = next(
-                    obj["id"]
-                    for obj in list_kelas
-                    if json_resp["kelas"] in obj["kelas"]
+                form.kelas.data = f"{sql_siswa.kelas_id}"
+                form.jenisKelamin.data = sql_siswa.gender.lower()
+                form.tempatLahir.data = (
+                    sql_siswa.tempat_lahir.title() if sql_siswa.tempat_lahir else "-"
                 )
-                form.jenisKelamin.default = json_resp["gender"].lower()
-                form.tempatLahir.default = json_resp["tempat_lahir"]
-                """
-                NOTE: Convert str to datetime.date
-                buat logika jika string tgl ada maka convert ke datetime.strptime(str_date, format).date
-                jika tidak maka tetapkan string tgl default '2000-10-10' agar tidak terjadi error
-                """
-                from_date = (
-                    json_resp["tgl_lahir"] if json_resp["tgl_lahir"] else "2000-10-10"
+                form.tanggalLahir.data = sql_siswa.tgl_lahir
+                form.tanggalLahir.render_kw = dict(required=False)
+                form.agama.data = sql_siswa.agama.lower()
+                form.alamat.data = sql_siswa.alamat.title() if sql_siswa.alamat else "-"
+                form.namaOrtu.data = (
+                    sql_siswa.nama_ortu_or_wali.title()
+                    if sql_siswa.nama_ortu_or_wali
+                    else "-"
                 )
-                to_date = datetime.strptime(from_date, "%Y-%m-%d").date()
-                """"""
-                form.tanggalLahir.default = to_date if json_resp["tgl_lahir"] else None
-                form.agama.default = json_resp["agama"].lower()
-                form.alamat.default = json_resp["alamat"]
-                form.namaOrtu.default = json_resp["nama_ortu"]
-                form.telp.default = json_resp["telp"]
-                form.process()
-                """
-                Cara for and if dari umum sampai tracky
-                ## cara umum
-                # nilai = None
-                # for item in list_kelas:
-                #     if json_resp['kelas'] in item['kelas']:
-                #         nilai = item['id']
-                ## cara 1
-                # item = next((item['id'] for item in list_kelas if json_resp['kelas'] in item['kelas']), None)
-                ## cara 2
-                # item = next(item['id'] for item in list_kelas if json_resp['kelas'] in item['kelas'])    
-                """
+                form.telp.data = sql_siswa.no_telp if sql_siswa.no_telp else "-"
+
+                data = dict(user_id=siswa, kelasId=sql_siswa.kelas_id)
+
+                render = render_template(
+                    "admin/siswa/edit_siswa.html", form=form, data=data
+                )
+
+                response = make_response(render)
+                return response
+            else:
+                abort(404)
+
+        return abort(401)
+        # GET KELAS
+        #     url_kelas = base_url + f"/api/v2/master/kelas/get-all"
+        #     get_kelas = req.get(url_kelas)
+        #     list_kelas = get_kelas.json()["data"]
+        #     choices = [("", "- Pilih -")]
+        #     for _ in list_kelas:
+        #         # form.kelas.choices.append((_["id"], _["kelas"]))
+        #         choices.append((_["id"], _["kelas"]))
+        #     form.kelas.choices = choices
+
+        #     url_obj = (
+        #         base_url + f"api/v2/student/get-siswa/single-object?siswa={id}"
+        #     )
+
+        #     resp_obj = req.get(url=url_obj)
+        #     json_resp = resp_obj.json()
+        #     kelasId = json_resp["kelas_id"]
+        #     form.nisn.default = json_resp["nisn"]
+        #     form.fullname.default = (
+        #         json_resp["first_name"] + " " + json_resp["last_name"]
+        #     )
+        #     form.kelas.default = next(
+        #         obj["id"]
+        #         for obj in list_kelas
+        #         if json_resp["kelas"] in obj["kelas"]
+        #     )
+        #     form.jenisKelamin.default = json_resp["gender"].lower()
+        #     form.tempatLahir.default = json_resp["tempat_lahir"]
+        #     """
+        #     NOTE: Convert str to datetime.date
+        #     buat logika jika string tgl ada maka convert ke datetime.strptime(str_date, format).date
+        #     jika tidak maka tetapkan string tgl default '2000-10-10' agar tidak terjadi error
+        #     """
+        #     from_date = (
+        #         json_resp["tgl_lahir"] if json_resp["tgl_lahir"] else "2000-10-10"
+        #     )
+        #     to_date = datetime.strptime(from_date, "%Y-%m-%d").date()
+        #     """"""
+        #     form.tanggalLahir.default = to_date if json_resp["tgl_lahir"] else None
+        #     form.agama.default = json_resp["agama"].lower()
+        #     form.alamat.default = json_resp["alamat"]
+        #     form.namaOrtu.default = json_resp["nama_ortu"]
+        #     form.telp.default = json_resp["telp"]
+        #     form.process()
+        #     """
+        #     Cara for and if dari umum sampai tracky
+        #     ## cara umum
+        #     # nilai = None
+        #     # for item in list_kelas:
+        #     #     if json_resp['kelas'] in item['kelas']:
+        #     #         nilai = item['id']
+        #     ## cara 1
+        #     # item = next((item['id'] for item in list_kelas if json_resp['kelas'] in item['kelas']), None)
+        #     ## cara 2
+        #     # item = next(item['id'] for item in list_kelas if json_resp['kelas'] in item['kelas'])
+        #     """
+        #     if request.method == "POST":
+        #         nisn = request.form.get("nisn")
+        #         fullname = request.form.get("fullname")
+        #         first_name = ""
+        #         last_name = ""
+        #         first_name, *last_name = fullname.split() if fullname else "None"
+        #         if len(last_name) == 0:
+        #             last_name = first_name
+        #         elif len(last_name) != 0:
+        #             last_name = " ".join(last_name)
+        #         kelas = request.form.get("kelas")
+        #         gender = request.form.get("jenisKelamin")
+        #         tempat_lahir = request.form.get("tempatLahir")
+        #         tgl_lahir = request.form.get("tanggalLahir")
+        #         agama = request.form.get("agama")
+        #         alamat = request.form.get("alamat")
+        #         nama_ortu = request.form.get("namaOrtu")
+        #         telp = request.form.get("telp")
+        #         headers = {"Content-Type": "application/json"}
+        #         payload = json.dumps(
+        #             {
+        #                 "nisn": nisn,
+        #                 "first_name": first_name,
+        #                 "last_name": last_name,
+        #                 "kelas": kelas,
+        #                 "gender": gender,
+        #                 "tempat": tempat_lahir,
+        #                 "tgl": tgl_lahir,
+        #                 "agama": agama,
+        #                 "alamat": alamat,
+        #                 "nama_ortu": nama_ortu,
+        #                 "telp": telp,
+        #             }
+        #         )
+        #         response_update = req.put(url_obj, headers=headers, data=payload)
+        #         if response_update.status_code == 200:
+        #             baseKelasAfter = (
+        #                 base_url + f"api/v2/master/kelas/update-jumlah/{kelas}"
+        #             )
+        #             updateJumlahSiswaAfter = req.put(
+        #                 url=baseKelasAfter, headers=headers
+        #             )
+        #             baseKelasBefore = (
+        #                 base_url + f"api/v2/master/kelas/update-jumlah/{kelasId}"
+        #             )
+        #             updateJumlahSiswaAfter = req.put(
+        #                 url=baseKelasBefore, headers=headers
+        #             )
+        #             flash(
+        #                 f"Data dari {first_name} telah berhasil diperbaharui.",
+        #                 "info",
+        #             )
+        #             return redirect(url_for("admin2.getSiswa"))
+        #             # return redirect(url_for("admin2.get_siswa"))
+        #         else:
+        #             flash(
+        #                 f"Terjadi kesalahan dalam memuat data. statu : {response_update.status_code}",
+        #                 "error",
+        #             )
+        #             return render_template(
+        #                 "admin/siswa/edit_siswa.html",
+        #                 form=form,
+        #                 obj=json_resp,
+        #             )
+
+        #     return render_template(
+        #         "admin/siswa/edit_siswa.html", form=form, obj=json_resp
+        #     )
+        # else:
+        #     flash(
+        #         f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
+        #         "error",
+        #     )
+        #     abort(404)
+
+    @admin2.route("update-siswa/update", methods=["GET", "POST"])
+    @login_required
+    def updated_siswa():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                form = FormEditSiswa(request.form)
+
+                user_id = request.args.get("siswa", type=int)
+                kelas_id_sebelum = request.args.get("kelas", type=int)
+                sql_siswa = SiswaModel.query.filter_by(user_id=user_id).first()
+
+                sql_count_siswa = SiswaModel.query
+
                 if request.method == "POST":
-                    nisn = request.form.get("nisn")
-                    fullname = request.form.get("fullname")
+                    nisn = form.nisn.data
+                    fullname = form.fullname.data
                     first_name = ""
                     last_name = ""
                     first_name, *last_name = fullname.split() if fullname else "None"
@@ -357,100 +488,145 @@ class PenggunaSiswa:
                         last_name = first_name
                     elif len(last_name) != 0:
                         last_name = " ".join(last_name)
-                    kelas = request.form.get("kelas")
-                    gender = request.form.get("jenisKelamin")
-                    tempat_lahir = request.form.get("tempatLahir")
-                    tgl_lahir = request.form.get("tanggalLahir")
-                    agama = request.form.get("agama")
-                    alamat = request.form.get("alamat")
-                    nama_ortu = request.form.get("namaOrtu")
-                    telp = request.form.get("telp")
-                    headers = {"Content-Type": "application/json"}
-                    payload = json.dumps(
-                        {
-                            "nisn": nisn,
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "kelas": kelas,
-                            "gender": gender,
-                            "tempat": tempat_lahir,
-                            "tgl": tgl_lahir,
-                            "agama": agama,
-                            "alamat": alamat,
-                            "nama_ortu": nama_ortu,
-                            "telp": telp,
-                        }
-                    )
-                    response_update = req.put(url_obj, headers=headers, data=payload)
-                    if response_update.status_code == 200:
-                        baseKelasAfter = (
-                            base_url + f"api/v2/master/kelas/update-jumlah/{kelas}"
-                        )
-                        updateJumlahSiswaAfter = req.put(
-                            url=baseKelasAfter, headers=headers
-                        )
-                        baseKelasBefore = (
-                            base_url + f"api/v2/master/kelas/update-jumlah/{kelasId}"
-                        )
-                        updateJumlahSiswaAfter = req.put(
-                            url=baseKelasBefore, headers=headers
-                        )
-                        flash(
-                            f"Data dari {first_name} telah berhasil diperbaharui.",
-                            "info",
-                        )
-                        return redirect(url_for("admin2.getSiswa"))
-                        # return redirect(url_for("admin2.get_siswa"))
-                    else:
-                        flash(
-                            f"Terjadi kesalahan dalam memuat data. statu : {response_update.status_code}",
-                            "error",
-                        )
-                        return render_template(
-                            "admin/siswa/edit_siswa.html",
-                            form=form,
-                            obj=json_resp,
-                        )
+                    kelas = form.kelas.data
+                    gender = form.jenisKelamin.data
+                    tempat = form.tempatLahir.data
+                    tgl_lahir = form.tanggalLahir.data
+                    agama = form.agama.data
+                    alamat = form.alamat.data
+                    orang_tua = form.namaOrtu.data
+                    telp = form.telp.data
 
-                return render_template(
-                    "admin/siswa/edit_siswa.html", form=form, obj=json_resp
-                )
+                    sql_siswa.user.username = nisn
+                    sql_siswa.first_name = first_name.title()
+                    sql_siswa.last_name = last_name.title()
+                    sql_siswa.kelas_id = kelas
+                    sql_siswa.gender = gender
+                    sql_siswa.tempat_lahir = tempat
+                    sql_siswa.tgl_lahir = tgl_lahir
+                    sql_siswa.agama = agama
+                    sql_siswa.alamat = alamat
+                    sql_siswa.nama_ortu_or_wali = orang_tua
+                    sql_siswa.telp = telp
+
+                    sql_kelas = KelasModel.query
+                    kelas_baru = sql_kelas.filter_by(id=kelas).first()
+                    kelas_lama = sql_kelas.filter_by(id=kelas_id_sebelum).first()
+
+                    if kelas_baru.id != kelas_lama.id:
+                        kelas_baru.jml_seluruh = sql_count_siswa.filter_by(
+                            kelas_id=kelas
+                        ).count()
+                        kelas_baru.jml_perempuan = sql_count_siswa.filter_by(
+                            gender="perempuan", kelas_id=kelas
+                        ).count()
+                        kelas_baru.jml_laki = sql_count_siswa.filter_by(
+                            gender="laki-laki", kelas_id=kelas
+                        ).count()
+
+                        kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
+                            kelas_id=kelas_id_sebelum
+                        ).count()
+                        kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
+                            gender="perempuan", kelas_id=kelas_id_sebelum
+                        ).count()
+                        kelas_lama.jml_laki = sql_count_siswa.filter_by(
+                            gender="laki-laki", kelas_id=kelas_id_sebelum
+                        ).count()
+                    else:
+                        kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
+                            kelas_id=kelas_id_sebelum
+                        ).count()
+                        kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
+                            gender="perempuan", kelas_id=kelas_id_sebelum
+                        ).count()
+                        kelas_lama.jml_laki = sql_count_siswa.filter_by(
+                            gender="laki-laki", kelas_id=kelas_id_sebelum
+                        ).count()
+
+                    db.session.commit()
+
+                    flash("Data profil sisa telah diperbaharui", "success")
+                    direct = redirect(url_for(".getSiswa"))
+                    response = make_response(direct)
+
+                    return response
+
+                else:
+                    direct = redirect(url_for(".get_object_siswa", siswa=user_id))
+                    response = make_response(direct)
+                    flash("Data profil siswa gagal diperbaharui!", "error")
+                    return response
             else:
-                flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
-                )
                 abort(404)
+        else:
+            return abort(401)
 
     # NOTE:  DELETE DATA SISWA
-    @admin2.route("/delete-siswa/<int:id>", methods=["GET", "POST", "DELETE"])
+    @admin2.route("/siswa/delete-siswa", methods=["GET", "POST", "DELETE"])
     @login_required
-    def delete_siswa(id):
-        if current_user.group == "admin":
-            url = base_url + f"/api/v2/student/single/{id}"
-            respGetSiswa = req.get(url)
-            jsonResp = respGetSiswa.json()
-            kelasId = jsonResp["kelas_id"]
+    def delete_siswa():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                user_id = request.args.get("siswa", type=int)
+                kelas_id = request.args.get("kelas", type=int)
 
-            baseKelas = base_url + f"api/v2/master/kelas/update-jumlah/{kelasId}"
-            headers = {"Content-Type": "application/json"}
+                sql_user = UserModel.query.filter_by(id=user_id).first()
+                sql_kelas = KelasModel.query.filter_by(id=kelas_id)
+                get = sql_kelas.first()
 
-            response = req.delete(url)
-            if response.status_code == 204:
-                respkelas = req.put(url=baseKelas, headers=headers)
-                flash(
-                    message=f"Data siswa telah berhasil di hapus. {response.status_code}",
-                    category="info",
-                )
-                return redirect(url_for("admin2.getSiswa"))
-                # return redirect(url_for("admin2.get_siswa"))
+                if sql_user:
+                    sql_siswa = SiswaModel.query.filter_by(user_id=sql_user.id).first()
+
+                    db.session.delete(sql_siswa)
+                    db.session.delete(sql_user)
+
+                    sql_count_siswa = SiswaModel.query.filter_by(kelas_id=kelas_id)
+                    get.jml_seluruh = sql_count_siswa.count()
+                    get.jml_laki = sql_count_siswa.filter_by(gender="laki-laki").count()
+                    get.jml_perempuan = sql_count_siswa.filter_by(
+                        gender="perempuan"
+                    ).count()
+
+                    db.session.commit()
+
+                    flash("Data siswa telah dihapus.", "success")
+
+                    direct = redirect(url_for(".getSiswa"))
+                    response = make_response(direct)
+
+                    return response
+                else:
+                    flash("Gagal hapus data siswa!", "error")
             else:
-                flash(
-                    f"Ada tejadi kesalahan dalam menghapus data. Status : {response.status_code}",
-                    "error",
-                )
-                return redirect(url_for("admin2.getSiswa"))
-                # return redirect(url_for("admin2.get_siswa"))
+                abort(404)
+        else:
+            return abort(401)
+        # if current_user.group == "admin":
+        #     url = base_url + f"/api/v2/student/single/{id}"
+        #     respGetSiswa = req.get(url)
+        #     jsonResp = respGetSiswa.json()
+        #     kelasId = jsonResp["kelas_id"]
+
+        #     baseKelas = base_url + f"api/v2/master/kelas/update-jumlah/{kelasId}"
+        #     headers = {"Content-Type": "application/json"}
+
+        #     response = req.delete(url)
+        #     if response.status_code == 204:
+        #         respkelas = req.put(url=baseKelas, headers=headers)
+        #         flash(
+        #             message=f"Data siswa telah berhasil di hapus. {response.status_code}",
+        #             category="info",
+        #         )
+        #         return redirect(url_for("admin2.getSiswa"))
+        #         # return redirect(url_for("admin2.get_siswa"))
+        #     else:
+        #         flash(
+        #             f"Ada tejadi kesalahan dalam menghapus data. Status : {response.status_code}",
+        #             "error",
+        #         )
+        #         return redirect(url_for("admin2.getSiswa"))
+        #         # return redirect(url_for("admin2.get_siswa"))
 
     # eksport data
     @admin2.route("/export-siswa")

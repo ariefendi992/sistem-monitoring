@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, SubmitField, DateField
 from wtforms.validators import ValidationError
+
 # from wtforms.fields import DateField
+
 
 class FormAddSiswa(FlaskForm):
     username = StringField(label="NISN")
@@ -27,11 +29,11 @@ class FormAddSiswa(FlaskForm):
             ("budha", "Budha"),
         ],
     )
-    tempatLahir = StringField(label='Tempat Lahir')
-    tanggalLahir = DateField(label='Tanggal Lahir')
-    namaOrtu = StringField(label='Nama Orang Tua')
-    telp = StringField(label='No. Telp')    
-    alamat = StringField(label='Alamat')
+    tempatLahir = StringField(label="Tempat Lahir")
+    tanggalLahir = DateField(label="Tanggal Lahir")
+    namaOrtu = StringField(label="Nama Orang Tua")
+    telp = StringField(label="No. Telp")
+    alamat = StringField(label="Alamat")
     kelas = SelectField(label="Kelas")
     submit = SubmitField(label="Submit Data")
 
@@ -65,18 +67,17 @@ class FormAddSiswa(FlaskForm):
 class FormEditSiswa(FlaskForm):
     nisn = StringField("NISN")
     fullname = StringField("Nama Lengkap")
-    kelas = SelectField("Kelas")
-    # kelas = SelectField("Kelas", choices=[("", "- Pilih -")])
+    kelas = SelectField("Kelas", choices=[("", "- Pilih -")])
     jenisKelamin = SelectField(
         "Jenis Kelamin",
         choices=[
-            ("","- Pilih -"),
+            ("", "- Pilih -"),
             ("laki-laki", "Laki-Laki"),
             ("perempuan", "Perempuan"),
         ],
     )
-    tempatLahir = StringField('Tempat Lahir')
-    tanggalLahir= DateField('Tanggal Lahir')
+    tempatLahir = StringField("Tempat Lahir")
+    tanggalLahir = DateField("Tanggal Lahir")
     agama = SelectField(
         label="Agama",
         choices=[
@@ -88,8 +89,7 @@ class FormEditSiswa(FlaskForm):
             ("budha", "Budha"),
         ],
     )
-    alamat = StringField('Alamat')
-    namaOrtu = StringField('Nama Orang Tua/Wali')
-    telp = StringField('No. Telp')
-    submit = SubmitField('Save Changes')
-
+    alamat = StringField("Alamat")
+    namaOrtu = StringField("Nama Orang Tua/Wali")
+    telp = StringField("No. Telp")
+    submit = SubmitField("Submit")

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set filename = 'edit-siswa'  %}
+{% set filename = 'edit-siswa' %}
 {% block title %}Form Edit Siswa{% endblock %}
 
 {% block head %}
@@ -17,7 +17,7 @@
     </div>
   </div>
   <div class="card-body">
-    <form action="" method="post">
+    <form action="{{ url_for('admin2.updated_siswa', siswa=data.user_id, kelas=data.kelasId) }}" method="post">
       {{ form.csrf_token }}
       <div class="col-md-11 m-auto">
         <div class="row">
@@ -25,32 +25,15 @@
           <div class="col-md-6">
             <div class="form-group">
               {{ form.nisn.label}}
-              {% if form.nisn.errors %}
-              {{ form.nisn(class="form-control form-control-sm is-invalid", placeholder="NISN" ,aria_invalid="true")}}
-              {% for msg in form.nisn.errors %}
-              <span class="error invalid-feedback">{{ msg }}</span>
-              {% endfor %}
-              {% elif form.nisn.data %}
-              {{ form.nisn(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
               {{ form.nisn(class="form-control form-control-sm", placeholder="NISN")}}
-              {% endif %}
             </div>
           </div>
           <!-- FULLNAME -->
           <div class="col-md-6">
             <div class="form-group">
               {{ form.fullname.label}}
-              {% if form.fullname.errors %}
-              {{ form.fullname(class="form-control form-control-sm is-invalid", placeholder="Nama Lengkap", aria_invalid="true")}}
-              {% for msg in form.fullname.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.fullname.data %}
-              {{ form.fullname(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
+
               {{ form.fullname(class="form-control form-control-sm", placeholder="Nama Lengkap")}}
-              {% endif %}
             </div>
           </div>
         </div>
@@ -58,31 +41,14 @@
           <div class="col-md-6">
             <div class="form-group">
               {{ form.kelas.label}}
-              {% if form.kelas.errors %}
-              {{ form.kelas(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.kelas.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.kelas.data %}
-              {{ form.kelas(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
-              {{ form.kelas(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
-              {% endif %}
+              {{ form.kelas(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",
+              onchange='this.size=0;', onblur="this.size=0;")}}
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               {{ form.jenisKelamin.label}}
-              {% if form.jenisKelamin.errors %}
-              {{ form.jenisKelamin(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.jenisKelamin.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.jenisKelamin.data %}
-              {{ form.jenisKelamin(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
               {{ form.jenisKelamin(class="form-control form-control-sm")}}
-              {% endif %}
             </div>
           </div>
         </div>
@@ -90,31 +56,15 @@
           <div class="col-md-6">
             <div class="form-group">
               {{ form.tempatLahir.label}}
-              {% if form.tempatLahir.errors %}
-              {{ form.tempatLahir(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.tempatLahir.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.tempatLahir.data %}
-              {{ form.tempatLahir(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
-              {{ form.tempatLahir(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
-              {% endif %}
+              {{ form.tempatLahir(class="form-control form-control-sm",
+              onmousedown="if(this.options.length>6){this.size=6;}", onchange='this.size=0;', onblur="this.size=0;")}}
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               {{ form.tanggalLahir.label}}
-              {% if form.tanggalLahir.errors %}
-              {{ form.tanggalLahir(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.tanggalLahir.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.tanggalLahir.data %}
-              {{ form.tanggalLahir(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
-              {{ form.tanggalLahir(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
-              {% endif %}
+              {{ form.tanggalLahir(class="form-control form-control-sm",
+              onmousedown="if(this.options.length>6){this.size=6;}", onchange='this.size=0;', onblur="this.size=0;")}}
             </div>
           </div>
         </div>
@@ -122,31 +72,15 @@
           <div class="col-md-6">
             <div class="form-group">
               {{ form.agama.label}}
-              {% if form.agama.errors %}
-              {{ form.agama(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.agama.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.agama.data %}
-              {{ form.agama(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
-              {{ form.agama(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
-              {% endif %}
+              {{ form.agama(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",
+              onchange='this.size=0;', onblur="this.size=0;")}}
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               {{ form.alamat.label}}
-              {% if form.alamat.errors %}
-              {{ form.alamat(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.alamat.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.alamat.data %}
-              {{ form.alamat(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
-              {{ form.alamat(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
-              {% endif %}
+              {{ form.alamat(class="form-control form-control-sm",
+              onmousedown="if(this.options.length>6){this.size=6;}", onchange='this.size=0;', onblur="this.size=0;")}}
             </div>
           </div>
         </div>
@@ -154,38 +88,24 @@
           <div class="col-md-6">
             <div class="form-group">
               {{ form.namaOrtu.label}}
-              {% if form.namaOrtu.errors %}
-              {{ form.namaOrtu(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.namaOrtu.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.namaOrtu.data %}
-              {{ form.namaOrtu(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
-              {{ form.namaOrtu(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
-              {% endif %}
+              {{ form.namaOrtu(class="form-control form-control-sm",
+              onmousedown="if(this.options.length>6){this.size=6;}", onchange='this.size=0;', onblur="this.size=0;")}}
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               {{ form.telp.label}}
-              {% if form.telp.errors %}
-              {{ form.telp(class="form-control form-control-sm is-invalid", aria_invalid="true")}}
-              {% for msg in form.telp.errors %}
-              <span class="error invalid-feedback">{{msg}}</span>
-              {% endfor %}
-              {% elif form.telp.data %}
-              {{ form.telp(class="form-control form-control-sm", aria_invalid="false")}}
-              {% else %}
-              {{ form.telp(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
-              {% endif %}
+              {{ form.telp(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",
+              onchange='this.size=0;', onblur="this.size=0;")}}
             </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-6">
-            {{ form.submit(class="btn btn-primary btn-sm") }}
+          <div class="col-md-12">
+            <button class="btn btn-warning" onclick="window.history()">Batal</button>
+            {{ form.submit(class="btn btn-primary float-right") }}
           </div>
+
         </div>
       </div>
     </form>

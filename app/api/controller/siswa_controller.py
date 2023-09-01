@@ -76,6 +76,7 @@ def get():
                 "last_name": user.last_name.title(),
                 "gender": user.gender.title(),
                 "kelas": user.kelas.kelas if user.kelas_id else "-",
+                "kelas_id": user.kelas_id,
                 "tempat_lahir": user.tempat_lahir.title() if user.tempat_lahir else "-",
                 # 'tgl_lahir': user.tgl_lahir if user.tgl_lahir else '-',
                 "tgl_lahir": format_indo(user.tgl_lahir) if user.tgl_lahir else "-",
@@ -752,3 +753,33 @@ def riwayat_pelanggaran():
         return jsonify(status="ok", data=data), HTTP_200_OK
 
     return jsonify(msg="Tidak ada pelanggaran."), HTTP_404_NOT_FOUND
+
+
+@siswa.route("/get-siswa/single-object", methods=["GET", "PUT", "DELETE"])
+def getSiswaSingleObject():
+    user_id = request.args.get("siswa", type=int)
+
+    sql_siswa = db.session.query(SiswaModel).filter_by(user_id=user_id).first()
+    if request.method == "GET":
+        data = dict()
+        if sql_siswa:
+            data.update(
+                id=sql_siswa.user_id,
+                nisn=sql_siswa.user.username,
+                first_name=sql_siswa.first_name.title(),
+                last_name=sql_siswa.last_name.title(),
+                kelas_id=sql_siswa.kelas_id,
+                kelas=sql_siswa.kelas.kelas,
+                # kelas=sql_siswa.kelas.kelas,
+            )
+
+            return jsonify(data)
+
+        else:
+            msg = f"Data dengan ID {user_id} tidak ditemukan!"
+
+            return jsonify(msg=msg), HTTP_404_NOT_FOUND
+
+    # return jsonify(msg=f"Data dengan ID {user_id} tidak ditemukan!")
+
+    # return jsonify(id=sql_siswa.id)

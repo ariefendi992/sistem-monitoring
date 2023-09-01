@@ -203,8 +203,9 @@
             </li>
             <li class="nav-item">
               <a href="{{ url_for('admin2.getSiswa') }}"
-                class="nav-link  {{'active' if filename=='get-siswa' else ''}}">
-                <i class="far fa-circle nav-icon  {{'fa-dot-circle' if filename=='get-siswa' else ''}}"></i>
+                class="nav-link  {{'active' if filename=='get-siswa' or filename=='edit-siswa' else ''}}">
+                <i
+                  class="far fa-circle nav-icon  {{'fa-dot-circle' if filename=='get-siswa' or filename=='edit-siswa' else ''}}"></i>
                 <p>Daftar Siswa</p>
               </a>
             </li>

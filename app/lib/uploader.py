@@ -1,7 +1,8 @@
 from werkzeug.utils import secure_filename
+from PIL import Image
 import os
-import datetime
 import hashlib
+
 
 ALLOWED_EXTENSIONS = {"txt", "pdf", "png", "jpg", "jpeg", "gif"}
 UPLOAD_FOLDER = os.getcwd() + "/app/api/static/img/siswa/foto/"
@@ -50,3 +51,25 @@ def uploads(f, nama_user, kelas):
             }
         else:
             return {"status": "error"}
+
+
+def upload_resize_photo(f, nama_user, kelas):
+    if f and allowed_extension(f.filename):
+        fileOrign = f.filename.rsplit(".", 1)
+        fileExt = fileOrign[1].lower()
+        if fileExt == "jpeg" or fileExt == "jpg" or fileExt == "png":
+            encryptFile = hashlib.md5(
+                get_secure_filename(f.filename).encode("utf-8")
+            ).hexdigest()
+            filename = f"{kelas}_{nama_user}_{encryptFile}.{fileExt}"
+            path_file = UPLOAD_FOLDER + filename
+            img = Image.open(f)
+            width = int(img.size[0] / 10) * 2
+            height = int(img.size[1] / 10) * 2
+
+            re_image = img.resize((width, height), Image.ADAPTIVE)
+            re_image.save(
+                os.path.join(UPLOAD_FOLDER, filename), optimize=True, quality=95
+            )
+            response = dict(status="Ok", filename=filename, path=path_file)
+            return response

@@ -5,6 +5,7 @@ from flask import (
     Blueprint,
     Response,
     abort,
+    jsonify,
     make_response,
     request,
     redirect,
@@ -32,7 +33,8 @@ from ..forms.form_guru import *
 from ..lib.base_url import base_url
 from app.models.user_login_model import *
 from app.models.data_model import *
-from sqlalchemy import func
+from sqlalchemy import Select, func
+from app.lib.db_statement import DBStatement
 import os
 import requests as req
 import io
@@ -58,6 +60,8 @@ file = os.getcwd() + "/data.json"
 
 
 sql = lambda x: x
+
+dbs = DBStatement()
 
 
 @admin2.route("/")
@@ -575,8 +579,20 @@ class PenggunaSiswa:
                 sql_kelas = KelasModel.query.filter_by(id=kelas_id)
                 get = sql_kelas.first()
 
+                dir_foto = os.getcwd() + "/app/api/static/img/siswa/foto/"
+                dir_qr = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+
                 if sql_user:
                     sql_siswa = SiswaModel.query.filter_by(user_id=sql_user.id).first()
+
+                    if sql_siswa.pic and sql_siswa.qr_code:
+                        os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
+
+                        os.remove(os.path.join(dir_qr, f"{sql_siswa.qr_code}"))
+                    elif sql_siswa.pic:
+                        os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
+                    elif sql_siswa.qr_code:
+                        os.remove(os.path.join(dir_qr, f"{sql_siswa.qr_code}"))
 
                     db.session.delete(sql_siswa)
                     db.session.delete(sql_user)
@@ -627,6 +643,55 @@ class PenggunaSiswa:
         #         )
         #         return redirect(url_for("admin2.getSiswa"))
         #         # return redirect(url_for("admin2.get_siswa"))
+
+    ### NOTE: DELETE FOTO SISWA & QR CODE
+    @admin2.route("siswa/delete-foto", methods=["GET", "POST"])
+    @login_required
+    def delete_foto():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
+
+                user_id = request.args.get("siswa", type=int)
+                sql_siswa = dbs.get_one(entity=SiswaModel, user_id=user_id)
+
+                os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
+
+                sql_siswa.pic = None
+                dbs.update_data()
+
+                direct = redirect(url_for("admin2.getSiswa"))
+                response = make_response(direct)
+                flash("Foto siswa telah dihapus dari direktori file.", "info")
+                return response
+            else:
+                dbs.dbs_abort(404, description=f"Data User tidak ditemukan.")
+        else:
+            dbs.dbs_abort(401, "Masalah pada autentikasi")
+
+    @admin2.route("siswa/delete-qrfile", methods=["GET", "POST"])
+    @login_required
+    def delete_qr():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                path_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+
+                user_id = request.args.get("siswa", type=int)
+                sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
+
+                os.remove(os.path.join(path_file, sql_siswa.qr_code))
+                sql_siswa.qr_code = None
+                dbs.update_data()
+
+                direct = redirect(url_for("admin2.getSiswa"))
+                response = make_response(direct)
+                flash("File QR Code siswa telah dihapus dari direktori file.", "info")
+                return response
+
+            else:
+                dbs.dbs_abort(404, description=f"Data User tidak ditemukan.")
+        else:
+            dbs.dbs_abort(401, description="Login gagal.")
 
     # eksport data
     @admin2.route("/export-siswa")

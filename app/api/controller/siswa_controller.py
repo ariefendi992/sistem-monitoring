@@ -1,8 +1,7 @@
-from fileinput import filename
 import hashlib
 from time import sleep
 import qrcode, os
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from werkzeug.utils import secure_filename
 from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.moduledrawers import HorizontalBarsDrawer
@@ -11,7 +10,6 @@ from flask import (
     jsonify,
     make_response,
     request,
-    send_from_directory,
     url_for,
 )
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -27,7 +25,6 @@ from app.lib.status_code import *
 from app.models.data_model import PelanggaranModel
 from app.models.master_model import (
     HariModel,
-    # JenisPelanggaranModel,
     KelasModel,
     MapelModel,
     MengajarModel,
@@ -37,9 +34,10 @@ from app.models.master_model import (
 from app.models.user_details_model import SiswaModel
 from app.models.user_model import UserModel
 from app.extensions import db
-from app.lib.uploader import uploads
+from app.lib.uploader import upload_resize_photo, uploads
 from datetime import datetime
 from app.models.data_model import AbsensiModel
+from PIL import Image
 
 siswa = Blueprint(
     "siswa",
@@ -64,10 +62,26 @@ dic_data = lambda **args: args
 def get():
     # model = db.session.query(UserModel, SiswaModel)\
     #                   .join(SiswaModel).all()
-    base = BaseModel(SiswaModel)
-    model = base.get_all()
+    model = (
+        db.session.query(SiswaModel).join(KelasModel)
+        # .order_by(SiswaModel.first_name.asc())
+        .order_by(SiswaModel.kelas_id.asc(), SiswaModel.first_name.asc())
+    )
     data = []
+    path_file = os.getcwd() + "/app/api/static/img/siswa/"
+    list_file = os.listdir(path_file + "foto/")
+    list_qr_file = os.listdir(path_file + "qr_code/")
+
     for user in model:
+        if user.pic and user.pic not in list_file:
+            sql_siswa = SiswaModel.query.filter_by(id=user.id).first()
+            sql_siswa.pic = None
+            db.session.commit()
+
+        if user.qr_code and user.qr_code not in list_qr_file:
+            sql_siswa = SiswaModel.query.filter_by(id=user.id).first()
+            sql_siswa.qr_code = None
+            db.session.commit()
         data.append(
             {
                 "id": user.user.id,
@@ -107,6 +121,8 @@ def get():
                 "logout": user.user.user_logout if user.user.user_logout else "-",
             }
         )
+        # file = path_file + user.pic if user.pic else ""
+        # print(file)
     return jsonify(data=data), HTTP_200_OK
 
 
@@ -376,18 +392,25 @@ def upload_photo():
         return jsonify(msg="Data not found"), HTTP_404_NOT_FOUND
     else:
         f = request.files["images"]
+
         first_name = (
             model.first_name
             if len(model.first_name) != 2
             else model.last_name.split(" ", 1)[0]
         )
         user_first_name = first_name.replace(" ", "_").lower()
+        up_risize = upload_resize_photo(f, user_first_name, model.kelas.kelas)
 
-        upload_file = uploads(f, user_first_name, model.kelas.kelas)
-        if upload_file["status"] == "ok":
-            model.pic = upload_file["photo_name"]
+        # upload_file = uploads(f, user_first_name, model.kelas.kelas)
+        # if upload_file["status"] == "ok":
+        #     model.pic = upload_file["photo_name"]
+        #     base.edit()
+        #     return jsonify(msg="upload photo success"), HTTP_200_OK
+
+        if up_risize["status"] == "Ok":
+            model.pic = up_risize["filename"]
             base.edit()
-            return jsonify(msg="upload photo success"), HTTP_200_OK
+            return jsonify(msg="Unggah Foto Berhasil."), HTTP_200_OK
 
 
 # GET SISWA BY NISN

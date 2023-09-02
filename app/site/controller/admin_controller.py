@@ -31,7 +31,7 @@ from ..forms.form_guru import *
 from ..lib.base_url import base_url
 from app.models.user_login_model import *
 from app.models.data_model import *
-from sqlalchemy import Select, func
+from sqlalchemy import func
 from app.lib.db_statement import DBStatement
 import os
 import requests as req
@@ -152,14 +152,12 @@ class PenggunaSiswa:
                         category="success",
                     )
                     return redirect(url_for("admin2.getSiswa"))
-                    # return redirect(url_for("admin2.get_siswa"))
                 else:
                     flash(
                         message=f"Maaf terjadi kesalahan dalam generate QR CODE. Status : {r.status_code}",
                         category="error",
                     )
                     return redirect(url_for("admin2.getSiswa"))
-                    # return redirect(url_for("admin2.get_siswa"))
             else:
                 flash(
                     f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
@@ -169,7 +167,6 @@ class PenggunaSiswa:
 
     # NOTE:  UPLOAD FOTO
     @admin2.post("/upload-photo")
-    # @admin2.route('/upload-photo', methods=['GET','PUT','POST'])
     @login_required
     def upload_foto():
         if current_user.is_authenticated:
@@ -194,7 +191,6 @@ class PenggunaSiswa:
                         "success",
                     )
                     return redirect(url_for("admin2.getSiswa"))
-                    # return redirect(url_for("admin2.get_siswa"))
                 else:
                     return f"<p>error : {response.status_code}</p>"
             else:
@@ -264,7 +260,6 @@ class PenggunaSiswa:
                             category="success",
                         )
                         return redirect(url_for("admin2.getSiswa"))
-                        # return redirect(url_for("admin2.get_siswa"))
                     elif response.status_code == 409:
                         flash(
                             message="NISN sudah yang di input, telah terdaftar",
@@ -1617,7 +1612,6 @@ class MasterData:
                     (i["id"], i["first_name"] + "" + i["last_name"])
                 )
 
-            # status = [{'0':'Tidak Aktif','1':'AKtif'}]
             status = [
                 {"id": "0", "status": "tidak aktif"},
                 {"id": "1", "status": "aktif"},
@@ -1758,12 +1752,6 @@ class JadwalMengajara:
             for i in respKelas.json()["data"]:
                 form.kelas.choices.append((i["id"], i["kelas"]))
 
-            # urlJam = base_url + "api/v2/master/jam/get-all"
-            # respJam = req.get(urlJam)
-            # for i in respJam.json()["data"]:
-            #     form.waktuMulai.choices.append((i["jam"], i["jam"]))
-            #     form.waktuSelesai.choices.append((i["jam"], i["jam"]))
-
             form.kode.data = kodeMengajar
             form.semester.data = sms.title()
             form.ta.data = ta_id
@@ -1778,8 +1766,7 @@ class JadwalMengajara:
                 mapel_id = request.form.get("namaMapel")
                 hari_id = request.form.get("hari")
                 kelas_id = request.form.get("kelas")
-                # jam_mulai = request.form.get("waktuMulai")
-                # jam_selesai = request.form.get("waktuSelesai")
+             
                 jam_mulai2 = request.form.get("waktuMulai2")
                 jam_selesai2 = request.form.get("waktuSelesai2")
                 jam_ke = request.form.get("jamKe")
@@ -1847,11 +1834,6 @@ class JadwalMengajara:
             for i in respKelas.json()["data"]:
                 form.kelas.choices.append((i["id"], i["kelas"]))
 
-            # urlJam = base_url + "api/v2/master/jam/get-all"
-            # respJam = req.get(urlJam)
-            # for i in respJam.json()["data"]:
-            #     form.waktuMulai.choices.append((i["jam"], i["jam"]))
-            #     form.waktuSelesai.choices.append((i["jam"], i["jam"]))
 
             form.kode.default = jsonResp["kode_mengajar"]
             form.tahunAjaran.default = jsonResp["tahun_ajaran"]

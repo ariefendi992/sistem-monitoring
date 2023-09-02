@@ -1,11 +1,9 @@
 import json
 import time
-import traceback
 from flask import (
     Blueprint,
     Response,
     abort,
-    jsonify,
     make_response,
     request,
     redirect,
@@ -40,7 +38,6 @@ import requests as req
 import io
 import xlwt
 
-# import pandas as pd
 
 admin2 = Blueprint(
     "admin2",
@@ -52,11 +49,6 @@ admin2 = Blueprint(
 
 file = os.getcwd() + "/data.json"
 
-
-# @admin2.route("/admin/<path:filename>")
-# def static(filename):
-#     dir = send_from_directory("frontend/static", filename)
-#     return dir
 
 
 sql = lambda x: x
@@ -338,136 +330,7 @@ class PenggunaSiswa:
                 abort(404)
 
         return abort(401)
-        # GET KELAS
-        #     url_kelas = base_url + f"/api/v2/master/kelas/get-all"
-        #     get_kelas = req.get(url_kelas)
-        #     list_kelas = get_kelas.json()["data"]
-        #     choices = [("", "- Pilih -")]
-        #     for _ in list_kelas:
-        #         # form.kelas.choices.append((_["id"], _["kelas"]))
-        #         choices.append((_["id"], _["kelas"]))
-        #     form.kelas.choices = choices
-
-        #     url_obj = (
-        #         base_url + f"api/v2/student/get-siswa/single-object?siswa={id}"
-        #     )
-
-        #     resp_obj = req.get(url=url_obj)
-        #     json_resp = resp_obj.json()
-        #     kelasId = json_resp["kelas_id"]
-        #     form.nisn.default = json_resp["nisn"]
-        #     form.fullname.default = (
-        #         json_resp["first_name"] + " " + json_resp["last_name"]
-        #     )
-        #     form.kelas.default = next(
-        #         obj["id"]
-        #         for obj in list_kelas
-        #         if json_resp["kelas"] in obj["kelas"]
-        #     )
-        #     form.jenisKelamin.default = json_resp["gender"].lower()
-        #     form.tempatLahir.default = json_resp["tempat_lahir"]
-        #     """
-        #     NOTE: Convert str to datetime.date
-        #     buat logika jika string tgl ada maka convert ke datetime.strptime(str_date, format).date
-        #     jika tidak maka tetapkan string tgl default '2000-10-10' agar tidak terjadi error
-        #     """
-        #     from_date = (
-        #         json_resp["tgl_lahir"] if json_resp["tgl_lahir"] else "2000-10-10"
-        #     )
-        #     to_date = datetime.strptime(from_date, "%Y-%m-%d").date()
-        #     """"""
-        #     form.tanggalLahir.default = to_date if json_resp["tgl_lahir"] else None
-        #     form.agama.default = json_resp["agama"].lower()
-        #     form.alamat.default = json_resp["alamat"]
-        #     form.namaOrtu.default = json_resp["nama_ortu"]
-        #     form.telp.default = json_resp["telp"]
-        #     form.process()
-        #     """
-        #     Cara for and if dari umum sampai tracky
-        #     ## cara umum
-        #     # nilai = None
-        #     # for item in list_kelas:
-        #     #     if json_resp['kelas'] in item['kelas']:
-        #     #         nilai = item['id']
-        #     ## cara 1
-        #     # item = next((item['id'] for item in list_kelas if json_resp['kelas'] in item['kelas']), None)
-        #     ## cara 2
-        #     # item = next(item['id'] for item in list_kelas if json_resp['kelas'] in item['kelas'])
-        #     """
-        #     if request.method == "POST":
-        #         nisn = request.form.get("nisn")
-        #         fullname = request.form.get("fullname")
-        #         first_name = ""
-        #         last_name = ""
-        #         first_name, *last_name = fullname.split() if fullname else "None"
-        #         if len(last_name) == 0:
-        #             last_name = first_name
-        #         elif len(last_name) != 0:
-        #             last_name = " ".join(last_name)
-        #         kelas = request.form.get("kelas")
-        #         gender = request.form.get("jenisKelamin")
-        #         tempat_lahir = request.form.get("tempatLahir")
-        #         tgl_lahir = request.form.get("tanggalLahir")
-        #         agama = request.form.get("agama")
-        #         alamat = request.form.get("alamat")
-        #         nama_ortu = request.form.get("namaOrtu")
-        #         telp = request.form.get("telp")
-        #         headers = {"Content-Type": "application/json"}
-        #         payload = json.dumps(
-        #             {
-        #                 "nisn": nisn,
-        #                 "first_name": first_name,
-        #                 "last_name": last_name,
-        #                 "kelas": kelas,
-        #                 "gender": gender,
-        #                 "tempat": tempat_lahir,
-        #                 "tgl": tgl_lahir,
-        #                 "agama": agama,
-        #                 "alamat": alamat,
-        #                 "nama_ortu": nama_ortu,
-        #                 "telp": telp,
-        #             }
-        #         )
-        #         response_update = req.put(url_obj, headers=headers, data=payload)
-        #         if response_update.status_code == 200:
-        #             baseKelasAfter = (
-        #                 base_url + f"api/v2/master/kelas/update-jumlah/{kelas}"
-        #             )
-        #             updateJumlahSiswaAfter = req.put(
-        #                 url=baseKelasAfter, headers=headers
-        #             )
-        #             baseKelasBefore = (
-        #                 base_url + f"api/v2/master/kelas/update-jumlah/{kelasId}"
-        #             )
-        #             updateJumlahSiswaAfter = req.put(
-        #                 url=baseKelasBefore, headers=headers
-        #             )
-        #             flash(
-        #                 f"Data dari {first_name} telah berhasil diperbaharui.",
-        #                 "info",
-        #             )
-        #             return redirect(url_for("admin2.getSiswa"))
-        #             # return redirect(url_for("admin2.get_siswa"))
-        #         else:
-        #             flash(
-        #                 f"Terjadi kesalahan dalam memuat data. statu : {response_update.status_code}",
-        #                 "error",
-        #             )
-        #             return render_template(
-        #                 "admin/siswa/edit_siswa.html",
-        #                 form=form,
-        #                 obj=json_resp,
-        #             )
-
-        #     return render_template(
-        #         "admin/siswa/edit_siswa.html", form=form, obj=json_resp
-        #     )
-        # else:
-        #     flash(
-        #         f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-        #         "error",
-        #     )
-        #     abort(404)
+        
 
     @admin2.route("update-siswa/update", methods=["GET", "POST"])
     @login_required
@@ -618,31 +481,7 @@ class PenggunaSiswa:
                 abort(404)
         else:
             return abort(401)
-        # if current_user.group == "admin":
-        #     url = base_url + f"/api/v2/student/single/{id}"
-        #     respGetSiswa = req.get(url)
-        #     jsonResp = respGetSiswa.json()
-        #     kelasId = jsonResp["kelas_id"]
-
-        #     baseKelas = base_url + f"api/v2/master/kelas/update-jumlah/{kelasId}"
-        #     headers = {"Content-Type": "application/json"}
-
-        #     response = req.delete(url)
-        #     if response.status_code == 204:
-        #         respkelas = req.put(url=baseKelas, headers=headers)
-        #         flash(
-        #             message=f"Data siswa telah berhasil di hapus. {response.status_code}",
-        #             category="info",
-        #         )
-        #         return redirect(url_for("admin2.getSiswa"))
-        #         # return redirect(url_for("admin2.get_siswa"))
-        #     else:
-        #         flash(
-        #             f"Ada tejadi kesalahan dalam menghapus data. Status : {response.status_code}",
-        #             "error",
-        #         )
-        #         return redirect(url_for("admin2.getSiswa"))
-        #         # return redirect(url_for("admin2.get_siswa"))
+       
 
     ### NOTE: DELETE FOTO SISWA & QR CODE
     @admin2.route("siswa/delete-foto", methods=["GET", "POST"])
@@ -2347,208 +2186,8 @@ def rekap_bulan():
                 )
                 return response
 
-    # except Exception as e:
-    #     # traceback_ = traceback.format_exc()
-    #     # trace_file = traceback.format_exc().split(" ")[7]
-    #     # get_file = trace_file.split(sep="\\")[-1]
-    #     # trace_line = traceback_.split(" ")
-    #     # response = make_response(
-    #     #     f"Pesan : {str(e)} </br> {get_file} </br> {trace_line} </br> {len(trace_line)}"
-    #     # )
-    #     # return response
-    #     return
     else:
         response = make_response(
             render_template("admin/letter_report/rekap_bulan.html", form=form)
         )
         return response
-
-
-"""
-NOTE: KATEOGRI PELANGGARAN
-"""
-
-
-# @admin2.route("kategori-pelanggaran")
-# @login_required
-# def kategori_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             form = FormKategoriPelanggaran()
-#             sql_kategori = BaseModel(KategoriPelanggaranModel).get_all()
-#             response = make_response(
-#                 render_template(
-#                     "admin/master/pelanggaran/kategori_pelanggaran.html",
-#                     form=form,
-#                     sql_kategori=sql_kategori,
-#                 )
-#             )
-#             return response
-#         else:
-#             return abort(404)
-
-
-# @admin2.route("kategori-pelanggaran/add", methods=["GET", "POST"])
-# @login_required
-# def add_kategori_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             form = FormKategoriPelanggaran()
-#             if request.method == "POST" and form.validate_on_submit():
-#                 kategori = form.kategori.data
-#                 insert_sql = KategoriPelanggaranModel(kategori=kategori)
-#                 db.session.add(insert_sql)
-#                 db.session.commit()
-#                 response = make_response(
-#                     redirect(url_for("admin2.kategori_pelanggaran"))
-#                 )
-#                 flash(f"Data kategori berhasil ditambahkan!", "success")
-#                 return response
-#             else:
-#                 flash(f"Ma'af!\\nTerjadi kesalahan dalam menginput data.", "error")
-#                 return redirect(url_for("admin2.kategori_pelanggaran"))
-#         else:
-#             return abort(404)
-
-
-# @admin2.route("kategori-pelanggaran/edit", methods=["GET", "POST"])
-# @login_required
-# def edit_kategori_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             form = FormKategoriPelanggaran()
-#             id = request.args.get("idx")
-#             sql_kategori = KategoriPelanggaranModel.query.filter_by(id=id).first()
-
-#             sql_kategori.kategori = form.kategori.data
-#             db.session.commit()
-
-#             response = make_response(redirect(url_for("admin2.kategori_pelanggaran")))
-#             flash(f"Data kategori berhasil diperbaharui.", "info")
-#             return response
-#         else:
-#             return abort(404)
-
-
-# @admin2.route("kategori-pelanggaran/delete", methods=["GET", "POST", "DELETE"])
-# @login_required
-# def delete_kategori_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             id = request.args.get("idx")
-#             sql_kategori = KategoriPelanggaranModel.query.filter_by(id=id).first()
-#             db.session.delete(sql_kategori)
-#             db.session.commit()
-
-#             flash(f"Data Kategori Pelanggaran\\nTelah Dihapus Dari Database.", "info")
-#             return redirect(url_for("admin2.kategori_pelanggaran"))
-#         else:
-#             return abort(404)
-
-
-"""
-NOTE : JENIS PELANGGARAN
-"""
-
-
-# @admin2.route("jenis-pelanggaran", methods=["GET", "POST"])
-# @login_required
-# def jenis_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             form = FormJenisPelanggaran()
-#             sql_kategori = KategoriPelanggaranModel.query.all()
-#             for i in sql_kategori:
-#                 form.kategori.choices.append((i.id, i.kategori))
-
-#             sql_jenis = BaseModel(JenisPelanggaranModel).get_all()
-#             response = make_response(
-#                 render_template(
-#                     "admin/master/pelanggaran/jenis_pelanggaran.html",
-#                     form=form,
-#                     sql_jenis=sql_jenis,
-#                     sql_kategori=sql_kategori,
-#                 )
-#             )
-#             return response
-#         else:
-#             return abort(404)
-
-
-# @admin2.route("jenis-pelanggaran/add", methods=["GET", "POST"])
-# @login_required
-# def add_jenis_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             form = FormJenisPelanggaran()
-#             if request.method == "POST":
-#                 kategori_id = form.kategori.data
-#                 jenis = form.jenis.data
-#                 poin = form.poin.data
-#                 if kategori_id != "" and jenis != "" and poin != "":
-#                     insert_jenis = JenisPelanggaranModel(
-#                         kategori_id=kategori_id, jenis=jenis, poin=poin
-#                     )
-
-#                     db.session.add(insert_jenis)
-#                     db.session.commit()
-#                     response = make_response(
-#                         redirect(url_for("admin2.jenis_pelanggaran"))
-#                     )
-#                     flash(f"Data Jenis Pelanggaran Berhasil Ditambahkan.", "success")
-#                     return response
-#                 else:
-#                     #     response = make_response(redirect(url_for("admin2.jenis_pelanggaran")))
-#                     flash(
-#                         f"Ma'af! Gagal menginput data.\\nSilah periksa kembali inputan anda.",
-#                         "error",
-#                     )
-#                     return redirect(url_for("admin2.jenis_pelanggaran"))
-
-#         else:
-#             return abort(404)
-
-
-# @admin2.route("jenis-pelanggaran/edit", methods=["GET", "POST"])
-# @login_required
-# def edit_jenis_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             id = request.args.get("idx")
-#             sql_jenis = JenisPelanggaranModel.query.filter_by(id=id).first()
-
-#             kategori_id = request.form.get("kategori")
-#             jenis = request.form.get("jenis")
-#             poin = request.form.get("poin")
-
-#             sql_jenis.kategori_pelanggaran_id = kategori_id
-#             sql_jenis.jenis = jenis
-#             sql_jenis.poin_pelanggaran = poin
-
-#             # print(kategori_id, '----', jenis, '-----', poin)
-
-#             db.session.commit()
-
-#             response = make_response(redirect(url_for("admin2.jenis_pelanggaran")))
-#             flash(f"Data Jenis Pelanggaran Telah Di Perbaharui.", "info")
-#             return response
-#         else:
-#             return abort(404)
-
-
-# @admin2.route("jenis-pelanggaran/delete", methods=["GET", "POST"])
-# @login_required
-# def delete_jenis_pelanggaran():
-#     if current_user.is_authenticated:
-#         if current_user.group == "admin":
-#             id = request.args.get("idx")
-#             sql_jenis = JenisPelanggaranModel.query.filter_by(id=id).first()
-
-#             db.session.delete(sql_jenis)
-#             db.session.commit()
-
-#             response = make_response(redirect(url_for("admin2.jenis_pelanggaran")))
-#             flash(f"Data Jenis Pelanggaran Telah Di Hapus Dari Database.", "info")
-#             return response
-#         else:
-#             return abort(404)

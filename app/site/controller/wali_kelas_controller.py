@@ -1,9 +1,8 @@
 from calendar import monthrange
 from datetime import datetime
-from flask import make_response, request, flash, render_template, Blueprint, abort
+from flask import make_response, request, flash, render_template, Blueprint
 from flask_login import current_user, login_required
 from sqlalchemy import func, and_
-from app.api.controller.master_controller import JadwalMengajar
 from app.lib.date_time import format_indo
 from app.lib.filters import hari_minggu, hari_sabtu
 from app.models.data_model import (
@@ -15,9 +14,7 @@ from app.models.data_model import (
 from app.models.master_model import (
     HariModel,
     KepsekModel,
-    MapelModel,
     MengajarModel,
-    NamaBulanModel,
     SemesterModel,
     TahunAjaranModel,
     WaliKelasModel,

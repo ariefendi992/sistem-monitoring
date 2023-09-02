@@ -3,7 +3,7 @@ from app.extensions import db
 import sqlalchemy.orm as rs
 from sqlalchemy.orm import backref
 from .user_details_model import *
-from typing import Any, Optional
+from typing import Optional
 
 from .user_details_model import GuruModel
 
@@ -168,10 +168,6 @@ class MengajarModel(db.Model):
         self.mapel_id = mapelId
         self.jam_ke = jamKe
 
-    # def __repr__(self) -> str:
-    #     return "Kode Mengajar : {}, Nama Guru : {}, Mapel : {}".format(
-    #         self.kode_mengajar, self.guru.first_name, self
-    #     )
 
 
 class KepsekModel(db.Model):
@@ -236,34 +232,3 @@ class TahunModel(db.Model):
         return "id : {} | tahun {} | status {}".format(self.id, self.tahun, self.status)
 
 
-# class KategoriPelanggaranModel(db.Model):
-#     __tablename__ = "master_kategori_pelanggaran"
-#     id = sa.Column(sa.Integer, primary_key=True)
-#     kategori = sa.Column(sa.String(64), nullable=False)
-
-#     def __init__(self, kategori: str):
-#         self.kategori = kategori
-
-#     def __repr__(self) -> str:
-#         return f"kategori : {self.kategori}"
-
-
-# class JenisPelanggaranModel(db.Model):
-#     __tablename__ = "master_jenis_pelanggaran"
-#     id = sa.Column(sa.Integer, primary_key=True)
-#     kategori_pelanggaran_id = sa.Column(
-#         sa.Integer, sa.ForeignKey("master_kategori_pelanggaran.id", onupdate="CASCADE")
-#     )
-#     kategori = rs.relationship(
-#         "KategoriPelanggaranModel", backref="kategori_pelanggaran"
-#     )
-#     jenis = sa.Column(sa.String(128), nullable=False)
-#     poin_pelanggaran = sa.Column(sa.Integer, nullable=True)
-
-#     def __init__(self, kategori_id: int = None, jenis: str = None, poin: int = None):
-#         self.kategori_pelanggaran_id = kategori_id
-#         self.jenis = jenis
-#         self.poin_pelanggaran = poin
-
-#     def __repr__(self) -> str:
-#         return self.jenis

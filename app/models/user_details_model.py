@@ -1,4 +1,3 @@
-from datetime import datetime
 from app.extensions import db
 import sqlalchemy as sa
 from .user_model import UserModel

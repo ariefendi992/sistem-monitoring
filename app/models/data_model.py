@@ -4,10 +4,9 @@ import sqlalchemy.orm as sql
 from sqlalchemy.orm import backref
 from app.models.master_model import *
 from datetime import datetime
-from sqlalchemy import Integer, String, ForeignKey, Column, Text, true
+from sqlalchemy import Integer, String, Column
 from sqlalchemy.orm import relationship
 from app.models.user_details_model import GuruModel
-import typing as t
 
 
 class AbsensiModel(db.Model):
@@ -30,7 +29,6 @@ class AbsensiModel(db.Model):
     tgl_absen = sa.Column(sa.Date)
     ket = sa.Column(sa.String(16), nullable=True)
     pertemuan_ke = sa.Column(sa.Integer, nullable=True)
-    # pertemuan_ke = sa.Column(sa.String(2), nullable=True)
 
     def __init__(
         self,
@@ -72,10 +70,7 @@ class PelanggaranModel(db.Model):
     note = sa.Column(sa.Text(), nullable=True)
     tgl_report = sa.Column(sa.Date, nullable=False)
     status = sa.Column(sa.String(128), nullable=True)
-    # pembinaan = relationship(
-    #     "PembinaanModel",
-    #     back_populates="pelanggaran",
-    # )
+ 
 
     def __init__(
         self,
@@ -159,7 +154,6 @@ class PembinaanModel(db.Model):
         self.bina = bina
         self.pelanggaran_id = pelanggaran_id
         self.siswa_id = siswa_id
-        # self.tgl_bina = datetime.date(datetime.today())
         self.tgl_bina = tgl_bina
         self.status = status
 

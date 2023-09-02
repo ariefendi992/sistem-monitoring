@@ -50,7 +50,6 @@ admin2 = Blueprint(
 file = os.getcwd() + "/data.json"
 
 
-
 sql = lambda x: x
 
 dbs = DBStatement()
@@ -104,31 +103,6 @@ class PenggunaSiswa:
                     "admin/siswa/get_siswa.html",
                     kelas=jsonRespKelas,
                     siswa=jsonRespSiswa,
-                )
-            else:
-                flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
-                )
-                abort(404)
-
-    @admin2.route("/data-siswa")
-    @login_required
-    def get_siswa():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                url = base_url + url_for("siswa.get")
-                r = req.get(url)
-                data = r.json()
-                # NOTE: GET KELAS
-                base_kelas = request.url_root
-                url_kelas = base_kelas + url_for("master.kelas_all")
-                resp_kelas = req.get(url_kelas)
-                json_kelas = resp_kelas.json()
-                return render_template(
-                    "admin/siswa/data_siswa.html",
-                    model=data,
-                    jsonKelas=json_kelas,
                 )
             else:
                 flash(
@@ -200,9 +174,14 @@ class PenggunaSiswa:
                 )
                 abort(404)
 
+    """
+    kode in dimatikan hanya untuk sementara waktu.
+
     @admin2.errorhandler(413)
     def request_entity_too_large(error):
-        return "File Upload Maks 2MB", HTTP_413_REQUEST_ENTITY_TOO_LARGE
+         return "File Upload Maks 2MB", HTTP_413_REQUEST_ENTITY_TOO_LARGE
+
+    """
 
     # NOTE:  TAMBAH DATA SISWA
     @admin2.route("/add-siswa", methods=["GET", "POST"])
@@ -325,7 +304,6 @@ class PenggunaSiswa:
                 abort(404)
 
         return abort(401)
-        
 
     @admin2.route("update-siswa/update", methods=["GET", "POST"])
     @login_required
@@ -476,7 +454,6 @@ class PenggunaSiswa:
                 abort(404)
         else:
             return abort(401)
-       
 
     ### NOTE: DELETE FOTO SISWA & QR CODE
     @admin2.route("siswa/delete-foto", methods=["GET", "POST"])
@@ -526,6 +503,46 @@ class PenggunaSiswa:
                 dbs.dbs_abort(404, description=f"Data User tidak ditemukan.")
         else:
             dbs.dbs_abort(401, description="Login gagal.")
+
+    @admin2.route("siswa/download-foto", methods=["GET", "POST"])
+    @login_required
+    def download_foto():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
+
+                user_id = request.args.get("siswa", type=int)
+
+                sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
+
+                unduh = send_from_directory(
+                    path_file, sql_siswa.pic, as_attachment=True
+                )
+                response = make_response(unduh)
+                return response
+            else:
+                abort(404, description=f"Data user tidak ditemukan")
+        else:
+            abort(401)
+
+    @admin2.route("siswa/download-qr", methods=["GET", "POST"])
+    @login_required
+    def download_qr():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                dir_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+
+                user_id = request.args.get("siswa", type=int)
+                sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
+
+                unduh = send_from_directory(
+                    dir_file, sql_siswa.qr_code, as_attachment=True
+                )
+                response = make_response(unduh)
+                return response
+            else:
+                abort(404)
+        abort(401)
 
     # eksport data
     @admin2.route("/export-siswa")
@@ -1766,7 +1783,7 @@ class JadwalMengajara:
                 mapel_id = request.form.get("namaMapel")
                 hari_id = request.form.get("hari")
                 kelas_id = request.form.get("kelas")
-             
+
                 jam_mulai2 = request.form.get("waktuMulai2")
                 jam_selesai2 = request.form.get("waktuSelesai2")
                 jam_ke = request.form.get("jamKe")
@@ -1833,7 +1850,6 @@ class JadwalMengajara:
             respKelas = req.get(urlKelas)
             for i in respKelas.json()["data"]:
                 form.kelas.choices.append((i["id"], i["kelas"]))
-
 
             form.kode.default = jsonResp["kode_mengajar"]
             form.tahunAjaran.default = jsonResp["tahun_ajaran"]

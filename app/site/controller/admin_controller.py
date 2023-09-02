@@ -783,29 +783,31 @@ class PenggunaUser:
         else:
             abort(404)
 
-    @admin2.post("/edit-status/<int:id>")
+    @admin2.route("/status-pengguna", methods=["GET", "POST"])
     @login_required
-    def update_status(id):
+    def update_status():
         if current_user.group == "admin":
-            url = base_url + f"api/v2/auth/edit-status?id={id}"
+            user_id = request.args.get("pengguna", type=int)
 
-            status_form = request.form.get("status")
+            sql_user = dbs.get_one(UserModel, id=user_id)
 
             status = ""
-            if request.method == "POST":
-                if status_form == "Aktif":
-                    status = "0"
-                elif status_form == "Non-Aktif":
-                    status = "1"
 
-                payload = json.dumps({"status": status})
-                headers = {"Content-Type": "application/json"}
-                response = req.put(url, headers=headers, data=payload)
+            if sql_user.is_active == "1":
+                status = 0
+            elif sql_user.is_active == "0":
+                status = 1
 
-                if response.status_code == 200:
-                    return redirect(url_for("admin2.get_user"))
-                else:
-                    return redirect(url_for("admin2.get_user"))
+            sql_user.is_active = status
+            sql_user.update_date = utc_makassar()
+
+            dbs.update_data()
+
+            direct = redirect(url_for("admin2.get_user"))
+            response = make_response(direct)
+
+            return response
+
         else:
             abort(400)
 

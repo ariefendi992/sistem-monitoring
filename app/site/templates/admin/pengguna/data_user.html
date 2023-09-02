@@ -31,13 +31,12 @@
       <thead>
         <tr>
           <th>NO</th>
-          <th>Username</th>
-          <th>Group</th>
-          <th>Taggal Buat</th>
-          <th>Last Update</th>
-          <th>Las Login</th>
-          <th>Status</th>
-          <th>Aksi</th>
+          <th class="text-center">Username</th>
+          <th class="text-center">Group</th>
+          <th class="text-center">Taggal Buat</th>
+          <th class="text-center">Last Update</th>
+          <th class="text-center">Las Login</th>
+          <th class="text-center" style="width: 70px;">Aksi</th>
         </tr>
       </thead>
       <tbody>
@@ -49,20 +48,15 @@
           <td>{{_.join_date | datetime_id(hari=false, jam=false)}}</td>
           <td>{{_.update_date | datetime_id(hari=false) if _.update_date else '-'}}</td>
           <td>{{_.user_last_login | datetime_id(hari=false) if _.user_last_login else '-'}}</td>
-          <td class="align-middle">
-            <form action="{{url_for('admin2.update_status',id=_.id)}}" method="post">
-              {#{ form.csrf_token}#}
-              <input type="text" hidden="true" name="status" value="{{'Aktif' if _.is_active == '1' else 'Non-Aktif'}}">
-              <!-- {{form.state(class="btn btn-success btn-xs", title="Non-Aktifkan") if _.is_active == '1' else form.state(class="btn btn-danger btn-xs", value='Non-Aktif', title="Aktifkan") }} -->
-              <input type="submit" class="btn {{'btn-success' if _.is_active == '1' else 'btn-danger'}} btn-xs"
-                title="{{'Non-Aktifkan' if _.is_active == '1' else 'Aktifkan'}}"
-                value="{{'Non-Aktifkan' if _.is_active == '1' else 'Aktifkan'}}">
-            </form>
-          </td>
-          <td>
-            <button class="btn btn-info btn-xs" title="Ubah Password" data-toggle="modal"
-              data-target="#modal-user-{{_.id}}">
-              <i class="fas fa-user-edit"></i> Ubah Pswd
+          <td class="text-center">
+            <a href="{{ url_for('admin2.update_status', pengguna=_.id)}}"
+              class="btn btn-xs btn-outline-{{'danger' if _.is_active == '0' else 'success'}} " data-tooltip="tooltip"
+              title="{{'Aktifkan' if _.is_active == '0' else 'Non-Aktifkan'}}">
+              <i class="fas fa-{{'user' if _.is_active == '1' else 'user-slash'}}"></i>
+            </a>
+            <button class="btn btn-xs btn-outline-warning" title="Ubah Password" data-toggle="modal"
+              data-tooltip="tooltip" title="Ubah Password" data-target="#modal-user-{{_.id}}">
+              <i class="fas fa-sync"></i>
             </button>
           </td>
 
@@ -108,6 +102,8 @@
       "responsive": true,
 
     });
+
+    $('[data-tooltip="tooltip"]').tooltip()
   });
 </script>
 {% endblock js %}

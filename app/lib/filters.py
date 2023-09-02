@@ -44,6 +44,33 @@ def tgl_absen(datetime: datetime) -> datetime:
     return date
 
 
+def datetime_id(
+    datetime: type[datetime],
+    hari: type[bool] = True,
+    jam: type[bool] = True,
+) -> datetime:
+    day = WEEKDAYSLIST[datetime.weekday()]
+    date = datetime.day
+    month = MONTHLISTSHORT[datetime.month - 1]
+    year = datetime.year
+    time = datetime.time()
+    value = ""
+    if hari == False and jam:
+        value = f"{date}-{month}-{year} | {time}"
+        # return value
+    elif jam == False and hari:
+        value = f"{day}, {date}-{month}-{year}"
+        # return value
+
+    elif (hari and jam) == False:
+        value = f"{date}-{month}-{year}"
+        # return value
+    else:
+        value = f"{day}, {date}-{month}-{year} | {time}"
+
+    return value
+
+
 def truncate(
     s: str,
     length: int = 255,

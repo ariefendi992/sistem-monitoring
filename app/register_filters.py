@@ -1,5 +1,5 @@
 from app.lib.date_time import *
-from app.lib.filters import from_db, hari_minggu, hari_sabtu, tgl_absen
+from app.lib.filters import datetime_id, from_db, hari_minggu, hari_sabtu, tgl_absen
 
 
 def register_filters(app):
@@ -10,3 +10,4 @@ def register_filters(app):
     app.jinja_env.filters["sabtu"] = hari_sabtu
     app.jinja_env.filters["minggu"] = hari_minggu
     app.jinja_env.filters["tglAbsen"] = tgl_absen
+    app.jinja_env.filters["datetime_id"] = datetime_id

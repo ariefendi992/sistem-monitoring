@@ -46,9 +46,9 @@
           <td>{{loop.index}}</td>
           <td>{{_.username}}</td>
           <td>{{_.group.upper()}}</td>
-          <td>{{_.join}}</td>
-          <td>{{_.last_update}}</td>
-          <td>{{_.user_last_login}}</td>
+          <td>{{_.join_date | datetime_id(hari=false, jam=false)}}</td>
+          <td>{{_.update_date | datetime_id(hari=false) if _.update_date else '-'}}</td>
+          <td>{{_.user_last_login | datetime_id(hari=false) if _.user_last_login else '-'}}</td>
           <td class="align-middle">
             <form action="{{url_for('admin2.update_status',id=_.id)}}" method="post">
               {#{ form.csrf_token}#}

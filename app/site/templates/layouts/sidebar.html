@@ -14,24 +14,6 @@
   <!-- Sidebar -->
   {% block sideBar %}
   <div class="sidebar">
-    <!-- Sidebar user (optional) -->
-    {# <div class="user-panel mt-2 pb-1 mb-3 d-flex align-items-center">
-      <div class="image">
-        <img src="{{ url_for('admin2.static', filename='img/avatar.png')}}" class="img-circle elevation-2"
-          alt="User Image" />
-      </div>
-      <div class="info">
-        <a href="#collapseExample" class="d-block">
-          {% if current_user.is_authenticated %}
-          <p class="mb-0 p-0">
-            {{ current_user.first_name}} {{ current_user.last_name}}
-            <!-- <i class="right fas fa-angle-left"></i> -->
-          </p>
-          <div class="text-white-50">{{ current_user.username | upper}}</div>
-          {% endif %}
-        </a>
-      </div>
-    </div> #}
     <!-- Sidebar Menu -->
     <nav class="mt-3">
       <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact" data-widget="treeview" role="menu"
@@ -124,35 +106,7 @@
                 <p>Kepala Sekolah</p>
               </a>
             </li>
-            {#<li
-              class="nav-item {{ 'menu-open' if filename=='kategori-pelanggaran' or filename=='jenis-pelanggaran' else '' }}">
-              <a href="#"
-                class="nav-link {{ 'active' if filename=='kategori-pelanggaran' or filename=='jenis-pelanggaran' else '' }}">
-                <i
-                  class="nav-icon far fa-circle {{ 'fa-dot-circle' if filename=='kategori-pelanggaran' or filename=='jenis-pelanggaran' else '' }}"></i>
-                <p>Pelanggaran
-                  <i class="right fas fa-angle-left"></i>
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="{{ url_for('admin2.kategori_pelanggaran') }}"
-                    class="nav-link {{ 'active' if filename=='kategori-pelanggaran' else '' }}">
-                    <i
-                      class="nav-icon far fa-circle {{ 'fa-dot-circle' if filename=='kategori-pelanggaran' else '' }} "></i>
-                    <p>Kategori Pelanggaran</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="{{ url_for('admin2.jenis_pelanggaran') }}"
-                    class="nav-link {{ 'active' if filename=='jenis-pelanggaran' else '' }}">
-                    <i
-                      class="nav-icon far fa-circle {{ 'fa-dot-circle' if filename=='jenis-pelanggaran' else '' }}"></i>
-                    <p>Jenis Pelanggaran</p>
-                  </a>
-                </li>
-              </ul>
-            </li>#}
+
           </ul>
         </li>
         <li
@@ -238,6 +192,15 @@
             </li>
           </ul>
         </li>
+
+        <li class="nav-header">Pengaturan</li>
+        <li class="nav-item">
+          <a href="{{url_for('admin2.get_user')}}" class="nav-link {{ 'active' if filename=='data-user' else None }}">
+            <i class="fas fa-users nav-icon"></i>
+            <p>Akun Pengguna</p>
+          </a>
+        </li>
+        {#<li class="nav-header">Laporan</li>
         <li
           class="nav-item
           {{ 'menu-open' if filename=='daftar_hadir' or filename=='result-bulan' or filename=='hadir-semester' or filename=='result-semester'  else '' }}">
@@ -268,13 +231,6 @@
             </li>
           </ul>
         </li>
-        <li class="nav-item">
-          <a href="{{url_for('admin2.get_user')}}" class="nav-link {{ 'active' if filename=='data-user' else None }}">
-            <i class="fas fa-users nav-icon"></i>
-            <p>Akun Pengguna</p>
-          </a>
-        </li>
-        <li class="nav-header">Letter & Report</li>
         <li class="nav-item ">
           <a href="{{ url_for('admin2.select_siswa') }}"
             class="nav-link {{ 'active' if filename=='siswa-kelas' or filename=='select-siswa' else '' }}">
@@ -294,72 +250,7 @@
             <i class="nav-icon fas fa-print"></i>
             <p>Rekap Pelanggaran</p>
           </a>
-        </li>
-        {# <li class="nav-header">Profile</li> #}
-        {#
-        <li
-          class="nav-item {{'menu-open' if filename=='data-siswa' or filename=='tambah-siswa' or filename == 'data-guru' or filename == 'edit-guru' or filename == 'edit-siswa' or filename == 'tambah-guru' else None}}">
-          <a href="#"
-            class="nav-link {{'active' if filename=='data-siswa' or filename=='tambah-siswa' or filename == 'data-guru' or filename == 'edit-guru' or filename == 'edit-siswa' or filename == 'tambah-guru' else None}}">
-            <i class="nav-icon fas fa-layer-group"></i>
-            <p>
-              Data Pengguna
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Admin2</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ url_for('admin2.get_guru')}}"
-                class="nav-link {{'active' if filename == 'data-guru' or filename == 'edit-guru' or filename == 'tambah-guru' else ''}}">
-                <i
-                  class="far fa-circle {{ 'fa-dot-circle' if filename == 'data-guru' or filename == 'edit-guru' or filename == 'tambah-guru' else ''}}  nav-icon"></i>
-                <p>Guru</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ url_for('admin2.get_siswa')}}"
-                class="nav-link {{'active' if filename=='data-siswa' or filename=='tambah-siswa' or filename == 'edit-siswa' else None}}">
-                <i
-                  class="far nav-icon {{ 'fa-dot-circle' if filename=='data-siswa' or filename=='tambah-siswa' or filename == 'edit-siswa' else 'fa-circle' }}"></i>
-                <p>Siswa</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        #}
-        {# <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-user-cog"> </i>
-            <p>
-              Pengaturan Akun
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far nav-icon fa-dot-circle"></i>
-                <p>Ubah Data</p>
-              </a>
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Ubah Password</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a href="{{ url_for('login.logout') }}" class="nav-link">
-            <i class="nav-icon fas fa-sign-out-alt"></i>
-            <p>Logout</p>
-          </a>
-        </li> #}
+        </li>#}
       </ul>
     </nav>
     <!-- /.sidebar-menu -->

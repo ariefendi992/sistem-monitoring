@@ -4,7 +4,7 @@ import qrcode, os
 from sqlalchemy import and_, func
 from werkzeug.utils import secure_filename
 from qrcode.image.styledpil import StyledPilImage
-from qrcode.image.styles.moduledrawers import HorizontalBarsDrawer
+from qrcode.image.styles.moduledrawers import *
 from flask import (
     Blueprint,
     jsonify,
@@ -338,10 +338,14 @@ def generate_qc():
     if not model:
         return jsonify(msg="User not found."), HTTP_404_NOT_FOUND
     else:
-        qc = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L)
+        qc = qrcode.QRCode(
+            error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=20, border=2
+        )
         qc.add_data(model.user.username)
         qc_img = qc.make_image(
-            image_factory=StyledPilImage, module_drawer=HorizontalBarsDrawer(), fit=True
+            image_factory=StyledPilImage,
+            module_drawer=RoundedModuleDrawer(),
+            fit=True,
         )
         enc_file_name = hashlib.md5(
             secure_filename(model.user.username).encode("utf-8")
@@ -514,49 +518,6 @@ def getJadwalByHari():
         ),
         HTTP_200_OK,
     )
-
-
-# @siswa.route("/daftar-pelanggar")
-# @jwt_required()
-# def get_daftar_pelanggar():
-#     sql_pelanggar = (
-#         db.session.query(
-#             PelanggaranModel,
-#             func.sum(JenisPelanggaranModel.poin_pelanggaran),
-#         )
-#         .join(JenisPelanggaranModel)
-#         .join(SiswaModel)
-#         .group_by(PelanggaranModel.siswa_id)
-#         .order_by(func.sum(JenisPelanggaranModel.poin_pelanggaran.desc))
-#         .limit(6)
-#     )
-
-#     data = []
-#     new_data = []
-
-#     if sql_pelanggar:
-#         for i, poin in sql_pelanggar:
-#             data.append(
-#                 dic_data(
-#                     id=i.id,
-#                     poin=poin,
-#                     nama_siswa=f"{i.siswa.first_name.title()} {i.siswa.last_name.title()}",
-#                 )
-#             )
-
-#         for index, val in enumerate(data, start=1):
-#             new_data.append(
-#                 dic_data(
-#                     urut=index,
-#                     id=val["id"],
-#                     poin=val["poin"],
-#                     nama_siswa=val["nama_siswa"],
-#                 )
-#             )
-#         return jsonify(data=new_data), HTTP_200_OK
-
-#     else:
-#         return jsonify(msg="Belum ada siswa yang melanggar"), HTTP_404_NOT_FOUND
 
 
 @siswa.route("/jadwal-harian")

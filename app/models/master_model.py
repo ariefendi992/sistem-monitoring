@@ -5,7 +5,7 @@ from sqlalchemy.orm import backref
 from .user_details_model import *
 from typing import Optional
 
-from .user_details_model import GuruModel
+# from .user_details_model import GuruModel
 
 
 class KelasModel(db.Model):
@@ -169,7 +169,6 @@ class MengajarModel(db.Model):
         self.jam_ke = jamKe
 
 
-
 class KepsekModel(db.Model):
     __tablename__ = "master_kepsek"
     id = sa.Column(sa.Integer, primary_key=True)
@@ -196,7 +195,7 @@ class GuruBKModel(db.Model):
     guru = rs.relationship("GuruModel", backref="guru_bk")
     status = sa.Column(sa.String(1), nullable=True)
 
-    def __init__(self, guruId: Optional[GuruModel], status: Optional[str]):
+    def __init__(self, guruId: int, status: str):
         self.guru_id = guruId
         self.status = status
 
@@ -230,5 +229,3 @@ class TahunModel(db.Model):
 
     def __repr__(self) -> str:
         return "id : {} | tahun {} | status {}".format(self.id, self.tahun, self.status)
-
-

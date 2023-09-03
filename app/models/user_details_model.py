@@ -1,6 +1,5 @@
 from app.extensions import db
 import sqlalchemy as sa
-from .user_model import UserModel
 from .master_model import *
 from sqlalchemy.orm import backref, relationship
 
@@ -13,18 +12,18 @@ class AdminModel(db.Model):
     gender = sa.Column(sa.String(32), nullable=True)
     alamat = sa.Column(sa.String(128), nullable=True)
     user_id = sa.Column(sa.Integer, sa.ForeignKey("auth_user.id", ondelete="CASCADE"))
-    user = relationship(
-        "UserModel", backref=backref("user_admin", cascade="all, delete-orphan")
-    )
+    user = db.relationship("UserModel", back_populates="admins")
 
     def __init__(
-        self, first_name=None, last_name=None, gender=None, alamat=None, user_id=None
+        self, first_name=None, last_name=None, gender=None, alamat=None, user=None
     ) -> str:
         self.first_name = first_name
         self.last_name = last_name
         self.gender = gender
         self.alamat = alamat
-        self.user_id = user_id
+        self.user = user
+
+        # self.user_id = user_id
 
 
 class SiswaModel(db.Model):

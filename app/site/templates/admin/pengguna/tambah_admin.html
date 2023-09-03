@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ super()}}
+{% endblock %}
+{% set filename = 'tambah-admin' %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-user-plus mr-1"></i>Form Tambah Admin</h3>
+  </div>
+  <form action="" method="post">
+    {{ form.csrf_token }}
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-8 m-auto">
+          <h6 class="font-weight-normal mb-2 border-bottom">..::Data Akun::..</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.username.label}}
+                {% if form.username.errors %}
+                {{ form.username(class="form-control form-control-sm is-invalid")}}
+                {% for msg in form.username.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.username.data %}
+                {{ form.username(class="form-control form-control-sm")}}
+                {% else %}
+                {{ form.username(class="form-control form-control-sm")}}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.password.label}}
+                {% if form.password.errors %}
+                {{ form.password(class="form-control form-control-sm is-invalid")}}
+                {% for msg in form.password.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.password.data %}
+                {{ form.password(class="form-control form-control-sm")}}
+                {% else %}
+                {{ form.password(class="form-control form-control-sm")}}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.group.label}}
+                {% if form.group.errors %}
+                {{ form.group(class="form-control form-control-sm is-invalid")}}
+                {% for msg in form.group.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.group.data %}
+                {{ form.group(class="form-control form-control-sm")}}
+                {% else %}
+                {{ form.group(class="form-control form-control-sm")}}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+              </div>
+            </div>
+          </div>
+          <h6 class="font-weight-normal mb-2 border-bottom mt-2">..::Data Profil::..</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.fullname.label}}
+                {% if form.fullname.errors %}
+                {{ form.fullname(class="form-control form-control-sm is-invalid")}}
+                {% for msg in form.fullname.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.fullname.data %}
+                {{ form.fullname(class="form-control form-control-sm")}}
+                {% else %}
+                {{ form.fullname(class="form-control form-control-sm")}}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.gender.label}}
+                {% if form.gender.errors %}
+                {{ form.gender(class="form-control form-control-sm is-invalid")}}
+                {% for msg in form.gender.errors %}
+                <span class="error invalid-feedback">{{ msg }}</span>
+                {% endfor %}
+                {% elif form.gender.data %}
+                {{ form.gender(class="form-control form-control-sm")}}
+                {% else %}
+                {{ form.gender(class="form-control form-control-sm")}}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.alamat.label}}
+                {{ form.alamat}} <!-- Definisi class via render kw -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <div class="row">
+        <div class="col-md-8 m-auto">
+          <div class="row">
+
+            <div class="col-md-6">
+              <button type="reset" class="btn btn-warning float-left"><i
+                  class="fas fa-undo-alt  mr-1"></i>Reset</button>
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-primary float-right">
+                Submit <i class="fas fa-arrow-right ml-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

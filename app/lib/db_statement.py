@@ -11,6 +11,12 @@ class DBStatement:
         self.model = model_class
         self.session = db.session
 
+    def add_data(self, data: t.Any) -> t.Any:
+        """AI is creating summary for add_data table"""
+        if type(data) == t.List:
+            self.session.add_all(data)
+        self.session.add(data)
+
     def get_first_or_404(
         self, statement: db.sql.Select[t.Any], *, description: str | None = None
     ) -> t.Any:
@@ -41,7 +47,7 @@ class DBStatement:
         self.session.delete(statement)
         return self.session.commit()
 
-    def update_data(self) -> _O:
+    def commit_data(self) -> _O:
         return self.session.commit()
 
     def dbs_abort(self, status_code: int, description: str | None = None) -> t.Any:

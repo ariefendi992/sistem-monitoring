@@ -13,11 +13,11 @@ from flask import (
     url_for,
 )
 from jinja2 import TemplateError, TemplateNotFound
-from app.api.controller.master_controller import Kelas
 from app.models.user_details_model import SiswaModel
 from flask_login import login_required, current_user
 from app.models.master_model import GuruBKModel
 from app.models.data_model import *
+from app.models.user_model import UserModel
 from app.site.forms.form_guru import (
     FormEditGuru,
     FormGetProfileGuru,
@@ -84,7 +84,7 @@ def index():
 @login_required
 def fetch_data_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             data = (
                 db.session.query(
                     PelanggaranModel,
@@ -112,7 +112,7 @@ def fetch_data_pelanggaran():
 @login_required
 def add_data_pelanggar():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             form = FormTambahPelanggar(request.form)
             sql_kelas = KelasModel.query.all()
             sql_jenis = JenisPelanggaranModel2.query.filter_by(status="1").all()
@@ -182,7 +182,7 @@ def add_data_pelanggar():
 @login_required
 def detail_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             siswa_id = request.args.get("siswa")
             pelanggaran_id = request.args.get("pelanggaran")
 
@@ -214,7 +214,7 @@ def detail_pelanggaran():
 def detail_all_pelanggaran():
     try:
         if current_user.is_authenticated:
-            if current_user.id == get_guru_bk().guru_id:
+            if current_user.group == "bk":
                 id = request.args.get("id")
 
                 detail_data = PelanggaranModel.query.filter_by(siswa_id=id).first()
@@ -287,7 +287,7 @@ def edit_pelanggaran():
 @login_required
 def delete_data_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             id = request.args.get("pelanggaran")
             siswa_id = request.args.get("siswa", type=int)
             sql_pelanggaran = PelanggaranModel.query.filter_by(id=id).first()
@@ -313,7 +313,7 @@ def delete_data_pelanggaran():
 @login_required
 def atur_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             form = FormJenisPelanggaran(request.form)
             model = JenisPelanggaranModel2
             data = model.fetchAll()
@@ -334,7 +334,7 @@ def atur_pelanggaran():
 @login_required
 def add_jenis_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             form = FormJenisPelanggaran(request.form)
             data = JenisPelanggaranModel2.fetchAll()
 
@@ -364,7 +364,7 @@ def add_jenis_pelanggaran():
 @login_required
 def get_one_jenis_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             form = FormEditJenisPelanggaran(request.form)
             model = JenisPelanggaranModel2
             data = model.fetchAll()
@@ -399,7 +399,7 @@ def get_one_jenis_pelanggaran():
 @login_required
 def delete_jenis_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             id = request.args.get("jp", type=int)
 
             sql = JenisPelanggaranModel2.query.filter_by(id=id).first()
@@ -422,7 +422,7 @@ def delete_jenis_pelanggaran():
 @login_required
 def data_pembinaan():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             data = (
                 db.session.query(PembinaanModel)
                 .group_by(PembinaanModel.siswa_id)
@@ -449,7 +449,7 @@ def data_pembinaan():
 @login_required
 def add_proses_pembinaan():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             pel_id = request.args.get("pelanggaran")
             siswa_id = request.args.get("siswa")
             status = str(object="0")
@@ -561,7 +561,7 @@ def add_tata_tertib():
 @login_required
 def get_tata_tertib():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             form = FormTambahTTertib()
             utama = TataTertibModel.query.all()
             data = TataTertibModel.query.all()
@@ -586,7 +586,7 @@ def get_tata_tertib():
 @login_required
 def get_one_tata_tertib():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             form = FormTambahTTertib(request.form)
 
             id = request.args.get("tataTertib")
@@ -778,7 +778,7 @@ def laporan_kehadiran():
 @login_required
 def laporan_pelanggaran():
     if current_user.is_authenticated:
-        if current_user.id == get_guru_bk().guru_id:
+        if current_user.group == "bk":
             form = FormLaporanPelanggaran()
 
             if form.kelas.data:

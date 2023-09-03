@@ -6,7 +6,6 @@ from app.models.master_model import *
 from datetime import datetime
 from sqlalchemy import Integer, String, Column
 from sqlalchemy.orm import relationship
-from app.models.user_details_model import GuruModel
 
 
 class AbsensiModel(db.Model):
@@ -70,7 +69,6 @@ class PelanggaranModel(db.Model):
     note = sa.Column(sa.Text(), nullable=True)
     tgl_report = sa.Column(sa.Date, nullable=False)
     status = sa.Column(sa.String(128), nullable=True)
- 
 
     def __init__(
         self,

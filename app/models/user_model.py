@@ -18,6 +18,7 @@ class UserModel(db.Model, UserMixin):
     is_active = sa.Column(sa.String(2), nullable=False)
     user_last_login = sa.Column(sa.DateTime)
     user_logout = sa.Column(sa.DateTime)
+    admins = db.relationship("AdminModel", back_populates="user")
 
     def __init__(self, username=None, password=None, group=None) -> None:
         super().__init__()
@@ -31,7 +32,7 @@ class UserModel(db.Model, UserMixin):
 
     def check_pswd(*args, **kwargs):
         return check_password_hash(*args, **kwargs)
-    
+
     def generate_pswd(password):
         return generate_password_hash(password)
 

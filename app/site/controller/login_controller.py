@@ -10,11 +10,11 @@ from flask import (
     session,
     make_response,
 )
-from app.models.user_details_model import AdminModel, GuruModel
+from app.models.user_details_model import *
 from app.site.forms.form_auth import FormLogin
 from flask_login import login_user, current_user, login_required, logout_user
 from urllib.parse import urljoin, urlparse
-from ...models.user_model import UserModel
+from app.models.user_model import *
 from app.lib.date_time import utc_makassar
 from app.extensions import db
 

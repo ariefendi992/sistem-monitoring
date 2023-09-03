@@ -1,5 +1,6 @@
 import json
 import time
+from typing import Any
 from flask import (
     Blueprint,
     Response,
@@ -25,6 +26,7 @@ from app.site.forms.form_auth import FormEditStatus
 from app.site.forms.form_jadwal import FormJadwalMengajar
 from app.site.forms.form_letter_report import FormSelectKelas
 from app.site.forms.form_master import *
+from app.site.forms.form_pengguna import FormTambahAdmin
 from app.site.forms.form_siswa import FormAddSiswa, FormEditSiswa
 from ..forms.form_auth import *
 from ..forms.form_guru import *
@@ -469,7 +471,7 @@ class PenggunaSiswa:
                 os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
 
                 sql_siswa.pic = None
-                dbs.update_data()
+                dbs.commit_data()
 
                 direct = redirect(url_for("admin2.getSiswa"))
                 response = make_response(direct)
@@ -492,7 +494,7 @@ class PenggunaSiswa:
 
                 os.remove(os.path.join(path_file, sql_siswa.qr_code))
                 sql_siswa.qr_code = None
-                dbs.update_data()
+                dbs.commit_data()
 
                 direct = redirect(url_for("admin2.getSiswa"))
                 response = make_response(direct)
@@ -801,7 +803,7 @@ class PenggunaUser:
             sql_user.is_active = status
             sql_user.update_date = utc_makassar()
 
-            dbs.update_data()
+            dbs.commit_data()
 
             direct = redirect(url_for("admin2.get_user"))
             response = make_response(direct)
@@ -810,6 +812,60 @@ class PenggunaUser:
 
         else:
             abort(400)
+
+    @admin2.route("/pengguna/tambah-admin", methods=["GET", "POST"])
+    @login_required
+    def tambah_admin():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                form = FormTambahAdmin()
+
+                if form.validate_on_submit():
+                    username = form.username.data
+                    password = form.password.data
+                    group = form.group.data
+                    fullname = form.fullname.data
+                    gender = form.gender.data
+                    alamat = form.alamat.data
+
+                    first_name = ""
+                    last_name = ""
+
+                    first_name, *last_name = fullname.split(" ") if fullname else ""
+
+                    if len(last_name) == 0:
+                        last_name = first_name
+                    elif len(last_name) != 0:
+                        last_name = " ".join(last_name)
+
+                    pswd = generate_password_hash(password)
+                    user = UserModel(username, pswd, group)
+
+                    dbs.add_data(user)
+                    detail: AdminModel = None
+                    if user:
+                        detail = AdminModel(
+                            first_name, last_name, gender, alamat, user=user
+                        )
+
+                        dbs.add_data(detail)
+
+                        dbs.commit_data()
+
+                        flash("Data user admin telah ditambahkan.", "success")
+                        direct = redirect(url_for("admin2.get_user"))
+                        response = make_response(direct)
+                        return response
+                    else:
+                        flash("Gagal menambahkan data user amdin", "error")
+
+                render = render_template("admin/pengguna/tambah_admin.html", form=form)
+                response = make_response(render)
+                return response
+            else:
+                abort(404)
+
+        abort(401)
 
     @admin2.post("edit-pswd/<int:id>")
     @login_required

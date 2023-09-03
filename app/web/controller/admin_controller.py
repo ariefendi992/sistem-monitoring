@@ -21,13 +21,13 @@ from app.models.user_model import *
 from app.models.master_model import *
 from app.models.user_details_model import *
 from app.lib.base_model import BaseModel
-from app.site.forms.form_absen import FormSelectAbsensi, FormSelectKehadiranSemester
-from app.site.forms.form_auth import FormEditStatus
-from app.site.forms.form_jadwal import FormJadwalMengajar
-from app.site.forms.form_letter_report import FormSelectKelas
-from app.site.forms.form_master import *
-from app.site.forms.form_pengguna import FormTambahAdmin
-from app.site.forms.form_siswa import FormAddSiswa, FormEditSiswa
+from app.web.forms.form_absen import FormSelectAbsensi, FormSelectKehadiranSemester
+from app.web.forms.form_auth import FormEditStatus
+from app.web.forms.form_jadwal import FormJadwalMengajar
+from app.web.forms.form_letter_report import FormSelectKelas
+from app.web.forms.form_master import *
+from app.web.forms.form_pengguna import FormTambahAdmin
+from app.web.forms.form_siswa import FormAddSiswa, FormEditSiswa
 from ..forms.form_auth import *
 from ..forms.form_guru import *
 from ..lib.base_url import base_url

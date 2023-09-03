@@ -20,7 +20,7 @@ from app.models.master_model import (
     WaliKelasModel,
 )
 from app.models.user_details_model import GuruModel, SiswaModel
-from app.site.forms.form_letter_report import FormRekapAbsenWali, FormSelectMapel
+from app.web.forms.form_letter_report import FormRekapAbsenWali, FormSelectMapel
 from ...extensions import db
 
 wali_kelas = Blueprint(

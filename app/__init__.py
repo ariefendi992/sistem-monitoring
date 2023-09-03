@@ -1,7 +1,7 @@
 from flask import Flask
 from app.api.register_app import register_app
 from app.models.user_model import UserModel
-from app.site.register_app import register_app_site
+from app.web.register_app import register_app_web
 from settings import Config
 from app.lib.date_time import *
 from app.register_filters import register_filters
@@ -15,7 +15,7 @@ def create_app():
 
     extended_ext(app)
     register_app(app)
-    register_app_site(app)
+    register_app_web(app)
     # loginManager(app)
 
     register_filters(app)

@@ -18,18 +18,18 @@ from flask_login import login_required, current_user
 from app.models.master_model import GuruBKModel
 from app.models.data_model import *
 from app.models.user_model import UserModel
-from app.site.forms.form_guru import (
+from app.web.forms.form_guru import (
     FormEditGuru,
     FormGetProfileGuru,
     FormUpdatePassword,
 )
-from app.site.forms.form_guru_bk import *
+from app.web.forms.form_guru_bk import *
 from sqlalchemy import func, and_
 from app.lib.date_time import format_indo, utc_makassar
 from app.lib.filters import *
 from builtins import enumerate
-from app.site.forms.form_laporan import FormLaporanPelanggaran
-from app.site.forms.form_letter_report import FormRekapAbsen
+from app.web.forms.form_laporan import FormLaporanPelanggaran
+from app.web.forms.form_letter_report import FormRekapAbsen
 
 guru_bk = Blueprint(
     "guru_bk",

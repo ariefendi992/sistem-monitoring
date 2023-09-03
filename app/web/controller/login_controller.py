@@ -11,7 +11,7 @@ from flask import (
     make_response,
 )
 from app.models.user_details_model import *
-from app.site.forms.form_auth import FormLogin
+from app.web.forms.form_auth import FormLogin
 from flask_login import login_user, current_user, login_required, logout_user
 from urllib.parse import urljoin, urlparse
 from app.models.user_model import *

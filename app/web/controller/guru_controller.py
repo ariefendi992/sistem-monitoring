@@ -10,12 +10,12 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy import and_, func
-from app.site.forms.form_absen import AbsensiForm
-from app.site.forms.form_letter_report import FormSelectKehadiranSiswa
+from app.web.forms.form_absen import AbsensiForm
+from app.web.forms.form_letter_report import FormSelectKehadiranSiswa
 from ...extensions import db
 from app.lib.base_model import BaseModel
 from app.models.user_details_model import GuruModel, SiswaModel
-from app.site.forms.form_guru import FormGetProfileGuru, FormUpdatePassword
+from app.web.forms.form_guru import FormGetProfileGuru, FormUpdatePassword
 from ...models.user_login_model import *
 from ...models.master_model import (
     KelasModel,

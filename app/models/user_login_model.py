@@ -1,6 +1,6 @@
 import os
 from flask_login import UserMixin
-from ..site.lib.json import JsonFileObject
+from app.web.lib.json import JsonFileObject
 
 file = os.getcwd() + "/data.json"
 

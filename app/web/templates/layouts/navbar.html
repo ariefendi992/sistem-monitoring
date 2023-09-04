@@ -19,7 +19,9 @@
     <li class="nav-item">
       <a href="#" class="nav-link" data-toggle="dropdown">
         <i class="fas fa-user-cog mr-1"></i>
-        {{ session.first_name.title() }} {{ session.last_name.title()}}
+        {{ session.first_name.title() }} {{ session.last_name.title() if session.last_name.title() !=
+        session.first_name.title()
+        else ''}}
         {% if current_user.group == 'admin' %}
         (ADMIN)
         {% elif current_user.group == 'bk' %}
@@ -55,12 +57,12 @@
         <div class="dropdown-divider"></div>
         <!-- ADMIN -->
         {% if current_user.group == 'admin' %}
-        <a href="#" class="dropdown-item">
+        <a href="{{ url_for('admin2.update_profil')}}" class="dropdown-item">
           <i class="fas fa-user-edit mr-1"></i>
           Ubah Data
         </a>
         <div class="dropdown-divider"></div>
-        <a href="{{ url_for('guru2.update_pswd') }}" class="dropdown-item">
+        <a href="{{ url_for('admin2.update_password_admin') }}" class="dropdown-item">
           <i class="fas fa-user-lock mr-1"></i>
           Ubah Password
         </a>

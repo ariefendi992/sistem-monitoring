@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% set filename='update_profile' %}
+{% block content %}
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title">Profil Admin</h3>
+      </div>
+      <form id="myForm" action="{{ url_for('admin2.updated_data_admin')}}" method="post">
+        {{ form.csrf_token() }}
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.username.label}}
+                {{form.username(class="form-control")}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.fullname.label}}
+
+                {{form.fullname(class="form-control")}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.gender.label}}
+                {{form.gender(class="form-control")}}
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.alamat.label}}
+                {{form.alamat(class="form-control")}}
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                {{form.telp.label}}
+                {{form.telp(class="form-control")}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          {{form.submit(class="btn btn-primary")}}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+
+{% endblock js %}

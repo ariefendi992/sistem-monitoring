@@ -11,16 +11,24 @@ class AdminModel(db.Model):
     last_name = sa.Column(sa.String(128), nullable=False, default="")
     gender = sa.Column(sa.String(32), nullable=True)
     alamat = sa.Column(sa.String(128), nullable=True)
+    telp = db.Column(db.String(20), nullable=True)
     user_id = sa.Column(sa.Integer, sa.ForeignKey("auth_user.id", ondelete="CASCADE"))
     user = db.relationship("UserModel", back_populates="admins")
 
     def __init__(
-        self, first_name=None, last_name=None, gender=None, alamat=None, user=None
+        self,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        gender: str | None = None,
+        alamat: str | None = None,
+        telp: str | int | None = None,
+        user: str | None = None,
     ) -> str:
         self.first_name = first_name
         self.last_name = last_name
         self.gender = gender
         self.alamat = alamat
+        self.telp = telp
         self.user = user
 
         # self.user_id = user_id

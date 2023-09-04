@@ -26,7 +26,11 @@ from app.web.forms.form_auth import FormEditStatus
 from app.web.forms.form_jadwal import FormJadwalMengajar
 from app.web.forms.form_letter_report import FormSelectKelas
 from app.web.forms.form_master import *
-from app.web.forms.form_pengguna import FormTambahAdmin
+from app.web.forms.form_pengguna import (
+    FormEditAdmin,
+    FormTambahAdmin,
+    FormUpdatePasswordAmdin,
+)
 from app.web.forms.form_siswa import FormAddSiswa, FormEditSiswa
 from ..forms.form_auth import *
 from ..forms.form_guru import *
@@ -899,6 +903,98 @@ class PenggunaUser:
                     return redirect(url_for("admin2.get_user"))
         else:
             abort(404)
+
+    @admin2.route("/admin/perbaharui-data", methods=["GET", "POST"])
+    @login_required
+    def update_profil():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                form = FormEditAdmin()
+                user_id = current_user.id
+                user = dbs.get_one(UserModel, id=user_id)
+
+                form.username.data = user.username
+                for i in user.admins:
+                    form.fullname.data = f"{i.first_name.title()} {i.last_name.title() if i.first_name.lower() != i.last_name.lower() else ''}"
+                    form.gender.data = i.gender
+                    form.alamat.data = i.alamat.title() if i.alamat else ""
+                    form.telp.data = i.telp
+
+                render = render_template("akun/profil_admin.html", form=form)
+                response = make_response(render)
+                return response
+
+            else:
+                abort(404)
+
+        abort(401)
+
+    @admin2.route("/admin/perbaharui-data/updated", methods=["GET", "POST"])
+    @login_required
+    def updated_data_admin():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                fullname = request.form.get("fullname")
+                gender = request.form.get("gender")
+                alamat = request.form.get("alamat")
+                telp = request.form.get("telp")
+
+                firstName: str | None
+                lastName: str | None
+
+                firstName, *lastName = fullname.split(" ") if fullname else ""
+                if len(lastName) == 0:
+                    lastName = firstName
+                elif len(lastName) != 0:
+                    lastName = " ".join(lastName)
+
+                user = dbs.get_one(AdminModel, user_id=current_user.id)
+
+                user.first_name = firstName
+                user.last_name = lastName
+                user.gender = gender
+                user.alamat = alamat
+                user.telp = telp
+
+                dbs.commit_data()
+
+                flash("Data profil admin telah diperbaharui", "success")
+                direct = redirect(url_for("admin2.index"))
+                response = make_response(direct)
+                return response
+
+            else:
+                abort(404)
+        abort(401)
+
+    @admin2.route("/admin/update-password", methods=["GET", "POST"])
+    @login_required
+    def update_password_admin():
+        if current_user.is_authenticated:
+            if current_user.group == "admin":
+                form = FormUpdatePasswordAmdin()
+
+                if form.validate_on_submit():
+                    password = form.password.data
+
+                    user = dbs.get_one(UserModel, id=current_user.id)
+                    pswd = generate_password_hash(password)
+                    user.password = pswd
+
+                    dbs.commit_data()
+                    
+                    flash('Password admin telah diperbaharui', 'success')
+                    direct = redirect(url_for("admin2.index"))
+                    response = make_response(direct)
+                    return response
+                
+                render = render_template("akun/update_password.html", form=form)
+                response = make_response(render)
+                return response
+
+            else:
+                abort(404)
+        abort(401)
 
 
 # NOTE: MASTER DATA

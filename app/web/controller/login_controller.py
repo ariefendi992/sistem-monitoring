@@ -80,7 +80,7 @@ def login():
                     db.session.commit()
 
                     flash(
-                        message=f"Login Sukses...\\nHi.. {sql_admin.first_name.title()} {sql_admin.last_name.title()} Selamat Datang Di Sistem E-Monitoring.",
+                        message=f"Login Sukses...\\nHi.. {sql_admin.first_name.title()} {sql_admin.last_name.title()} Selamat Datang Di Sistem Monitoring Siswa.",
                         category="success",
                     )
                     response = make_response(redirect(url_for("admin2.index")))

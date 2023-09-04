@@ -14,8 +14,8 @@ class DBStatement:
     def add_data(self, data: t.Any) -> t.Any:
         """AI is creating summary for add_data table"""
         if type(data) == t.List:
-            self.session.add_all(data)
-        self.session.add(data)
+            return self.session.add_all(data)
+        return self.session.add(data)
 
     def get_first_or_404(
         self, statement: db.sql.Select[t.Any], *, description: str | None = None
@@ -48,7 +48,21 @@ class DBStatement:
         return self.session.commit()
 
     def commit_data(self) -> _O:
+        """AI is creating summary for commit_data
+
+        Returns:
+            _O: [Result commit database]
+        """
         return self.session.commit()
 
     def dbs_abort(self, status_code: int, description: str | None = None) -> t.Any:
+        """AI is creating summary for dbs_abort
+
+        Args:
+            status_code (int): [HTTP Status]
+            description (str, optional): [description about connection status]. Defaults to None.
+
+        Returns:
+            t.Any: [description]
+        """
         abort(status_code, description=description)

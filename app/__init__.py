@@ -20,7 +20,7 @@ def create_app():
 
     register_filters(app)
 
-    login_manager.session_protection = "strong"
+    # login_manager.session_protection = "strong"
     login_manager.login_view = "auth2.login"
     login_manager.login_message = (
         f"Ma'af...!!!\\nSilahkan Login Untuk Mengakses Halaman Ini."

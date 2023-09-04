@@ -27,7 +27,7 @@ from ...models.master_model import (
     TahunAjaranModel,
     WaliKelasModel,
 )
-from app.lib.date_time import  tomorrow_, today_
+from app.lib.date_time import tomorrow_, today_
 from werkzeug.security import generate_password_hash, check_password_hash
 from ...models.data_model import AbsensiModel
 from datetime import datetime
@@ -87,74 +87,71 @@ def check_wali():
 @guru2.route("/")
 @login_required
 def index():
-    if current_user.is_authenticated:
-        if current_user.group == "guru":
-            """With general function"""
-            # sqlToday = get_kelas_today()
+    if current_user.group == "guru":
+        """With general function"""
+        # sqlToday = get_kelas_today()
 
-            """get With Lambda function"""
-            sqlToday = day(
-                sql=(
-                    db.session.query(MengajarModel)
-                    .join(HariModel)
-                    .join(SemesterModel)
-                    .filter(MengajarModel.guru_id == current_user.id)
-                    .filter(MengajarModel.hari_id == HariModel.id)
-                    .filter(HariModel.hari == today_())
-                    .filter(SemesterModel.is_active == "1")
-                    .order_by(MengajarModel.jam_mulai)
-                    .all()
-                )
+        """get With Lambda function"""
+        sqlToday = day(
+            sql=(
+                db.session.query(MengajarModel)
+                .join(HariModel)
+                .join(SemesterModel)
+                .filter(MengajarModel.guru_id == current_user.id)
+                .filter(MengajarModel.hari_id == HariModel.id)
+                .filter(HariModel.hari == today_())
+                .filter(SemesterModel.is_active == "1")
+                .order_by(MengajarModel.jam_mulai)
+                .all()
             )
-            baseJadwal = BaseModel(MengajarModel)
-            mengajar = baseJadwal.get_all_filter_by(
-                baseJadwal.model.hari_id.asc(), guru_id=current_user.id
-            )
-            wali_kelas = check_wali()
+        )
+        baseJadwal = BaseModel(MengajarModel)
+        mengajar = baseJadwal.get_all_filter_by(
+            baseJadwal.model.hari_id.asc(), guru_id=current_user.id
+        )
+        wali_kelas = check_wali()
 
-            get_one_semester = SemesterModel.query.filter_by(is_active="1").first()
-            get_one_tahun_ajaran = TahunAjaranModel.query.filter_by(
-                is_active="1"
-            ).first()
+        get_one_semester = SemesterModel.query.filter_by(is_active="1").first()
+        get_one_tahun_ajaran = TahunAjaranModel.query.filter_by(is_active="1").first()
 
-            count_kelas_ajar = MengajarModel.query.filter_by(
+        count_kelas_ajar = MengajarModel.query.filter_by(
+            guru_id=current_user.id,
+            semester_id=get_one_semester.id,
+            tahun_ajaran_id=get_one_tahun_ajaran.id,
+        ).count()
+
+        count_ajar_today = (
+            MengajarModel.query.filter_by(
                 guru_id=current_user.id,
                 semester_id=get_one_semester.id,
                 tahun_ajaran_id=get_one_tahun_ajaran.id,
-            ).count()
+            )
+            .join(HariModel)
+            .filter_by(hari=today_())
+            .count()
+        )
+        count_ajar_besok = (
+            MengajarModel.query.filter_by(
+                guru_id=current_user.id,
+                semester_id=get_one_semester.id,
+                tahun_ajaran_id=get_one_tahun_ajaran.id,
+            )
+            .join(HariModel)
+            .filter_by(hari=tomorrow_())
+            .count()
+        )
 
-            count_ajar_today = (
-                MengajarModel.query.filter_by(
-                    guru_id=current_user.id,
-                    semester_id=get_one_semester.id,
-                    tahun_ajaran_id=get_one_tahun_ajaran.id,
-                )
-                .join(HariModel)
-                .filter_by(hari=today_())
-                .count()
-            )
-            count_ajar_besok = (
-                MengajarModel.query.filter_by(
-                    guru_id=current_user.id,
-                    semester_id=get_one_semester.id,
-                    tahun_ajaran_id=get_one_tahun_ajaran.id,
-                )
-                .join(HariModel)
-                .filter_by(hari=tomorrow_())
-                .count()
-            )
-
-            return render_template(
-                "guru/index_guru.html",
-                sqlJadwal=mengajar,
-                sqlToday=sqlToday,
-                wali_kelas=wali_kelas,
-                count_kelas=count_kelas_ajar,
-                count_today=count_ajar_today,
-                count_besok=count_ajar_besok,
-            )
-        else:
-            abort(404)
+        return render_template(
+            "guru/index_guru.html",
+            sqlJadwal=mengajar,
+            sqlToday=sqlToday,
+            wali_kelas=wali_kelas,
+            count_kelas=count_kelas_ajar,
+            count_today=count_ajar_today,
+            count_besok=count_ajar_besok,
+        )
+    else:
+        abort(401)
 
 
 @guru2.route("/profile")
@@ -184,7 +181,7 @@ def profile_guru():
             wali_kelas=check_wali(),
         )
     else:
-        abort(404)
+        abort(401)
 
 
 @guru2.route("/profile/<int:id>", methods=["GET", "POST"])
@@ -219,7 +216,7 @@ def update_profile(id):
         flash(f"Data profil anda terlah diperbaharui.", "info")
         return redirect(url_for("guru2.profile_guru"))
     else:
-        return abort(404)
+        return abort(401)
 
 
 @guru2.route("update-password", methods=["POST", "GET", "PUT"])
@@ -248,78 +245,77 @@ def update_pswd():
             "akun/update_password.html", form=form, wali_kelas=check_wali()
         )
     else:
-        return abort(404)
+        return abort(401)
 
 
 @guru2.route("jadwal-mengajar")
 @login_required
 def jadwal_mengajar():
-    if current_user.is_authenticated:
-        if current_user.group == "guru":
-            # mengajar = base.get_all_filter_by(
-            #     base.model.hari_id.asc(), guru_id=current_user.id
-            # )
-            sql_mengajar = (
+    if current_user.group == "guru":
+        # mengajar = base.get_all_filter_by(
+        #     base.model.hari_id.asc(), guru_id=current_user.id
+        # )
+        sql_mengajar = (
+            db.session.query(MengajarModel)
+            .join(SemesterModel)
+            .filter(SemesterModel.is_active == 1)
+            .filter(MengajarModel.guru_id == current_user.id)
+            # .order_by(MengajarModel.hari_id.asc())
+            # .order_by(MengajarModel.jam_mulai.asc())
+            # .all()
+        )
+        """GET WITH GENERAL FUNCTION"""
+        # sqlToday = get_kelas_today()
+        # sqlTomorrow = get_kelas_tomorrow()
+
+        """GET WITH LAMBDA FUNCTION"""
+        sqlToday = day(
+            sql=(
                 db.session.query(MengajarModel)
+                .join(HariModel)
                 .join(SemesterModel)
+                .filter(MengajarModel.guru_id == current_user.id)
+                .filter(MengajarModel.hari_id == HariModel.id)
+                .filter(HariModel.hari == today_())
                 .filter(SemesterModel.is_active == 1)
-                .filter(MengajarModel.guru_id == current_user.id)
-                # .order_by(MengajarModel.hari_id.asc())
-                # .order_by(MengajarModel.jam_mulai.asc())
-                # .all()
+                .order_by(MengajarModel.jam_mulai)
+                .all()
             )
-            """GET WITH GENERAL FUNCTION"""
-            # sqlToday = get_kelas_today()
-            # sqlTomorrow = get_kelas_tomorrow()
-
-            """GET WITH LAMBDA FUNCTION"""
-            sqlToday = day(
-                sql=(
-                    db.session.query(MengajarModel)
-                    .join(HariModel)
-                    .join(SemesterModel)
-                    .filter(MengajarModel.guru_id == current_user.id)
-                    .filter(MengajarModel.hari_id == HariModel.id)
-                    .filter(HariModel.hari == today_())
-                    .filter(SemesterModel.is_active == 1)
-                    .order_by(MengajarModel.jam_mulai)
-                    .all()
-                )
-            )
-            sqlTomorrow = day(
-                sql=(
-                    db.session.query(MengajarModel)
-                    .join(HariModel)
-                    .join(SemesterModel)
-                    .filter(MengajarModel.guru_id == current_user.id)
-                    .filter(MengajarModel.hari_id == HariModel.id)
-                    .filter(HariModel.hari == tomorrow_())
-                    .filter(SemesterModel.is_active == 1)
-                    .all()
-                )
-            )
-
-            sql_hari = (
+        )
+        sqlTomorrow = day(
+            sql=(
                 db.session.query(MengajarModel)
+                .join(HariModel)
                 .join(SemesterModel)
-                .filter(SemesterModel.is_active == "1")
                 .filter(MengajarModel.guru_id == current_user.id)
-                .group_by(MengajarModel.hari_id)
-                .order_by(MengajarModel.hari_id.asc())
+                .filter(MengajarModel.hari_id == HariModel.id)
+                .filter(HariModel.hari == tomorrow_())
+                .filter(SemesterModel.is_active == 1)
+                .all()
             )
+        )
 
-            return render_template(
-                "guru/modul/jadwal_mengajar/jadwal_mengajar.html",
-                # sqlJadwal=mengajar,
-                sqlJadwal=sql_mengajar,
-                sqlToday=sqlToday,
-                sqlTomorrow=sqlTomorrow,
-                wali_kelas=check_wali(),
-                sqlHari=sql_hari,
-                MM=MengajarModel,
-            )
-        else:
-            return abort(404)
+        sql_hari = (
+            db.session.query(MengajarModel)
+            .join(SemesterModel)
+            .filter(SemesterModel.is_active == "1")
+            .filter(MengajarModel.guru_id == current_user.id)
+            .group_by(MengajarModel.hari_id)
+            .order_by(MengajarModel.hari_id.asc())
+        )
+
+        return render_template(
+            "guru/modul/jadwal_mengajar/jadwal_mengajar.html",
+            # sqlJadwal=mengajar,
+            sqlJadwal=sql_mengajar,
+            sqlToday=sqlToday,
+            sqlTomorrow=sqlTomorrow,
+            wali_kelas=check_wali(),
+            sqlHari=sql_hari,
+            MM=MengajarModel,
+        )
+    else:
+        return abort(401)
 
 
 @guru2.route("/absensi-pelajaran/<int:mengajar_id>", methods=["GET", "POST"])
@@ -485,7 +481,7 @@ def absensi(mengajar_id):
             wali_kelas=check_wali(),
         )
     else:
-        return abort(404)
+        return abort(401)
 
 
 @guru2.route("update-absensi/<int:mengajar_id>", methods=["GET", "POST"])
@@ -554,110 +550,105 @@ def update_absen(mengajar_id):
             wali_kelas=check_wali(),
         )
     else:
-        return abort(404)
+        return abort(401)
 
 
 @guru2.route("/daftar-hadir", methods=["GET", "POST"])
 @login_required
 def daftar_kehadiran():
-    if current_user.is_authenticated:
-        if current_user.group == "guru":
-            form = FormSelectKehadiranSiswa()
-            data = dict()
+    if current_user.group == "guru":
+        form = FormSelectKehadiranSiswa()
+        data = dict()
 
-            if form.validate_on_submit():
-                bulan = form.bulan.data
-                tahun = form.tahun.data
-                kelas = form.kelas.data
+        if form.validate_on_submit():
+            bulan = form.bulan.data
+            tahun = form.tahun.data
+            kelas = form.kelas.data
 
-                sql_absen = (
+            sql_absen = (
+                db.session.query(AbsensiModel)
+                .join(SiswaModel)
+                .join(MengajarModel)
+                .filter(
+                    and_(
+                        SiswaModel.kelas_id == kelas.id,
+                        func.month(AbsensiModel.tgl_absen) == bulan.id,
+                        func.year(AbsensiModel.tgl_absen) == tahun.tgl_absen.year,
+                        MengajarModel.guru_id == current_user.id,
+                    )
+                )
+                .group_by(AbsensiModel.siswa_id)
+                .order_by(SiswaModel.first_name.asc())
+                .all()
+            )
+
+            if not sql_absen:
+                flash(
+                    "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
+                    "error",
+                )
+            else:
+                sql_kepsek = KepsekModel.query.filter_by(status="1").first()
+
+                sql_tgl_pertemuan = (
                     db.session.query(AbsensiModel)
                     .join(SiswaModel)
                     .join(MengajarModel)
                     .filter(
                         and_(
-                            SiswaModel.kelas_id == kelas.id,
                             func.month(AbsensiModel.tgl_absen) == bulan.id,
                             func.year(AbsensiModel.tgl_absen) == tahun.tgl_absen.year,
+                            SiswaModel.kelas_id == kelas.id,
                             MengajarModel.guru_id == current_user.id,
                         )
                     )
-                    .group_by(AbsensiModel.siswa_id)
-                    .order_by(SiswaModel.first_name.asc())
-                    .all()
+                    .group_by(AbsensiModel.tgl_absen)
+                    .order_by(AbsensiModel.tgl_absen.asc())
                 )
 
-                if not sql_absen:
-                    flash(
-                        "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
-                        "error",
-                    )
-                else:
-                    sql_kepsek = KepsekModel.query.filter_by(status="1").first()
+                sql_siswa = SiswaModel.query.filter_by(kelas_id=kelas.id)
 
-                    sql_tgl_pertemuan = (
-                        db.session.query(AbsensiModel)
-                        .join(SiswaModel)
-                        .join(MengajarModel)
-                        .filter(
-                            and_(
-                                func.month(AbsensiModel.tgl_absen) == bulan.id,
-                                func.year(AbsensiModel.tgl_absen)
-                                == tahun.tgl_absen.year,
-                                SiswaModel.kelas_id == kelas.id,
-                                MengajarModel.guru_id == current_user.id,
-                            )
-                        )
-                        .group_by(AbsensiModel.tgl_absen)
-                        .order_by(AbsensiModel.tgl_absen.asc())
-                    )
+                data.update(
+                    kepsek=f"{sql_kepsek.guru.first_name.title()} {sql_kepsek.guru.last_name.title()}",
+                    nipKepsek=sql_kepsek.guru.user.username,
+                    guru=[
+                        f"{i.mengajar.guru.first_name.title()} {i.mengajar.guru.last_name.title()}"
+                        for i in sql_absen
+                    ][0],
+                    nipGuru=[i.mengajar.guru.user.username for i in sql_absen][0],
+                    tahunAjaran=[
+                        i.mengajar.tahun_ajaran.th_ajaran for i in sql_tgl_pertemuan
+                    ][0],
+                    semester=[
+                        i.mengajar.semester.semester.title() for i in sql_tgl_pertemuan
+                    ][0],
+                    bulan=bulan.nama_bulan.title(),
+                    today=datetime.date(datetime.today()),
+                    kelas=[i.siswa.kelas.kelas for i in sql_absen][0],
+                    mapel=[i.mengajar.mapel.mapel.title() for i in sql_absen][0],
+                    countPertemuan=sql_tgl_pertemuan.count(),
+                    countSiswa=sql_siswa.count(),
+                    countSiswaL=sql_siswa.filter_by(gender="laki-laki").count(),
+                    countSiswaP=sql_siswa.filter_by(gender="perempuan").count(),
+                )
 
-                    sql_siswa = SiswaModel.query.filter_by(kelas_id=kelas.id)
+                render = render_template(
+                    "laporan/result_absen_mapel.html",
+                    data=data,
+                    absen=sql_absen,
+                    tglPertemuan=sql_tgl_pertemuan,
+                    AM=AbsensiModel,
+                )
+                response = make_response(render)
+                return response
 
-                    data.update(
-                        kepsek=f"{sql_kepsek.guru.first_name.title()} {sql_kepsek.guru.last_name.title()}",
-                        nipKepsek=sql_kepsek.guru.user.username,
-                        guru=[
-                            f"{i.mengajar.guru.first_name.title()} {i.mengajar.guru.last_name.title()}"
-                            for i in sql_absen
-                        ][0],
-                        nipGuru=[i.mengajar.guru.user.username for i in sql_absen][0],
-                        tahunAjaran=[
-                            i.mengajar.tahun_ajaran.th_ajaran for i in sql_tgl_pertemuan
-                        ][0],
-                        semester=[
-                            i.mengajar.semester.semester.title()
-                            for i in sql_tgl_pertemuan
-                        ][0],
-                        bulan=bulan.nama_bulan.title(),
-                        today=datetime.date(datetime.today()),
-                        kelas=[i.siswa.kelas.kelas for i in sql_absen][0],
-                        mapel=[i.mengajar.mapel.mapel.title() for i in sql_absen][0],
-                        countPertemuan=sql_tgl_pertemuan.count(),
-                        countSiswa=sql_siswa.count(),
-                        countSiswaL=sql_siswa.filter_by(gender="laki-laki").count(),
-                        countSiswaP=sql_siswa.filter_by(gender="perempuan").count(),
-                    )
-
-                    render = render_template(
-                        "laporan/result_absen_mapel.html",
-                        data=data,
-                        absen=sql_absen,
-                        tglPertemuan=sql_tgl_pertemuan,
-                        AM=AbsensiModel,
-                    )
-                    response = make_response(render)
-                    return response
-
-            render = render_template(
-                "guru/modul/absen/daftar_hadir.html",
-                wali_kelas=check_wali(),
-                form=form,
-            )
-            response = make_response(render)
-            return response
-        else:
-            abort(404)
+        render = render_template(
+            "guru/modul/absen/daftar_hadir.html",
+            wali_kelas=check_wali(),
+            form=form,
+        )
+        response = make_response(render)
+        return response
     else:
         abort(401)
 
@@ -761,68 +752,64 @@ def rekap_kehadiran():
 @guru2.route("data-kehadiran-siswa")
 @login_required
 def data_kehadiran():
-    if current_user.is_authenticated:
-        if current_user.group == "guru":
-            hari = today_()
-            data = dict()
-            mengajar_id = request.args.get("mengajar", type=int)
-            sql_mengajar = (
-                db.session.query(MengajarModel).filter_by(id=mengajar_id).all()
-            )
+    if current_user.group == "guru":
+        hari = today_()
+        data = dict()
+        mengajar_id = request.args.get("mengajar", type=int)
+        sql_mengajar = db.session.query(MengajarModel).filter_by(id=mengajar_id).all()
 
-            for i in sql_mengajar:
-                data.update(id=i.id)
+        for i in sql_mengajar:
+            data.update(id=i.id)
 
-            sql_daftar_kelas = (
-                db.session.query(MengajarModel)
-                .join(HariModel)
-                .join(SemesterModel)
-                .filter(
-                    and_(
-                        MengajarModel.guru_id == current_user.id,
-                        SemesterModel.is_active == "1",
-                        HariModel.hari == hari,
-                    )
+        sql_daftar_kelas = (
+            db.session.query(MengajarModel)
+            .join(HariModel)
+            .join(SemesterModel)
+            .filter(
+                and_(
+                    MengajarModel.guru_id == current_user.id,
+                    SemesterModel.is_active == "1",
+                    HariModel.hari == hari,
                 )
-                .order_by(MengajarModel.jam_ke.asc())
             )
+            .order_by(MengajarModel.jam_ke.asc())
+        )
 
-            render = render_template(
-                "guru/modul/absen/daftar_hadir_harian.html",
-                wali_kelas=check_wali(),
-                data=data,
-                sqlToday=sql_daftar_kelas.all(),
-            )
+        render = render_template(
+            "guru/modul/absen/daftar_hadir_harian.html",
+            wali_kelas=check_wali(),
+            data=data,
+            sqlToday=sql_daftar_kelas.all(),
+        )
 
-            response = make_response(render)
-            return response
-        else:
-            abort(404)
-
+        response = make_response(render)
+        return response
     else:
-        return abort(401)
+        abort(401)
 
 
 @guru2.route("get-data-kehadiran")
 @login_required
 def get_data_kehadiran():
-    today = datetime.date(datetime.today())
-    data = dict()
-    mengajar_id = request.args.get("mengajar", type=int)
+    if current_user.group == "guru":
+        today = datetime.date(datetime.today())
+        data = dict()
+        mengajar_id = request.args.get("mengajar", type=int)
 
-    sql_absen = (
-        db.session.query(AbsensiModel).join(MengajarModel)
-        # .join(HariModel)
-        .filter(
-            and_(
-                AbsensiModel.mengajar_id == mengajar_id,
-                AbsensiModel.tgl_absen == today,
-                MengajarModel.guru_id == current_user.id,
-                # HariModel.hari == hari,
-            ),
+        sql_absen = (
+            db.session.query(AbsensiModel).join(MengajarModel)
+            # .join(HariModel)
+            .filter(
+                and_(
+                    AbsensiModel.mengajar_id == mengajar_id,
+                    AbsensiModel.tgl_absen == today,
+                    MengajarModel.guru_id == current_user.id,
+                    # HariModel.hari == hari,
+                ),
+            )
         )
-    )
 
-    render = render_template("helper/daftar_hadir_siswa.html", data=sql_absen)
-    response = make_response(render)
-    return response
+        render = render_template("helper/daftar_hadir_siswa.html", data=sql_absen)
+        response = make_response(render)
+        return response
+    abort(401)

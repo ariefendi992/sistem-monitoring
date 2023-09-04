@@ -10,6 +10,8 @@ from flask import (
     session,
     make_response,
 )
+from app.api.controller.master_controller import WaliKelas
+from app.models.master_model import WaliKelasModel
 from app.models.user_details_model import *
 from app.web.forms.form_auth import FormLogin
 from flask_login import login_user, current_user, login_required, logout_user
@@ -38,14 +40,27 @@ def is_safe_url(target):
 def index():
     if current_user.is_authenticated:
         if current_user.group == "admin":
-            response = make_response(redirect(url_for("admin2.index")))
-            return response
+            if "next" in session and session["next"]:
+                if is_safe_url(session["next"]):
+                    return redirect(session["next"])
+            else:
+                response = make_response(redirect(url_for("admin2.index")))
+                return response
         elif current_user.group == "guru":
-            response = make_response(redirect(url_for("guru2.index")))
-            return response
+            if "next" in session and session["next"]:
+                if is_safe_url(session["next"]):
+                    return redirect(session["next"])
+            else:
+                response = make_response(redirect(url_for("guru2.index")))
+                return response
         elif current_user.group == "bk":
-            response = make_response(redirect(url_for("guru_bk.index")))
-            return response
+            if "next" in session and session["next"]:
+                if is_safe_url(session["next"]):
+                    return redirect(session["next"])
+            else:
+                response = make_response(redirect(url_for("guru_bk.index")))
+                return response
+
     return redirect(url_for("auth2.login"))
 
 
@@ -67,10 +82,15 @@ def login():
         else:
             sql_check_password = UserModel.check_pswd(sql_user.password, password)
             if sql_check_password:
-                login_user(user=sql_user, remember=remember)
-
-                if level == "admin" and current_user.group == "admin":
-                    sql_admin = AdminModel.query.filter_by(user_id=sql_user.id).first()
+                if (
+                    level == "admin"
+                    and sql_user.group == "admin"
+                    and sql_user.is_active == "1"
+                ):
+                    login_user(user=sql_user, remember=remember)
+                    sql_admin = AdminModel.query.filter_by(
+                        user_id=current_user.id
+                    ).first()
 
                     session["first_name"] = sql_admin.first_name.upper()
                     session["last_name"] = sql_admin.last_name.upper()
@@ -83,25 +103,50 @@ def login():
                         message=f"Login Sukses...\\nHi.. {sql_admin.first_name.title()} {sql_admin.last_name.title()} Selamat Datang Di Sistem Monitoring Siswa.",
                         category="success",
                     )
-                    response = make_response(redirect(url_for("admin2.index")))
-                    return response
-                elif current_user.group == "guru" and level == "guru":
-                    sql_guru = GuruModel.query.filter_by(user_id=sql_user.id).first()
+
+                    if "next" in session and session["next"]:
+                        if is_safe_url(session["next"]):
+                            return redirect(session["next"])
+                    else:
+                        response = make_response(redirect(url_for("admin2.index")))
+                        return response
+                elif (
+                    sql_user.group == "guru"
+                    and level == "guru"
+                    and sql_user.is_active == "1"
+                ):
+                    login_user(user=sql_user, remember=remember)
+                    sql_guru = GuruModel.query.filter_by(
+                        user_id=current_user.id
+                    ).first()
                     session["first_name"] = sql_guru.first_name.upper()
                     session["last_name"] = sql_guru.last_name.upper()
 
                     sql_user.user_last_login = utc_makassar()
 
                     db.session.commit()
+
                     flash(
                         message=f"Login Sukses...\\nHi.. {sql_guru.first_name} {sql_guru.last_name} Selamat Datang Di Sistem E-Monitoring.",
                         category="success",
                     )
-                    response = make_response(redirect(url_for("guru2.index")))
-                    return response
 
-                elif current_user.group == "bk" and level == "bk":
-                    sql_guru = GuruModel.query.filter_by(user_id=sql_user.id).first()
+                    if "next" in session and session["next"]:
+                        if is_safe_url(session["next"]):
+                            return redirect(session["next"])
+                    else:
+                        response = make_response(redirect(url_for("guru2.index")))
+                        return response
+
+                elif (
+                    sql_user.group == "bk"
+                    and level == "bk"
+                    and sql_user.is_active == "1"
+                ):
+                    login_user(user=sql_user, remember=remember)
+                    sql_guru = GuruModel.query.filter_by(
+                        user_id=current_user.id
+                    ).first()
                     session["first_name"] = sql_guru.first_name.upper()
                     session["last_name"] = sql_guru.last_name.upper()
 
@@ -112,14 +157,26 @@ def login():
                         message=f"Login Sukses...\\nHi.. {sql_guru.first_name} {sql_guru.last_name} Selamat Datang Di Sistem E-Monitoring.",
                         category="success",
                     )
-                    response = make_response(redirect(url_for("guru_bk.index")))
-                    return response
+
+                    if "next" in session and session["next"]:
+                        if is_safe_url(session["next"]):
+                            return redirect(session["next"])
+                    else:
+                        response = make_response(redirect(url_for("guru_bk.index")))
+                        return response
 
                 else:
-                    flash(
-                        f"Ma'af..! Login Gagal.\\nSilahkan Periksa Kembali Username Dan Level Pengguna Anda.",
-                        "error",
-                    )
+                    if current_user.is_active == "0":
+                        flash(
+                            "Ma'af..!\\nUntuk sementara waktu hak akses anda sendang di tangguhkan.",
+                            "error",
+                        )
+
+                    else:
+                        flash(
+                            f"Ma'af..! Login Gagal.\\nSilahkan Periksa Kembali Username Dan Level Pengguna Anda.",
+                            "error",
+                        )
 
             else:
                 flash(
@@ -127,8 +184,9 @@ def login():
                     category="error",
                 )
 
-    response = make_response(render_template("auth/login.html", form=form))
     session["next"] = request.args.get("next")
+    print(session["next"])
+    response = make_response(render_template("auth/login.html", form=form))
 
     return response
 

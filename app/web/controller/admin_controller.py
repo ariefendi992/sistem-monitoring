@@ -64,121 +64,117 @@ dbs = DBStatement()
 @admin2.route("/")
 @login_required
 def index():
-    if current_user.is_authenticated:
-        if current_user.group == "admin":
-            jml_siswa = sql(
-                x=db.session.query(UserModel).filter(UserModel.group == "siswa").count()
-            )
-            jml_guru = sql(
-                x=db.session.query(UserModel).filter(UserModel.group == "guru").count()
-            )
-            jml_admin = sql(
-                x=db.session.query(UserModel).filter(UserModel.group == "admin").count()
-            )
+    if current_user.group == "admin":
+        jml_siswa = sql(
+            x=db.session.query(UserModel).filter(UserModel.group == "siswa").count()
+        )
+        jml_guru = sql(
+            x=db.session.query(UserModel).filter(UserModel.group == "guru").count()
+        )
+        jml_admin = sql(
+            x=db.session.query(UserModel).filter(UserModel.group == "admin").count()
+        )
 
-            jml_mapel = sql(x=db.session.query(MapelModel).count())
+        jml_mapel = sql(x=db.session.query(MapelModel).count())
 
-            jml_kelas = sql(x=db.session.query(KelasModel).count())
+        jml_kelas = sql(x=db.session.query(KelasModel).count())
 
-            return render_template(
-                "admin/index_admin.html",
-                jml_siswa=jml_siswa,
-                jml_guru=jml_guru,
-                jml_admin=jml_admin,
-                jml_mapel=jml_mapel,
-                jml_kelas=jml_kelas,
-            )
-        else:
-            abort(404)
+        return render_template(
+            "admin/index_admin.html",
+            jml_siswa=jml_siswa,
+            jml_guru=jml_guru,
+            jml_admin=jml_admin,
+            jml_mapel=jml_mapel,
+            jml_kelas=jml_kelas,
+        )
+    else:
+        abort(401)
 
 
 class PenggunaSiswa:
     @admin2.route("get-siswa")
     @login_required
     def getSiswa():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                urlKelas = base_url + "api/v2/master/kelas/get-all"
-                respKelas = req.get(urlKelas)
-                jsonRespKelas = respKelas.json()
+        if current_user.group == "admin":
+            urlKelas = base_url + "api/v2/master/kelas/get-all"
+            respKelas = req.get(urlKelas)
+            jsonRespKelas = respKelas.json()
 
-                urlSiswa = base_url + url_for("siswa.get")
-                respSiswa = req.get(urlSiswa)
-                jsonRespSiswa = respSiswa.json()
-                return render_template(
-                    "admin/siswa/get_siswa.html",
-                    kelas=jsonRespKelas,
-                    siswa=jsonRespSiswa,
-                )
-            else:
-                flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
-                )
-                abort(404)
+            urlSiswa = base_url + url_for("siswa.get")
+            respSiswa = req.get(urlSiswa)
+            jsonRespSiswa = respSiswa.json()
+            return render_template(
+                "admin/siswa/get_siswa.html",
+                kelas=jsonRespKelas,
+                siswa=jsonRespSiswa,
+            )
+        else:
+            flash(
+                f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
+                "error",
+            )
+            abort(401)
 
     @admin2.route("/generate-qc", methods=["GET", "PUT"])
     @login_required
     def generate_qc():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                id = request.args.get("id")
-                url = base_url + url_for("siswa.generate_qc", id=id)
-                headers = {"Content-Type": "application/json"}
-                r = req.put(url, headers=headers)
-                if r.status_code == 200:
-                    flash(
-                        message=f"Generate QR kode berhasil. Status : {r.status_code}",
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.getSiswa"))
-                else:
-                    flash(
-                        message=f"Maaf terjadi kesalahan dalam generate QR CODE. Status : {r.status_code}",
-                        category="error",
-                    )
-                    return redirect(url_for("admin2.getSiswa"))
+        if current_user.group == "admin":
+            id = request.args.get("id")
+            url = base_url + url_for("siswa.generate_qc", id=id)
+            headers = {"Content-Type": "application/json"}
+            r = req.put(url, headers=headers)
+            if r.status_code == 200:
+                flash(
+                    message=f"Generate QR kode berhasil. Status : {r.status_code}",
+                    category="success",
+                )
+                return redirect(url_for("admin2.getSiswa"))
             else:
                 flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
+                    message=f"Maaf terjadi kesalahan dalam generate QR CODE. Status : {r.status_code}",
+                    category="error",
                 )
-                abort(404)
+                return redirect(url_for("admin2.getSiswa"))
+        else:
+            flash(
+                f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
+                "error",
+            )
+            abort(401)
 
     # NOTE:  UPLOAD FOTO
     @admin2.post("/upload-photo")
     @login_required
     def upload_foto():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                id = request.args.get("id")
-                url = base_url + url_for("siswa.upload_photo", id=id)
-                file = request.files["file"]
-                file_name = secure_filename(file.filename)
-                upload_folder = os.getcwd() + "/temp/"
-                path = upload_folder + file_name
-                file.save(path)
+        if current_user.group == "admin":
+            id = request.args.get("id")
+            url = base_url + url_for("siswa.upload_photo", id=id)
+            file = request.files["file"]
+            file_name = secure_filename(file.filename)
+            upload_folder = os.getcwd() + "/temp/"
+            path = upload_folder + file_name
+            file.save(path)
 
-                files = {"images": open(path, "rb")}
-                response = req.post(url, files=files)
+            files = {"images": open(path, "rb")}
+            response = req.post(url, files=files)
 
-                if response.status_code == 200:
-                    files.get("images").close()
-                    temp_file = upload_folder + file_name
-                    os.remove(f"{temp_file}")
-                    flash(
-                        f"File foto siswa telah berhasil di upload. Status : {response.status_code}",
-                        "success",
-                    )
-                    return redirect(url_for("admin2.getSiswa"))
-                else:
-                    return f"<p>error : {response.status_code}</p>"
-            else:
+            if response.status_code == 200:
+                files.get("images").close()
+                temp_file = upload_folder + file_name
+                os.remove(f"{temp_file}")
                 flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
+                    f"File foto siswa telah berhasil di upload. Status : {response.status_code}",
+                    "success",
                 )
-                abort(404)
+                return redirect(url_for("admin2.getSiswa"))
+            else:
+                return f"<p>error : {response.status_code}</p>"
+        else:
+            flash(
+                f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
+                "error",
+            )
+            abort(401)
 
     """
     kode in dimatikan hanya untuk sementara waktu.
@@ -194,361 +190,333 @@ class PenggunaSiswa:
     @login_required
     def add_siswa():
         # get kelas
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                url_kelas = base_url + f"/api/v2/master/kelas/get-all"
-                get_kelas = req.get(url_kelas)
-                data = get_kelas.json()
-                kelas = [("", "..::Select::..")]
-                for _ in data["data"]:
-                    kelas.append((_["id"], _["kelas"]))
 
-                url = base_url + f"/api/v2/auth/create"
-                form = FormAddSiswa(request.form)
-                form.kelas.choices = kelas
-                if request.method == "POST" and form.validate_on_submit():
-                    username = form.username.data
-                    password = form.password.data
-                    group = form.tipe.data if form.tipe.data else "siswa"
-                    fullname = form.fullname.data
-                    first_name = ""
-                    last_name = ""
-                    first_name, *last_name = fullname.split()
-                    if len(last_name) == 0:
-                        last_name = first_name
-                    elif len(last_name) != 0:
-                        last_name = " ".join(last_name)
-                    gender = form.jenisKelamin.data
-                    agama = form.agama.data
-                    kelas = form.kelas.data
-                    telp = request.form.get("telp")
+        if current_user.group == "admin":
+            url_kelas = base_url + f"/api/v2/master/kelas/get-all"
+            get_kelas = req.get(url_kelas)
+            data = get_kelas.json()
+            kelas = [("", "..::Select::..")]
+            for _ in data["data"]:
+                kelas.append((_["id"], _["kelas"]))
 
-                    payload = json.dumps(
-                        {
-                            "username": username,
-                            "password": password,
-                            "group": group,
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "gender": gender,
-                            "agama": agama,
-                            "kelas_id": kelas,
-                            "telp": telp,
-                        }
-                    )
-                    headers = {"Content-Type": "application/json"}
-                    response = req.post(url=url, headers=headers, data=payload)
-                    msg = response.json()
-                    if response.status_code == 201:
-                        flash(
-                            message=f"{msg['msg']}. Status : {response.status_code}",
-                            category="success",
-                        )
-                        return redirect(url_for("admin2.getSiswa"))
-                    elif response.status_code == 409:
-                        flash(
-                            message="NISN sudah yang di input, telah terdaftar",
-                            category="error",
-                        )
-                    else:
-                        return render_template(
-                            "admin/siswa/tambah_siswa.html", form=form
-                        )
-                return render_template("admin/siswa/tambah_siswa.html", form=form)
-            else:
-                flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
+            url = base_url + f"/api/v2/auth/create"
+            form = FormAddSiswa(request.form)
+            form.kelas.choices = kelas
+            if request.method == "POST" and form.validate_on_submit():
+                username = form.username.data
+                password = form.password.data
+                group = form.tipe.data if form.tipe.data else "siswa"
+                fullname = form.fullname.data
+                first_name = ""
+                last_name = ""
+                first_name, *last_name = fullname.split()
+                if len(last_name) == 0:
+                    last_name = first_name
+                elif len(last_name) != 0:
+                    last_name = " ".join(last_name)
+                gender = form.jenisKelamin.data
+                agama = form.agama.data
+                kelas = form.kelas.data
+                telp = request.form.get("telp")
+
+                payload = json.dumps(
+                    {
+                        "username": username,
+                        "password": password,
+                        "group": group,
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "gender": gender,
+                        "agama": agama,
+                        "kelas_id": kelas,
+                        "telp": telp,
+                    }
                 )
-                abort(404)
+                headers = {"Content-Type": "application/json"}
+                response = req.post(url=url, headers=headers, data=payload)
+                msg = response.json()
+                if response.status_code == 201:
+                    flash(
+                        message=f"{msg['msg']}. Status : {response.status_code}",
+                        category="success",
+                    )
+                    return redirect(url_for("admin2.getSiswa"))
+                elif response.status_code == 409:
+                    flash(
+                        message="NISN sudah yang di input, telah terdaftar",
+                        category="error",
+                    )
+                else:
+                    return render_template("admin/siswa/tambah_siswa.html", form=form)
+            return render_template("admin/siswa/tambah_siswa.html", form=form)
+        else:
+            flash(
+                f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
+                "error",
+            )
+            abort(401)
 
     # NOTE:  UPDATE DATA SISWA
     @admin2.route("/update-siswa/<int:siswa>", methods=["GET", "POST", "PUT"])
     @login_required
     def get_object_siswa(siswa):
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                form = FormEditSiswa(request.form)
+        if current_user.group == "admin":
+            form = FormEditSiswa(request.form)
 
-                sql_kelas = KelasModel.query.all()
-                sql_siswa = (
-                    db.session.query(SiswaModel).filter_by(user_id=siswa).first()
-                )
-                for i in sql_kelas:
-                    form.kelas.choices.append((i.id, i.kelas))
+            sql_kelas = KelasModel.query.all()
+            sql_siswa = db.session.query(SiswaModel).filter_by(user_id=siswa).first()
+            for i in sql_kelas:
+                form.kelas.choices.append((i.id, i.kelas))
 
-                ### NOTE: Definisi form data
-                form.nisn.data = sql_siswa.user.username
-                form.fullname.data = (
-                    f"{sql_siswa.first_name.title()} {sql_siswa.last_name.title()}"
-                )
-                form.kelas.data = f"{sql_siswa.kelas_id}"
-                form.jenisKelamin.data = sql_siswa.gender.lower()
-                form.tempatLahir.data = (
-                    sql_siswa.tempat_lahir.title() if sql_siswa.tempat_lahir else "-"
-                )
-                form.tanggalLahir.data = sql_siswa.tgl_lahir
-                form.tanggalLahir.render_kw = dict(required=False)
-                form.agama.data = sql_siswa.agama.lower()
-                form.alamat.data = sql_siswa.alamat.title() if sql_siswa.alamat else "-"
-                form.namaOrtu.data = (
-                    sql_siswa.nama_ortu_or_wali.title()
-                    if sql_siswa.nama_ortu_or_wali
-                    else "-"
-                )
-                form.telp.data = sql_siswa.no_telp if sql_siswa.no_telp else "-"
+            ### NOTE: Definisi form data
+            form.nisn.data = sql_siswa.user.username
+            form.fullname.data = (
+                f"{sql_siswa.first_name.title()} {sql_siswa.last_name.title()}"
+            )
+            form.kelas.data = f"{sql_siswa.kelas_id}"
+            form.jenisKelamin.data = sql_siswa.gender.lower()
+            form.tempatLahir.data = (
+                sql_siswa.tempat_lahir.title() if sql_siswa.tempat_lahir else "-"
+            )
+            form.tanggalLahir.data = sql_siswa.tgl_lahir
+            form.tanggalLahir.render_kw = dict(required=False)
+            form.agama.data = sql_siswa.agama.lower()
+            form.alamat.data = sql_siswa.alamat.title() if sql_siswa.alamat else "-"
+            form.namaOrtu.data = (
+                sql_siswa.nama_ortu_or_wali.title()
+                if sql_siswa.nama_ortu_or_wali
+                else "-"
+            )
+            form.telp.data = sql_siswa.no_telp if sql_siswa.no_telp else "-"
 
-                data = dict(user_id=siswa, kelasId=sql_siswa.kelas_id)
+            data = dict(user_id=siswa, kelasId=sql_siswa.kelas_id)
 
-                render = render_template(
-                    "admin/siswa/edit_siswa.html", form=form, data=data
-                )
+            render = render_template(
+                "admin/siswa/edit_siswa.html", form=form, data=data
+            )
 
-                response = make_response(render)
-                return response
-            else:
-                abort(404)
-
-        return abort(401)
+            response = make_response(render)
+            return response
+        else:
+            abort(401)
 
     @admin2.route("update-siswa/update", methods=["GET", "POST"])
     @login_required
     def updated_siswa():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                form = FormEditSiswa(request.form)
+        if current_user.group == "admin":
+            form = FormEditSiswa(request.form)
 
-                user_id = request.args.get("siswa", type=int)
-                kelas_id_sebelum = request.args.get("kelas", type=int)
-                sql_siswa = SiswaModel.query.filter_by(user_id=user_id).first()
+            user_id = request.args.get("siswa", type=int)
+            kelas_id_sebelum = request.args.get("kelas", type=int)
+            sql_siswa = SiswaModel.query.filter_by(user_id=user_id).first()
 
-                sql_count_siswa = SiswaModel.query
+            sql_count_siswa = SiswaModel.query
 
-                if request.method == "POST":
-                    nisn = form.nisn.data
-                    fullname = form.fullname.data
-                    first_name = ""
-                    last_name = ""
-                    first_name, *last_name = fullname.split() if fullname else "None"
-                    if len(last_name) == 0:
-                        last_name = first_name
-                    elif len(last_name) != 0:
-                        last_name = " ".join(last_name)
-                    kelas = form.kelas.data
-                    gender = form.jenisKelamin.data
-                    tempat = form.tempatLahir.data
-                    tgl_lahir = form.tanggalLahir.data
-                    agama = form.agama.data
-                    alamat = form.alamat.data
-                    orang_tua = form.namaOrtu.data
-                    telp = form.telp.data
+            if request.method == "POST":
+                nisn = form.nisn.data
+                fullname = form.fullname.data
+                first_name = ""
+                last_name = ""
+                first_name, *last_name = fullname.split() if fullname else "None"
+                if len(last_name) == 0:
+                    last_name = first_name
+                elif len(last_name) != 0:
+                    last_name = " ".join(last_name)
+                kelas = form.kelas.data
+                gender = form.jenisKelamin.data
+                tempat = form.tempatLahir.data
+                tgl_lahir = form.tanggalLahir.data
+                agama = form.agama.data
+                alamat = form.alamat.data
+                orang_tua = form.namaOrtu.data
+                telp = form.telp.data
 
-                    sql_siswa.user.username = nisn
-                    sql_siswa.first_name = first_name.title()
-                    sql_siswa.last_name = last_name.title()
-                    sql_siswa.kelas_id = kelas
-                    sql_siswa.gender = gender
-                    sql_siswa.tempat_lahir = tempat
-                    sql_siswa.tgl_lahir = tgl_lahir
-                    sql_siswa.agama = agama
-                    sql_siswa.alamat = alamat
-                    sql_siswa.nama_ortu_or_wali = orang_tua
-                    sql_siswa.telp = telp
+                sql_siswa.user.username = nisn
+                sql_siswa.first_name = first_name.title()
+                sql_siswa.last_name = last_name.title()
+                sql_siswa.kelas_id = kelas
+                sql_siswa.gender = gender
+                sql_siswa.tempat_lahir = tempat
+                sql_siswa.tgl_lahir = tgl_lahir
+                sql_siswa.agama = agama
+                sql_siswa.alamat = alamat
+                sql_siswa.nama_ortu_or_wali = orang_tua
+                sql_siswa.telp = telp
 
-                    sql_kelas = KelasModel.query
-                    kelas_baru = sql_kelas.filter_by(id=kelas).first()
-                    kelas_lama = sql_kelas.filter_by(id=kelas_id_sebelum).first()
+                sql_kelas = KelasModel.query
+                kelas_baru = sql_kelas.filter_by(id=kelas).first()
+                kelas_lama = sql_kelas.filter_by(id=kelas_id_sebelum).first()
 
-                    if kelas_baru.id != kelas_lama.id:
-                        kelas_baru.jml_seluruh = sql_count_siswa.filter_by(
-                            kelas_id=kelas
-                        ).count()
-                        kelas_baru.jml_perempuan = sql_count_siswa.filter_by(
-                            gender="perempuan", kelas_id=kelas
-                        ).count()
-                        kelas_baru.jml_laki = sql_count_siswa.filter_by(
-                            gender="laki-laki", kelas_id=kelas
-                        ).count()
+                if kelas_baru.id != kelas_lama.id:
+                    kelas_baru.jml_seluruh = sql_count_siswa.filter_by(
+                        kelas_id=kelas
+                    ).count()
+                    kelas_baru.jml_perempuan = sql_count_siswa.filter_by(
+                        gender="perempuan", kelas_id=kelas
+                    ).count()
+                    kelas_baru.jml_laki = sql_count_siswa.filter_by(
+                        gender="laki-laki", kelas_id=kelas
+                    ).count()
 
-                        kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
-                            kelas_id=kelas_id_sebelum
-                        ).count()
-                        kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
-                            gender="perempuan", kelas_id=kelas_id_sebelum
-                        ).count()
-                        kelas_lama.jml_laki = sql_count_siswa.filter_by(
-                            gender="laki-laki", kelas_id=kelas_id_sebelum
-                        ).count()
-                    else:
-                        kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
-                            kelas_id=kelas_id_sebelum
-                        ).count()
-                        kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
-                            gender="perempuan", kelas_id=kelas_id_sebelum
-                        ).count()
-                        kelas_lama.jml_laki = sql_count_siswa.filter_by(
-                            gender="laki-laki", kelas_id=kelas_id_sebelum
-                        ).count()
-
-                    db.session.commit()
-
-                    flash("Data profil sisa telah diperbaharui", "success")
-                    direct = redirect(url_for(".getSiswa"))
-                    response = make_response(direct)
-
-                    return response
-
+                    kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
+                        kelas_id=kelas_id_sebelum
+                    ).count()
+                    kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
+                        gender="perempuan", kelas_id=kelas_id_sebelum
+                    ).count()
+                    kelas_lama.jml_laki = sql_count_siswa.filter_by(
+                        gender="laki-laki", kelas_id=kelas_id_sebelum
+                    ).count()
                 else:
-                    direct = redirect(url_for(".get_object_siswa", siswa=user_id))
-                    response = make_response(direct)
-                    flash("Data profil siswa gagal diperbaharui!", "error")
-                    return response
+                    kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
+                        kelas_id=kelas_id_sebelum
+                    ).count()
+                    kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
+                        gender="perempuan", kelas_id=kelas_id_sebelum
+                    ).count()
+                    kelas_lama.jml_laki = sql_count_siswa.filter_by(
+                        gender="laki-laki", kelas_id=kelas_id_sebelum
+                    ).count()
+
+                db.session.commit()
+
+                flash("Data profil sisa telah diperbaharui", "success")
+                direct = redirect(url_for(".getSiswa"))
+                response = make_response(direct)
+
+                return response
+
             else:
-                abort(404)
+                direct = redirect(url_for(".get_object_siswa", siswa=user_id))
+                response = make_response(direct)
+                flash("Data profil siswa gagal diperbaharui!", "error")
+                return response
         else:
-            return abort(401)
+            abort(401)
 
     # NOTE:  DELETE DATA SISWA
     @admin2.route("/siswa/delete-siswa", methods=["GET", "POST", "DELETE"])
     @login_required
     def delete_siswa():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                user_id = request.args.get("siswa", type=int)
-                kelas_id = request.args.get("kelas", type=int)
+        if current_user.group == "admin":
+            user_id = request.args.get("siswa", type=int)
+            kelas_id = request.args.get("kelas", type=int)
 
-                sql_user = UserModel.query.filter_by(id=user_id).first()
-                sql_kelas = KelasModel.query.filter_by(id=kelas_id)
-                get = sql_kelas.first()
+            sql_user = UserModel.query.filter_by(id=user_id).first()
+            sql_kelas = KelasModel.query.filter_by(id=kelas_id)
+            get = sql_kelas.first()
 
-                dir_foto = os.getcwd() + "/app/api/static/img/siswa/foto/"
-                dir_qr = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+            dir_foto = os.getcwd() + "/app/api/static/img/siswa/foto/"
+            dir_qr = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
 
-                if sql_user:
-                    sql_siswa = SiswaModel.query.filter_by(user_id=sql_user.id).first()
+            if sql_user:
+                sql_siswa = SiswaModel.query.filter_by(user_id=sql_user.id).first()
 
-                    if sql_siswa.pic and sql_siswa.qr_code:
-                        os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
+                if sql_siswa.pic and sql_siswa.qr_code:
+                    os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
 
-                        os.remove(os.path.join(dir_qr, f"{sql_siswa.qr_code}"))
-                    elif sql_siswa.pic:
-                        os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
-                    elif sql_siswa.qr_code:
-                        os.remove(os.path.join(dir_qr, f"{sql_siswa.qr_code}"))
+                    os.remove(os.path.join(dir_qr, f"{sql_siswa.qr_code}"))
+                elif sql_siswa.pic:
+                    os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
+                elif sql_siswa.qr_code:
+                    os.remove(os.path.join(dir_qr, f"{sql_siswa.qr_code}"))
 
-                    db.session.delete(sql_siswa)
-                    db.session.delete(sql_user)
+                db.session.delete(sql_siswa)
+                db.session.delete(sql_user)
 
-                    sql_count_siswa = SiswaModel.query.filter_by(kelas_id=kelas_id)
-                    get.jml_seluruh = sql_count_siswa.count()
-                    get.jml_laki = sql_count_siswa.filter_by(gender="laki-laki").count()
-                    get.jml_perempuan = sql_count_siswa.filter_by(
-                        gender="perempuan"
-                    ).count()
+                sql_count_siswa = SiswaModel.query.filter_by(kelas_id=kelas_id)
+                get.jml_seluruh = sql_count_siswa.count()
+                get.jml_laki = sql_count_siswa.filter_by(gender="laki-laki").count()
+                get.jml_perempuan = sql_count_siswa.filter_by(
+                    gender="perempuan"
+                ).count()
 
-                    db.session.commit()
+                db.session.commit()
 
-                    flash("Data siswa telah dihapus.", "success")
+                flash("Data siswa telah dihapus.", "success")
 
-                    direct = redirect(url_for(".getSiswa"))
-                    response = make_response(direct)
+                direct = redirect(url_for(".getSiswa"))
+                response = make_response(direct)
 
-                    return response
-                else:
-                    flash("Gagal hapus data siswa!", "error")
+                return response
             else:
-                abort(404)
+                flash("Gagal hapus data siswa!", "error")
         else:
-            return abort(401)
+            abort(401)
 
     ### NOTE: DELETE FOTO SISWA & QR CODE
     @admin2.route("siswa/delete-foto", methods=["GET", "POST"])
     @login_required
     def delete_foto():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
+        if current_user.group == "admin":
+            path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
 
-                user_id = request.args.get("siswa", type=int)
-                sql_siswa = dbs.get_one(entity=SiswaModel, user_id=user_id)
+            user_id = request.args.get("siswa", type=int)
+            sql_siswa = dbs.get_one(entity=SiswaModel, user_id=user_id)
 
-                os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
+            os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
 
-                sql_siswa.pic = None
-                dbs.commit_data()
+            sql_siswa.pic = None
+            dbs.commit_data()
 
-                direct = redirect(url_for("admin2.getSiswa"))
-                response = make_response(direct)
-                flash("Foto siswa telah dihapus dari direktori file.", "info")
-                return response
-            else:
-                dbs.dbs_abort(404, description=f"Data User tidak ditemukan.")
+            direct = redirect(url_for("admin2.getSiswa"))
+            response = make_response(direct)
+            flash("Foto siswa telah dihapus dari direktori file.", "info")
+            return response
         else:
-            dbs.dbs_abort(401, "Masalah pada autentikasi")
+            dbs.dbs_abort(401)
 
     @admin2.route("siswa/delete-qrfile", methods=["GET", "POST"])
     @login_required
     def delete_qr():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                path_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+        if current_user.group == "admin":
+            path_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
 
-                user_id = request.args.get("siswa", type=int)
-                sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
+            user_id = request.args.get("siswa", type=int)
+            sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
 
-                os.remove(os.path.join(path_file, sql_siswa.qr_code))
-                sql_siswa.qr_code = None
-                dbs.commit_data()
+            os.remove(os.path.join(path_file, sql_siswa.qr_code))
+            sql_siswa.qr_code = None
+            dbs.commit_data()
 
-                direct = redirect(url_for("admin2.getSiswa"))
-                response = make_response(direct)
-                flash("File QR Code siswa telah dihapus dari direktori file.", "info")
-                return response
+            direct = redirect(url_for("admin2.getSiswa"))
+            response = make_response(direct)
+            flash("File QR Code siswa telah dihapus dari direktori file.", "info")
+            return response
 
-            else:
-                dbs.dbs_abort(404, description=f"Data User tidak ditemukan.")
         else:
-            dbs.dbs_abort(401, description="Login gagal.")
+            dbs.dbs_abort(401)
 
     @admin2.route("siswa/download-foto", methods=["GET", "POST"])
     @login_required
     def download_foto():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
+        if current_user.group == "admin":
+            path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
 
-                user_id = request.args.get("siswa", type=int)
+            user_id = request.args.get("siswa", type=int)
 
-                sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
+            sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
 
-                unduh = send_from_directory(
-                    path_file, sql_siswa.pic, as_attachment=True
-                )
-                response = make_response(unduh)
-                return response
-            else:
-                abort(404, description=f"Data user tidak ditemukan")
+            unduh = send_from_directory(path_file, sql_siswa.pic, as_attachment=True)
+            response = make_response(unduh)
+            return response
         else:
             abort(401)
 
     @admin2.route("siswa/download-qr", methods=["GET", "POST"])
     @login_required
     def download_qr():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                dir_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+        if current_user.group == "admin":
+            dir_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
 
-                user_id = request.args.get("siswa", type=int)
-                sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
+            user_id = request.args.get("siswa", type=int)
+            sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
 
-                unduh = send_from_directory(
-                    dir_file, sql_siswa.qr_code, as_attachment=True
-                )
-                response = make_response(unduh)
-                return response
-            else:
-                abort(404)
-        abort(401)
+            unduh = send_from_directory(dir_file, sql_siswa.qr_code, as_attachment=True)
+            response = make_response(unduh)
+            return response
+        else:
+            abort(401)
 
     # eksport data
     @admin2.route("/export-siswa")
@@ -620,68 +588,66 @@ class PenggunaGuru:
     @admin2.route("data-guru")
     @login_required
     def get_guru():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                url = base_url + "api/v2/guru/get-all"
-                response = req.get(url)
-                json_resp = response.json()
-                return render_template("admin/guru/data_guru.html", model=json_resp)
-            else:
-                abort(404)
+        if current_user.group == "admin":
+            url = base_url + "api/v2/guru/get-all"
+            response = req.get(url)
+            json_resp = response.json()
+            return render_template("admin/guru/data_guru.html", model=json_resp)
+        else:
+            abort(401)
 
     @admin2.route("tambah-data", methods=["GET", "POST"])
     @login_required
     def add_guru():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                form = FormAddGuru(request.form)
-                base = request.root_url
+        if current_user.group == "admin":
+            form = FormAddGuru(request.form)
+            base = request.root_url
 
-                if request.method == "POST" and form.validate_on_submit():
-                    username = form.username.data
-                    password = form.password.data
-                    group = form.tipe.data if form.tipe.data else "guru"
-                    fullname = form.fullname.data
-                    first_name = ""
-                    last_name = ""
-                    first_name, *last_name = fullname.split() if fullname else "None"
-                    if len(last_name) == 0:
-                        last_name = first_name
-                    elif len(last_name) != 0:
-                        last_name = " ".join(last_name)
-                    gender = form.jenisKelamin.data
-                    agama = form.agama.data
-                    alamat = form.alamat.data
-                    telp = form.telp.data
+            if request.method == "POST" and form.validate_on_submit():
+                username = form.username.data
+                password = form.password.data
+                group = form.tipe.data if form.tipe.data else "guru"
+                fullname = form.fullname.data
+                first_name = ""
+                last_name = ""
+                first_name, *last_name = fullname.split() if fullname else "None"
+                if len(last_name) == 0:
+                    last_name = first_name
+                elif len(last_name) != 0:
+                    last_name = " ".join(last_name)
+                gender = form.jenisKelamin.data
+                agama = form.agama.data
+                alamat = form.alamat.data
+                telp = form.telp.data
 
-                    url_create = base + "api/v2/auth/create"
-                    payload = json.dumps(
-                        {
-                            "username": username,
-                            "password": password,
-                            "group": group,
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "gender": gender,
-                            "alamat": alamat,
-                            "agama": agama,
-                            "telp": telp,
-                        }
-                    )
-                    headers = {"Content-Type": "application/json"}
-                    response = req.post(url=url_create, data=payload, headers=headers)
-                    msg = response.json().get("msg")
+                url_create = base + "api/v2/auth/create"
+                payload = json.dumps(
+                    {
+                        "username": username,
+                        "password": password,
+                        "group": group,
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "gender": gender,
+                        "alamat": alamat,
+                        "agama": agama,
+                        "telp": telp,
+                    }
+                )
+                headers = {"Content-Type": "application/json"}
+                response = req.post(url=url_create, data=payload, headers=headers)
+                msg = response.json().get("msg")
 
-                    if response.status_code == 201:
-                        flash(f"{msg} Status : {response.status_code}", "success")
-                        return redirect(url_for("admin2.get_guru"))
-                    else:
-                        flash(f"{msg}. Status : {response.status_code}", "error")
-                        # return redirect(url_for('admin2.get_guru'))
-                        return render_template("admin/guru/tambah_guru.html", form=form)
-                return render_template("admin/guru/tambah_guru.html", form=form)
-            else:
-                abort(404)
+                if response.status_code == 201:
+                    flash(f"{msg} Status : {response.status_code}", "success")
+                    return redirect(url_for("admin2.get_guru"))
+                else:
+                    flash(f"{msg}. Status : {response.status_code}", "error")
+                    # return redirect(url_for('admin2.get_guru'))
+                    return render_template("admin/guru/tambah_guru.html", form=form)
+            return render_template("admin/guru/tambah_guru.html", form=form)
+        else:
+            abort(401)
 
     @admin2.route("update-guru/<int:id>", methods=["POST", "GET"])
     @login_required
@@ -744,7 +710,7 @@ class PenggunaGuru:
                 return render_template("admin/guru/edit_guru.html", form=form)
             return render_template("admin/guru/edit_guru.html", form=form)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-guru/<id>", methods=["GET", "DELETE", "POST"])
     @login_required
@@ -766,7 +732,7 @@ class PenggunaGuru:
                 )
                 return redirect(url_for("admin2.get_guru"))
         else:
-            abort(404)
+            abort(401)
 
 
 class PenggunaUser:
@@ -787,7 +753,7 @@ class PenggunaUser:
                 formPassword=formUpdatePassword,
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("/status-pengguna", methods=["GET", "POST"])
     @login_required
@@ -820,56 +786,53 @@ class PenggunaUser:
     @admin2.route("/pengguna/tambah-admin", methods=["GET", "POST"])
     @login_required
     def tambah_admin():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                form = FormTambahAdmin()
+        if current_user.group == "admin":
+            form = FormTambahAdmin()
 
-                if form.validate_on_submit():
-                    username = form.username.data
-                    password = form.password.data
-                    group = form.group.data
-                    fullname = form.fullname.data
-                    gender = form.gender.data
-                    alamat = form.alamat.data
+            if form.validate_on_submit():
+                username = form.username.data
+                password = form.password.data
+                group = form.group.data
+                fullname = form.fullname.data
+                gender = form.gender.data
+                alamat = form.alamat.data
 
-                    first_name = ""
-                    last_name = ""
+                first_name = ""
+                last_name = ""
 
-                    first_name, *last_name = fullname.split(" ") if fullname else ""
+                first_name, *last_name = fullname.split(" ") if fullname else ""
 
-                    if len(last_name) == 0:
-                        last_name = first_name
-                    elif len(last_name) != 0:
-                        last_name = " ".join(last_name)
+                if len(last_name) == 0:
+                    last_name = first_name
+                elif len(last_name) != 0:
+                    last_name = " ".join(last_name)
 
-                    pswd = generate_password_hash(password)
-                    user = UserModel(username, pswd, group)
+                pswd = generate_password_hash(password)
+                user = UserModel(username, pswd, group)
 
-                    dbs.add_data(user)
-                    detail: AdminModel = None
-                    if user:
-                        detail = AdminModel(
-                            first_name, last_name, gender, alamat, user=user
-                        )
+                dbs.add_data(user)
+                detail: AdminModel = None
+                if user:
+                    detail = AdminModel(
+                        first_name, last_name, gender, alamat, user=user
+                    )
 
-                        dbs.add_data(detail)
+                    dbs.add_data(detail)
 
-                        dbs.commit_data()
+                    dbs.commit_data()
 
-                        flash("Data user admin telah ditambahkan.", "success")
-                        direct = redirect(url_for("admin2.get_user"))
-                        response = make_response(direct)
-                        return response
-                    else:
-                        flash("Gagal menambahkan data user amdin", "error")
+                    flash("Data user admin telah ditambahkan.", "success")
+                    direct = redirect(url_for("admin2.get_user"))
+                    response = make_response(direct)
+                    return response
+                else:
+                    flash("Gagal menambahkan data user amdin", "error")
 
-                render = render_template("admin/pengguna/tambah_admin.html", form=form)
-                response = make_response(render)
-                return response
-            else:
-                abort(404)
-
-        abort(401)
+            render = render_template("admin/pengguna/tambah_admin.html", form=form)
+            response = make_response(render)
+            return response
+        else:
+            abort(401)
 
     @admin2.post("edit-pswd/<int:id>")
     @login_required
@@ -902,99 +865,92 @@ class PenggunaUser:
                     )
                     return redirect(url_for("admin2.get_user"))
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("/admin/perbaharui-data", methods=["GET", "POST"])
     @login_required
     def update_profil():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                form = FormEditAdmin()
-                user_id = current_user.id
-                user = dbs.get_one(UserModel, id=user_id)
+        if current_user.group == "admin":
+            form = FormEditAdmin()
+            user_id = current_user.id
+            user = dbs.get_one(UserModel, id=user_id)
 
-                form.username.data = user.username
-                for i in user.admins:
-                    form.fullname.data = f"{i.first_name.title()} {i.last_name.title() if i.first_name.lower() != i.last_name.lower() else ''}"
-                    form.gender.data = i.gender
-                    form.alamat.data = i.alamat.title() if i.alamat else ""
-                    form.telp.data = i.telp
+            form.username.data = user.username
+            for i in user.admins:
+                form.fullname.data = f"{i.first_name.title()} {i.last_name.title() if i.first_name.lower() != i.last_name.lower() else ''}"
+                form.gender.data = i.gender
+                form.alamat.data = i.alamat.title() if i.alamat else ""
+                form.telp.data = i.telp
 
-                render = render_template("akun/profil_admin.html", form=form)
-                response = make_response(render)
-                return response
+            render = render_template("akun/profil_admin.html", form=form)
+            response = make_response(render)
+            return response
 
-            else:
-                abort(404)
-
-        abort(401)
+        else:
+            abort(401)
 
     @admin2.route("/admin/perbaharui-data/updated", methods=["GET", "POST"])
     @login_required
     def updated_data_admin():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                fullname = request.form.get("fullname")
-                gender = request.form.get("gender")
-                alamat = request.form.get("alamat")
-                telp = request.form.get("telp")
+        if current_user.group == "admin":
+            fullname = request.form.get("fullname")
+            gender = request.form.get("gender")
+            alamat = request.form.get("alamat")
+            telp = request.form.get("telp")
 
-                firstName: str | None
-                lastName: str | None
+            firstName: str | None
+            lastName: str | None
 
-                firstName, *lastName = fullname.split(" ") if fullname else ""
-                if len(lastName) == 0:
-                    lastName = firstName
-                elif len(lastName) != 0:
-                    lastName = " ".join(lastName)
+            firstName, *lastName = fullname.split(" ") if fullname else ""
+            if len(lastName) == 0:
+                lastName = firstName
+            elif len(lastName) != 0:
+                lastName = " ".join(lastName)
 
-                user = dbs.get_one(AdminModel, user_id=current_user.id)
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
 
-                user.first_name = firstName
-                user.last_name = lastName
-                user.gender = gender
-                user.alamat = alamat
-                user.telp = telp
+            user.first_name = firstName
+            user.last_name = lastName
+            user.gender = gender
+            user.alamat = alamat
+            user.telp = telp
 
-                dbs.commit_data()
+            dbs.commit_data()
 
-                flash("Data profil admin telah diperbaharui", "success")
-                direct = redirect(url_for("admin2.index"))
-                response = make_response(direct)
-                return response
+            flash("Data profil admin telah diperbaharui", "success")
+            direct = redirect(url_for("admin2.index"))
+            response = make_response(direct)
+            return response
 
-            else:
-                abort(404)
-        abort(401)
+        else:
+            abort(401)
 
     @admin2.route("/admin/update-password", methods=["GET", "POST"])
     @login_required
     def update_password_admin():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                form = FormUpdatePasswordAmdin()
+        if current_user.group == "admin":
+            form = FormUpdatePasswordAmdin()
 
-                if form.validate_on_submit():
-                    password = form.password.data
+            if form.validate_on_submit():
+                password = form.password.data
 
-                    user = dbs.get_one(UserModel, id=current_user.id)
-                    pswd = generate_password_hash(password)
-                    user.password = pswd
+                user = dbs.get_one(UserModel, id=current_user.id)
+                pswd = generate_password_hash(password)
+                user.password = pswd
 
-                    dbs.commit_data()
-                    
-                    flash('Password admin telah diperbaharui', 'success')
-                    direct = redirect(url_for("admin2.index"))
-                    response = make_response(direct)
-                    return response
-                
-                render = render_template("akun/update_password.html", form=form)
-                response = make_response(render)
+                dbs.commit_data()
+
+                flash("Password admin telah diperbaharui", "success")
+                direct = redirect(url_for("admin2.index"))
+                response = make_response(direct)
                 return response
 
-            else:
-                abort(404)
-        abort(401)
+            render = render_template("akun/update_password.html", form=form)
+            response = make_response(render)
+            return response
+
+        else:
+            abort(401)
 
 
 # NOTE: MASTER DATA
@@ -1011,7 +967,7 @@ class MasterData:
                 "admin/master/mapel/data_mapel.html", model=jsonRespon
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("add-mapel", methods=["POST", "GET"])
     @login_required
@@ -1041,7 +997,7 @@ class MasterData:
                     )
             return render_template("admin/master/mapel/tambah_mapel.html", form=form)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-mapel/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1077,7 +1033,7 @@ class MasterData:
                     )
             return render_template("admin/master/mapel/edit_mapel.html", form=form)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-mapel/<int:id>", methods=["GET", "DELETE"])
     @login_required
@@ -1099,7 +1055,7 @@ class MasterData:
                 )
                 return redirect(url_for("admin2.get_mapel"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA SESMESTER =====================================
     @admin2.get("data-semester")
@@ -1113,7 +1069,7 @@ class MasterData:
                 "admin/master/semester/data_semester.html", model=jsonResp
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("add-semester", methods=["GET", "POST"])
     @login_required
@@ -1149,7 +1105,7 @@ class MasterData:
                 "admin/master/semester/tambah_semester.html", form=form
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-semester/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1186,7 +1142,7 @@ class MasterData:
                 "admin/master/semester/edit_semester.html", form=form
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-semester/<int:id>", methods=["DELETE", "GET"])
     @login_required
@@ -1201,7 +1157,7 @@ class MasterData:
                 )
                 return redirect(url_for("admin2.get_semester"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA TAHUN AJARAN =====================================
     @admin2.route("data-tahun-ajaran")
@@ -1215,7 +1171,7 @@ class MasterData:
                 "admin/master/tahun_ajaran/data_tahun_ajaran.html", model=jsonResp
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("add-tahun-ajaran", methods=["GET", "POST"])
     @login_required
@@ -1251,7 +1207,7 @@ class MasterData:
                 "admin/master/tahun_ajaran/tambah_tahun_ajaran.html", form=form
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-tahun-ajaran/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1290,7 +1246,7 @@ class MasterData:
                 "admin/master/tahun_ajaran/edit_tahun_ajaran.html", form=form
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-tahun-ajaran/<int:id>", methods=["GET", "DELETE"])
     @login_required
@@ -1305,7 +1261,7 @@ class MasterData:
                 )
                 return redirect(url_for("admin2.get_ajaran"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA KELAS =====================================
     @admin2.route("data-kelas")
@@ -1317,7 +1273,7 @@ class MasterData:
             jsonResp = response.json()
             return render_template("admin/master/kelas/data_kelas.html", model=jsonResp)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("add-kelas", methods=["GET", "POST"])
     @login_required
@@ -1349,7 +1305,7 @@ class MasterData:
                     )
             return render_template("admin/master/kelas/tambah_kelas.html", form=form)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-kelas/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1394,7 +1350,7 @@ class MasterData:
                     )
             return render_template("admin/master/kelas/edit_kelas.html", form=form)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-kelas/<int:id>", methods=["GET", "DELETE"])
     @login_required
@@ -1409,7 +1365,7 @@ class MasterData:
                 )
                 return redirect(url_for("admin2.get_kelas"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA HARI =====================================
     @admin2.route("data-hari")
@@ -1421,7 +1377,7 @@ class MasterData:
             jsonResp = response.json()
             return render_template("admin/master/hari/data_hari.html", model=jsonResp)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("add-hari", methods=["GET", "POST"])
     @login_required
@@ -1453,7 +1409,7 @@ class MasterData:
 
             return render_template("admin/master/hari/tambah_hari.html", form=form)
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-hari/<int:id>", methods=["GET", "POST"])
     def edit_hari(id):
@@ -1472,7 +1428,7 @@ class MasterData:
                 )
                 return redirect(url_for("admin2.get_hari"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA JAM =====================================
     @admin2.route("data-jam")
@@ -1488,7 +1444,7 @@ class MasterData:
                 "admin/master/jam/data_jam.html", model=jsonResp, form=form
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("tambah-jam", methods=["GET", "POST"])
     @login_required
@@ -1519,7 +1475,7 @@ class MasterData:
                     f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
                     "error",
                 )
-                abort(404)
+                abort(401)
 
     @admin2.route("edit-jam/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1549,7 +1505,7 @@ class MasterData:
                     f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
                     "error",
                 )
-                abort(404)
+                abort(401)
 
     @admin2.route("delete-jam/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1570,7 +1526,7 @@ class MasterData:
                 )
                 return redirect(url_for("admin2.get_jam"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA WALI KELAS =====================================
     @admin2.route("data-wali-kelas")
@@ -1604,7 +1560,7 @@ class MasterData:
                 jsonKelas=jsonRespKelas["data"],
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("tambah-wali", methods=["GET", "POST"])
     @login_required
@@ -1636,7 +1592,7 @@ class MasterData:
                     f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
                     "error",
                 )
-                abort(404)
+                abort(401)
 
     @admin2.route("update-wali/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1657,7 +1613,7 @@ class MasterData:
                     flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
                     return redirect(url_for("admin2.get_wali"))
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-wali/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1679,7 +1635,7 @@ class MasterData:
                 )
                 return redirect(url_for("admin2.get_wali"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA GURU BK=====================================
     @admin2.route("data-guru-bk", methods=["GET"])
@@ -1704,7 +1660,7 @@ class MasterData:
                 jsonGuru=jsonRespGuru,
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("add-guru-bk", methods=["GET", "POST"])
     @login_required
@@ -1725,7 +1681,7 @@ class MasterData:
                 flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
                 return redirect(url_for("admin2.get_bk"))
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-guru-bk/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1745,7 +1701,7 @@ class MasterData:
                 flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
                 return redirect(url_for("admin2.get_bk"))
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-guru-bk/<int:id>", methods=["GET", "DELETE"])
     @login_required
@@ -1764,7 +1720,7 @@ class MasterData:
                 flash(f"Gagal memuat data. Status : {resp.status_code}", "error")
                 return redirect(url_for("admin2.get_bk"))
         else:
-            abort(404)
+            abort(401)
 
     # NOTE: ================== MASTER DATA KEPALA SEKOLAH =====================================
     @admin2.route("data-kepsek", methods=["GET"])
@@ -1796,7 +1752,7 @@ class MasterData:
                 status=status,
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("add-kepsek", methods=["GET", "POST"])
     @login_required
@@ -1816,7 +1772,7 @@ class MasterData:
                 flash(f"Ma'af! Terjadi kesalahan menginput data.", "error")
                 return redirect(url_for("admin2.get_kepsek"))
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-kepsek/<int:id>", methods=["GET", "POST"])
     @login_required
@@ -1838,7 +1794,7 @@ class MasterData:
                 flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
                 return redirect(url_for("admin2.get_kepsek"))
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("delete-kepsek/<int:id>", methods=["GET", "DELETE"])
     @login_required
@@ -1857,7 +1813,7 @@ class MasterData:
                 flash(f"Gagal memuat data. Status : {resp.status_code}", "error")
                 return redirect(url_for("admin2.get_kepsek"))
         else:
-            abort(404)
+            abort(401)
 
 
 class JadwalMengajara:
@@ -1865,16 +1821,15 @@ class JadwalMengajara:
     @admin2.route("data-jawdwal-mengajar")
     @login_required
     def get_jadwal():
-        if current_user.is_authenticated:
-            if current_user.group == "admin":
-                url = base_url + "api/v2/master/jadwal-mengajar/get-all"
-                resp = req.get(url)
-                jsonResp = resp.json()
-                return render_template(
-                    "admin/jadwal_mengajar/data_jadwal.html", model=jsonResp
-                )
-            else:
-                abort(404)
+        if current_user.group == "admin":
+            url = base_url + "api/v2/master/jadwal-mengajar/get-all"
+            resp = req.get(url)
+            jsonResp = resp.json()
+            return render_template(
+                "admin/jadwal_mengajar/data_jadwal.html", model=jsonResp
+            )
+        else:
+            abort(401)
 
     @admin2.route("tambah-jadwal-mengajar", methods=["GET", "POST"])
     @login_required
@@ -1972,7 +1927,7 @@ class JadwalMengajara:
                 "admin/jadwal_mengajar/tambah_jadwal.html", form=form
             )
         else:
-            abort(404)
+            abort(401)
 
     @admin2.route("edit-jadwal/<int:id>", methods=["GET", "POST"])
     def edit_jadwal(id):
@@ -2076,7 +2031,7 @@ class JadwalMengajara:
                 )
                 return redirect(url_for("admin2.get_jadwal"))
         else:
-            abort(404)
+            abort(401)
 
 
 """
@@ -2159,7 +2114,7 @@ def data_kehadiran_bulan():
             form=form,
         )
     else:
-        return abort(404)
+        return abort(401)
 
 
 @admin2.route("data-kehadiran/semester", methods=["GET", "POST"])
@@ -2201,7 +2156,7 @@ def data_kehadiran_semester():
             )
         return render_template("admin/absensi/daftar_hadir_semester.html", form=form)
     else:
-        return abort(404)
+        return abort(401)
 
 
 @admin2.route("surat-pernyataan/pilih-kelas", methods=["GET", "POST"])
@@ -2229,7 +2184,7 @@ def select_siswa():
 
         return render_template("admin/letter_report/select_kelas.html", form=form)
     else:
-        return abort(404)
+        return abort(401)
 
 
 @admin2.route("surat-pernyataan", methods=["GET", "POST"])
@@ -2251,7 +2206,7 @@ def surat_pernyataan():
                 sql_bk=sql_bk,
             )
         else:
-            return abort(404)
+            return abort(401)
     except Exception as e:
         return e
 

@@ -9,6 +9,7 @@ from flask import (
     request,
     redirect,
     send_from_directory,
+    session,
     url_for,
     render_template,
     flash,
@@ -79,6 +80,11 @@ def index():
 
         jml_kelas = sql(x=db.session.query(KelasModel).count())
 
+        user = dbs.get_one(AdminModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         return render_template(
             "admin/index_admin.html",
             jml_siswa=jml_siswa,
@@ -103,6 +109,12 @@ class PenggunaSiswa:
             urlSiswa = base_url + url_for("siswa.get")
             respSiswa = req.get(urlSiswa)
             jsonRespSiswa = respSiswa.json()
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             return render_template(
                 "admin/siswa/get_siswa.html",
                 kelas=jsonRespKelas,
@@ -248,6 +260,11 @@ class PenggunaSiswa:
                     )
                 else:
                     return render_template("admin/siswa/tambah_siswa.html", form=form)
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/siswa/tambah_siswa.html", form=form)
         else:
             flash(
@@ -290,6 +307,11 @@ class PenggunaSiswa:
             form.telp.data = sql_siswa.no_telp if sql_siswa.no_telp else "-"
 
             data = dict(user_id=siswa, kelasId=sql_siswa.kelas_id)
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
 
             render = render_template(
                 "admin/siswa/edit_siswa.html", form=form, data=data
@@ -592,6 +614,11 @@ class PenggunaGuru:
             url = base_url + "api/v2/guru/get-all"
             response = req.get(url)
             json_resp = response.json()
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/guru/data_guru.html", model=json_resp)
         else:
             abort(401)
@@ -645,6 +672,11 @@ class PenggunaGuru:
                     flash(f"{msg}. Status : {response.status_code}", "error")
                     # return redirect(url_for('admin2.get_guru'))
                     return render_template("admin/guru/tambah_guru.html", form=form)
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/guru/tambah_guru.html", form=form)
         else:
             abort(401)
@@ -708,6 +740,11 @@ class PenggunaGuru:
                 else:
                     flash(f"{msg['msg']}. Status : {resp_obj.status_code}", "error")
                 return render_template("admin/guru/edit_guru.html", form=form)
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/guru/edit_guru.html", form=form)
         else:
             abort(401)
@@ -746,6 +783,11 @@ class PenggunaUser:
             users = UserModel.query.all()
             form = FormEditStatus()
             formUpdatePassword = FormEditPassword()
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/pengguna/data_user.html",
                 user=users,
@@ -828,6 +870,10 @@ class PenggunaUser:
                 else:
                     flash("Gagal menambahkan data user amdin", "error")
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             render = render_template("admin/pengguna/tambah_admin.html", form=form)
             response = make_response(render)
             return response
@@ -882,6 +928,10 @@ class PenggunaUser:
                 form.alamat.data = i.alamat.title() if i.alamat else ""
                 form.telp.data = i.telp
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             render = render_template("akun/profil_admin.html", form=form)
             response = make_response(render)
             return response
@@ -995,6 +1045,11 @@ class MasterData:
                     return render_template(
                         "admin/master/mapel/tambah_mapel.html", form=form
                     )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/master/mapel/tambah_mapel.html", form=form)
         else:
             abort(401)
@@ -1031,6 +1086,11 @@ class MasterData:
                     return render_template(
                         "admin/master/mapel/edit_mapel.html", form=form
                     )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/master/mapel/edit_mapel.html", form=form)
         else:
             abort(401)
@@ -1100,7 +1160,10 @@ class MasterData:
                     return render_template(
                         "admin/master/semester/tambah_semester.html", form=form
                     )
-
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/master/semester/tambah_semester.html", form=form
             )
@@ -1138,6 +1201,11 @@ class MasterData:
                     return render_template(
                         "admin/master/semester/edit_semester.html", form=form
                     )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/master/semester/edit_semester.html", form=form
             )
@@ -1167,6 +1235,11 @@ class MasterData:
             URL = base_url + "api/v2/master/ajaran/get-all"
             response = req.get(URL)
             jsonResp = response.json()
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/master/tahun_ajaran/data_tahun_ajaran.html", model=jsonResp
             )
@@ -1203,6 +1276,11 @@ class MasterData:
                     return render_template(
                         "admin/master/tahun_ajaran/tambah_tahun_ajaran.html", form=form
                     )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/master/tahun_ajaran/tambah_tahun_ajaran.html", form=form
             )
@@ -1242,6 +1320,11 @@ class MasterData:
                         "admin/master/tahun_ajaran/edit_tahun_ajaran.html", form=form
                     )
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             return render_template(
                 "admin/master/tahun_ajaran/edit_tahun_ajaran.html", form=form
             )
@@ -1271,6 +1354,11 @@ class MasterData:
             URL = base_url + "api/v2/master/kelas/get-all"
             response = req.get(URL)
             jsonResp = response.json()
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/master/kelas/data_kelas.html", model=jsonResp)
         else:
             abort(401)
@@ -1303,6 +1391,12 @@ class MasterData:
                     return render_template(
                         "admin/master/kelas/tambah_kelas.html", form=form
                     )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             return render_template("admin/master/kelas/tambah_kelas.html", form=form)
         else:
             abort(401)
@@ -1348,6 +1442,12 @@ class MasterData:
                     return render_template(
                         "admin/master/kelas/edit_kelas.html", form=form
                     )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             return render_template("admin/master/kelas/edit_kelas.html", form=form)
         else:
             abort(401)
@@ -1375,6 +1475,11 @@ class MasterData:
             URL = base_url + "api/v2/master/hari/get-all"
             response = req.get(URL)
             jsonResp = response.json()
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/master/hari/data_hari.html", model=jsonResp)
         else:
             abort(401)
@@ -1407,6 +1512,10 @@ class MasterData:
                         "admin/master/hari/tambah_hari.html", form=form
                     )
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template("admin/master/hari/tambah_hari.html", form=form)
         else:
             abort(401)
@@ -1439,6 +1548,11 @@ class MasterData:
             resp = req.get(url)
             jsonResp = resp.json()
             form = FormJam(request.form)
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
 
             return render_template(
                 "admin/master/jam/data_jam.html", model=jsonResp, form=form
@@ -1552,6 +1666,10 @@ class MasterData:
             for i in jsonRespKelas["data"]:
                 form.kelas.choices.append((i["id"], i["kelas"]))
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/master/wali_kelas/data_wali.html",
                 model=jsonResp,
@@ -1653,6 +1771,11 @@ class MasterData:
                 form.namaGuru.choices.append(
                     (i["id"], i["first_name"] + " " + i["last_name"])
                 )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/master/guru_bk/data_guru_bk.html",
                 model=jsonResp,
@@ -1744,6 +1867,11 @@ class MasterData:
                 {"id": "1", "status": "aktif"},
             ]
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             return render_template(
                 "admin/master/kepsek/data_kepsek.html",
                 model=jsonResp,
@@ -1825,6 +1953,11 @@ class JadwalMengajara:
             url = base_url + "api/v2/master/jadwal-mengajar/get-all"
             resp = req.get(url)
             jsonResp = resp.json()
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/jadwal_mengajar/data_jadwal.html", model=jsonResp
             )
@@ -1923,6 +2056,10 @@ class JadwalMengajara:
                     flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
                     return redirect(url_for("admin2.get_jadwal"))
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "admin/jadwal_mengajar/tambah_jadwal.html", form=form
             )
@@ -2006,6 +2143,11 @@ class JadwalMengajara:
                     flash(
                         f"Terjadi kesalahan dalam perbaharui data. Status : {resp.status_code}"
                     )
+
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
 
             return render_template(
                 "admin/jadwal_mengajar/edit_jadwal.html", model=jsonResp, form=form
@@ -2107,6 +2249,11 @@ def data_kehadiran_bulan():
                 )
             )
             return response
+
+        user = dbs.get_one(AdminModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         return render_template(
             "admin/absensi/daftar_hadir_siswa.html",
             kelas=kelas,
@@ -2148,6 +2295,11 @@ def data_kehadiran_semester():
                 .filter(MengajarModel.semester_id == semester)
             )
 
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             return render_template(
                 "admin/absensi/result_daftar_hadir_sms.html",
                 sql_siswa=sql_siswa,
@@ -2182,6 +2334,11 @@ def select_siswa():
                 "admin/siswa/get_siswa_by_kelas.html", model=sql_siswa, data=data
             )
 
+        user = dbs.get_one(AdminModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         return render_template("admin/letter_report/select_kelas.html", form=form)
     else:
         return abort(401)
@@ -2198,6 +2355,10 @@ def surat_pernyataan():
             today = datetime.date(datetime.today())
             sql_wali = BaseModel(WaliKelasModel).get_one(kelas_id=sql_siswa.kelas_id)
             sql_bk = BaseModel(GuruBKModel).get_one_or_none(status="1")
+            user = dbs.get_one(AdminModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
             return render_template(
                 "arsip/surat_pernyataan.html",
                 sql_siswa=sql_siswa,
@@ -2294,6 +2455,10 @@ def rekap_bulan():
                 return response
 
     else:
+        user = dbs.get_one(AdminModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         response = make_response(
             render_template("admin/letter_report/rekap_bulan.html", form=form)
         )

@@ -11,15 +11,16 @@ from flask import (
     Blueprint,
     make_response,
     url_for,
+    session,
 )
 from jinja2 import TemplateError, TemplateNotFound
+from app.lib.db_statement import DBStatement
 from app.models.user_details_model import SiswaModel
 from flask_login import login_required, current_user
 from app.models.master_model import GuruBKModel
 from app.models.data_model import *
 from app.models.user_model import UserModel
 from app.web.forms.form_guru import (
-    FormEditGuru,
     FormGetProfileGuru,
     FormUpdatePassword,
 )
@@ -42,6 +43,7 @@ guru_bk = Blueprint(
 
 
 methods = ["GET", "POST"]
+dbs = DBStatement()
 
 
 @guru_bk.cli.command("create")
@@ -64,6 +66,10 @@ def index():
             PelanggaranModel.siswa_id
         ).count()
         count_binaan = PembinaanModel.query.group_by(PembinaanModel.siswa_id).count()
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         response = make_response(
             render_template(
                 "guru_bk/index_bk.html",
@@ -90,6 +96,11 @@ def fetch_data_pelanggaran():
             )
             .group_by(PelanggaranModel.siswa_id)
             .order_by(PelanggaranModel.siswa_id.desc())
+        )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
 
         return render_template(
@@ -158,6 +169,11 @@ def add_data_pelanggar():
             flash(f"Data Pelanggar Berhasil Di Tambahkan.", "success")
             return response
         else:
+            user = dbs.get_one(GuruModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             response = make_response(
                 render_template(
                     "guru_bk/modul/pelanggaran/tambah-pelanggar.html",
@@ -186,6 +202,11 @@ def detail_pelanggaran():
             .all()
         )
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         page = render_template(
             "guru_bk/modul/pelanggaran/detail-pelanggaran.html",
             guru_bk=get_guru_bk(),
@@ -212,6 +233,11 @@ def detail_all_pelanggaran():
             db.session.query(PelanggaranModel)
             .filter(PelanggaranModel.siswa_id == detail_data.siswa_id)
             .all()
+        )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
 
         return render_template(
@@ -292,6 +318,11 @@ def atur_pelanggaran():
         form = FormJenisPelanggaran(request.form)
         model = JenisPelanggaranModel2
         data = model.fetchAll()
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         return render_template(
             "guru_bk/modul/pelanggaran/atur_pelanggaran.html",
             guru_bk=get_guru_bk(),
@@ -320,6 +351,11 @@ def add_jenis_pelanggaran():
             flash("Jenis Pelanggaran telah ditambahkan!", "success")
 
             return redirect(url_for("guru_bk.atur_pelanggaran"))
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         return render_template(
             "guru_bk/modul/pelanggaran/atur_pelanggaran.html",
             guru_bk=get_guru_bk(),
@@ -351,6 +387,11 @@ def get_one_jenis_pelanggaran():
             db.session.commit()
             flash("Jenis Pelanggaran telah diperbaharui!", "success")
             return redirect(url_for("guru_bk.atur_pelanggaran"))
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
 
         return render_template(
             "guru_bk/modul/pelanggaran/atur_pelanggaran.html",
@@ -394,6 +435,11 @@ def data_pembinaan():
             .group_by(PembinaanModel.siswa_id)
             .order_by(PembinaanModel.siswa_id.desc())
             .all()
+        )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
         response = make_response(
             render_template(
@@ -474,7 +520,6 @@ def pembinaan_update_status():
         direct = redirect(url_for(".data_pembinaan"))
         response = make_response(direct)
         return response
-
     else:
         abort(401)
 
@@ -497,8 +542,11 @@ def add_tata_tertib():
             flash("Tata tertib telah ditambahkan!", "success")
 
             return redirect(url_for("guru_bk.get_tata_tertib"))
-        # return redirect(url_for("guru_bk.get_tata_tertib", form=form))
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         return render_template(
             "guru_bk/modul/tata_tertib/get_tata_tertib.html",
             guru_bk=get_guru_bk(),
@@ -517,6 +565,11 @@ def get_tata_tertib():
         utama = TataTertibModel.query.all()
         data = TataTertibModel.query.all()
         alfabet = list(string.ascii_lowercase)
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
 
         return render_template(
             "guru_bk/modul/tata_tertib/get_tata_tertib.html",
@@ -545,6 +598,11 @@ def get_one_tata_tertib():
 
         if sql_update:
             form.tataTertib.data = sql_update.tata_tertib
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
 
         return render_template(
             "guru_bk/modul/tata_tertib/get_tata_tertib.html",
@@ -688,6 +746,11 @@ def laporan_kehadiran():
                 )
                 return response
 
+            user = dbs.get_one(GuruModel, user_id=current_user.id)
+            session.update(
+                first_name=user.first_name.title(), last_name=user.last_name.title()
+            )
+
             render = render_template(
                 "laporan/result_absensi.html",
                 data=data,
@@ -757,6 +820,11 @@ def laporan_pelanggaran():
                 wali=sql_wali,
             )
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         return render_template(
             "laporan/laporan_pelanggaran.html",
             guru_bk=get_guru_bk(),
@@ -773,14 +841,17 @@ def laporan_pelanggaran():
 
 @guru_bk.route("/get-siswa")
 def get_siswa():
-    kelas_id = request.args.get("kelas")
-    sql_siswa = SiswaModel.query.filter_by(kelas_id=kelas_id).all()
+    if current_user.group == "bk":
+        kelas_id = request.args.get("kelas")
+        sql_siswa = SiswaModel.query.filter_by(kelas_id=kelas_id).all()
 
-    # return [
-    #     f"<option value={siswa.user_id}>{siswa.first_name.title()} {siswa.last_name.title()}</option>"
-    #     for siswa in sql_siswa
-    # ]
-    return render_template("helper/opt_siswa.html", siswa=sql_siswa)
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
+        return render_template("helper/opt_siswa.html", siswa=sql_siswa)
+    abort(401)
 
 
 @guru_bk.route("/result-pelanggaran", methods=["GET", "POST"])
@@ -800,6 +871,11 @@ def result_pelanggaran():
 
         result_pelanggaran = db.session.query(PelanggaranModel).filter_by(
             siswa_id=siswa_id
+        )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
 
         rendered = render_template(
@@ -833,6 +909,11 @@ def profil_bk():
         form.agama.data = sql_one.agama
         form.alamat.data = sql_one.alamat.title() if sql_one.alamat else "-"
         form.telp.data = sql_one.telp if sql_one.telp else "-"
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
 
         render = render_template("akun/profile_guru.html", form=form)
         response = make_response(render)
@@ -880,6 +961,10 @@ def update_profil():
 def password_bk():
     if current_user.group == "bk":
         form = FormUpdatePassword()
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         render = render_template("akun/update_password.html", form=form)
         response = make_response(render)
         return response

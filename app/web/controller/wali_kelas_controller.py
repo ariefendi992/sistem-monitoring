@@ -1,9 +1,18 @@
 from calendar import monthrange
 from datetime import datetime
-from flask import make_response, request, flash, render_template, Blueprint, abort
+from flask import (
+    make_response,
+    request,
+    flash,
+    render_template,
+    Blueprint,
+    abort,
+    session,
+)
 from flask_login import current_user, login_required
 from sqlalchemy import func, and_
 from app.lib.date_time import format_indo
+from app.lib.db_statement import DBStatement
 from app.lib.filters import hari_minggu, hari_sabtu
 from app.models.data_model import (
     AbsensiModel,
@@ -22,6 +31,8 @@ from app.models.master_model import (
 from app.models.user_details_model import GuruModel, SiswaModel
 from app.web.forms.form_letter_report import FormRekapAbsenWali, FormSelectMapel
 from ...extensions import db
+
+dbs = DBStatement()
 
 wali_kelas = Blueprint(
     "wali_kelas",
@@ -70,6 +81,11 @@ def index():
             siswa=count_siswa,
         )
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         return render_template(
             "guru_wali_kelas/index_wali_kelas.html",
             sql_wali_=sql_wali_(),
@@ -91,7 +107,10 @@ def data_siswa():
             .filter(SiswaModel.kelas_id == sql_wali_().kelas_id)
             .all()
         )
-
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         response = make_response(
             render_template(
                 "guru_wali_kelas/modul/siswa/data_siswa.html",
@@ -181,6 +200,11 @@ def rekap_absen():
 
                 response = make_response(render)
                 return response
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
 
         response = make_response(
             render_template(
@@ -282,6 +306,11 @@ def rekap_absen_mapel():
                 response = make_response(render)
                 return response
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         response = make_response(
             render_template(
                 "guru_wali_kelas/modul/rekap_kehadiran/rekap_by_mapel.html",
@@ -305,6 +334,11 @@ def get_pelanggaran_siswa():
             db.session.query(PelanggaranModel)
             .filter(PelanggaranModel.siswa_id == detail_data.siswa_id)
             .all()
+        )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
 
         render = render_template(
@@ -336,6 +370,11 @@ def get_jadwal_siswa():
         )
 
         sql_hari = db.session.query(HariModel).all()
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
 
         render = render_template(
             "guru_wali_kelas/modul/jadwal/jadwal_siswa.html",

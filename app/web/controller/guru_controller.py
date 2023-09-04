@@ -1,9 +1,11 @@
+from re import I
 from flask import (
     abort,
     make_response,
     request,
     Blueprint,
     redirect,
+    session,
     url_for,
     flash,
     render_template,
@@ -32,6 +34,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from ...models.data_model import AbsensiModel
 from datetime import datetime
 from sqlalchemy import exists
+from app.lib.db_statement import DBStatement
+
+dbs = DBStatement()
 
 
 guru2 = Blueprint(
@@ -88,10 +93,6 @@ def check_wali():
 @login_required
 def index():
     if current_user.group == "guru":
-        """With general function"""
-        # sqlToday = get_kelas_today()
-
-        """get With Lambda function"""
         sqlToday = day(
             sql=(
                 db.session.query(MengajarModel)
@@ -141,6 +142,11 @@ def index():
             .count()
         )
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         return render_template(
             "guru/index_guru.html",
             sqlJadwal=mengajar,
@@ -172,6 +178,11 @@ def profile_guru():
         form.alamat.data = guru.alamat.title()
         form.telp.data = guru.telp
         sqlToday = get_kelas_today()
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         return render_template(
             "akun/profile_guru.html",
             sql=guru,
@@ -213,8 +224,14 @@ def update_profile(id):
         guru.telp = telp
 
         base.edit()
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         flash(f"Data profil anda terlah diperbaharui.", "info")
         return redirect(url_for("guru2.profile_guru"))
+
     else:
         return abort(401)
 
@@ -241,6 +258,11 @@ def update_pswd():
                 flash(f"Password akun anda telah berhasil di perbaharui.!", "info")
 
                 return redirect(url_for("guru2.index"))
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         return render_template(
             "akun/update_password.html", form=form, wali_kelas=check_wali()
         )
@@ -304,6 +326,11 @@ def jadwal_mengajar():
             .order_by(MengajarModel.hari_id.asc())
         )
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         return render_template(
             "guru/modul/jadwal_mengajar/jadwal_mengajar.html",
             # sqlJadwal=mengajar,
@@ -350,7 +377,7 @@ def absensi(mengajar_id):
             pertemuan += 1
         else:
             pertemuan = sql_pertemuan + 1
-        print(pertemuan)
+
         data_mengajar = {}
         for i in mengajar:
             data_mengajar["kelas_id"] = i.kelas_id
@@ -470,6 +497,11 @@ def absensi(mengajar_id):
             return redirect(
                 url_for("guru2.absensi", mengajar_id=data_mengajar["mengajar_id"])
             )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
         return render_template(
             "guru/modul/absen/absensi.html",
             model=siswa,
@@ -540,6 +572,11 @@ def update_absen(mengajar_id):
             flash(f"Anda telah melakukan perubahan absensi siswa.", "info")
 
             return redirect(url_for("guru2.absensi", mengajar_id=mengajar_id))
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
 
         return render_template(
             "guru/modul/absen/update_absensi.html",
@@ -642,6 +679,11 @@ def daftar_kehadiran():
                 response = make_response(render)
                 return response
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         render = render_template(
             "guru/modul/absen/daftar_hadir.html",
             wali_kelas=check_wali(),
@@ -656,97 +698,104 @@ def daftar_kehadiran():
 @guru2.route("/rekap-kehadiran", methods=["GET", "POST"])
 @login_required
 def rekap_kehadiran():
-    data = {}
-    form = FormSelectKehadiranSiswa()
-    data["filename"] = "rekap-data"
-    sql_kelas = (
-        MengajarModel.query.filter_by(guru_id=current_user.id)
-        .group_by("kelas_id")
-        .order_by(MengajarModel.kelas_id.asc())
-        .all()
-    )
-    sql_bulan = NamaBulanModel.query.all()
-    sql_tahun = AbsensiModel.query.group_by(func.year(AbsensiModel.tgl_absen)).all()
-    sql_kepsek = KepsekModel.query.filter_by(status=1).first()
-    sql_guru = GuruModel.query.filter_by(user_id=current_user.id).first()
-    for i in sql_kelas:
-        form.kelas.choices.append((i.id, i.kelas))
-    for i in sql_bulan:
-        form.bulan.choices.append((i.id, i.nama_bulan.upper()))
-
-    for i in sql_tahun:
-        form.tahun.choices.append((i.tgl_absen.year, i.tgl_absen.year))
-
-    if request.method == "POST" and form.validate_on_submit():
-        kelas = request.form.get("kelas")
-        bulan = request.form.get("bulan")
-        tahun = request.form.get("tahun")
-        sql_kehadiran = (
-            db.session.query(AbsensiModel)
-            .join(MengajarModel)
-            .join(SiswaModel)
-            .filter(AbsensiModel.mengajar_id == MengajarModel.id)
-            .filter(func.month(AbsensiModel.tgl_absen) == bulan)
-            .filter(func.year(AbsensiModel.tgl_absen) == tahun)
-            .filter(MengajarModel.kelas_id == kelas)
-            .filter(MengajarModel.guru_id == current_user.id)
-            .group_by(AbsensiModel.siswa_id)
-            .order_by(SiswaModel.first_name.asc())
+    if current_user.group == "guru":
+        data = {}
+        form = FormSelectKehadiranSiswa()
+        data["filename"] = "rekap-data"
+        sql_kelas = (
+            MengajarModel.query.filter_by(guru_id=current_user.id)
+            .group_by("kelas_id")
+            .order_by(MengajarModel.kelas_id.asc())
+            .all()
         )
+        sql_bulan = NamaBulanModel.query.all()
+        sql_tahun = AbsensiModel.query.group_by(func.year(AbsensiModel.tgl_absen)).all()
+        sql_kepsek = KepsekModel.query.filter_by(status=1).first()
+        sql_guru = GuruModel.query.filter_by(user_id=current_user.id).first()
+        for i in sql_kelas:
+            form.kelas.choices.append((i.id, i.kelas))
+        for i in sql_bulan:
+            form.bulan.choices.append((i.id, i.nama_bulan.upper()))
 
-        for i in sql_kehadiran.all():
-            data["kelas"] = i.siswa.kelas.kelas
-            data["mapel"] = i.mengajar.mapel.mapel
-            data["semester"] = i.mengajar.semester.semester
-            data["tahun_ajaran"] = i.mengajar.tahun_ajaran.th_ajaran
-            data["mengajar_id"] = i.mengajar_id
-            data["bulan"] = min(
-                [k.nama_bulan for k in sql_bulan if k.id == i.tgl_absen.month]
+        for i in sql_tahun:
+            form.tahun.choices.append((i.tgl_absen.year, i.tgl_absen.year))
+
+        if request.method == "POST" and form.validate_on_submit():
+            kelas = request.form.get("kelas")
+            bulan = request.form.get("bulan")
+            tahun = request.form.get("tahun")
+            sql_kehadiran = (
+                db.session.query(AbsensiModel)
+                .join(MengajarModel)
+                .join(SiswaModel)
+                .filter(AbsensiModel.mengajar_id == MengajarModel.id)
+                .filter(func.month(AbsensiModel.tgl_absen) == bulan)
+                .filter(func.year(AbsensiModel.tgl_absen) == tahun)
+                .filter(MengajarModel.kelas_id == kelas)
+                .filter(MengajarModel.guru_id == current_user.id)
+                .group_by(AbsensiModel.siswa_id)
+                .order_by(SiswaModel.first_name.asc())
             )
 
-        data["today"] = datetime.date(datetime.today())
-        data["kepsek"] = f"{sql_kepsek.guru.first_name} {sql_kepsek.guru.last_name}"
-        data["nip_kepsek"] = sql_kepsek.guru.user.username
-        data["guru"] = f"{sql_guru.first_name} {sql_guru.last_name}"
-        data["nip_guru"] = f"{sql_guru.user.username}"
-
-        sql_tgl_absen = (
-            db.session.query(AbsensiModel)
-            .filter(AbsensiModel.mengajar_id == MengajarModel.id)
-            .filter(MengajarModel.guru_id == current_user.id)
-            .filter(MengajarModel.kelas_id == kelas)
-            .filter(func.month(AbsensiModel.tgl_absen) == bulan)
-            .filter(func.year(AbsensiModel.tgl_absen) == tahun)
-            .group_by(func.day(AbsensiModel.tgl_absen))
-        )
-
-        if sql_kehadiran.all():
-            response = make_response(
-                render_template(
-                    "guru/modul/absen/rekap_kehadiran.html",
-                    sqlToday=get_kelas_today(),
-                    sql_kehadiran=sql_kehadiran,
-                    data=data,
-                    sql_tgl_absen=sql_tgl_absen,
-                    AbsensiModel=AbsensiModel,
-                    func=func,
+            for i in sql_kehadiran.all():
+                data["kelas"] = i.siswa.kelas.kelas
+                data["mapel"] = i.mengajar.mapel.mapel
+                data["semester"] = i.mengajar.semester.semester
+                data["tahun_ajaran"] = i.mengajar.tahun_ajaran.th_ajaran
+                data["mengajar_id"] = i.mengajar_id
+                data["bulan"] = min(
+                    [k.nama_bulan for k in sql_bulan if k.id == i.tgl_absen.month]
                 )
+
+            data["today"] = datetime.date(datetime.today())
+            data["kepsek"] = f"{sql_kepsek.guru.first_name} {sql_kepsek.guru.last_name}"
+            data["nip_kepsek"] = sql_kepsek.guru.user.username
+            data["guru"] = f"{sql_guru.first_name} {sql_guru.last_name}"
+            data["nip_guru"] = f"{sql_guru.user.username}"
+
+            sql_tgl_absen = (
+                db.session.query(AbsensiModel)
+                .filter(AbsensiModel.mengajar_id == MengajarModel.id)
+                .filter(MengajarModel.guru_id == current_user.id)
+                .filter(MengajarModel.kelas_id == kelas)
+                .filter(func.month(AbsensiModel.tgl_absen) == bulan)
+                .filter(func.year(AbsensiModel.tgl_absen) == tahun)
+                .group_by(func.day(AbsensiModel.tgl_absen))
             )
-            return response
-        else:
-            flash(
-                "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
-                "error",
-            )
-    response = make_response(
-        render_template(
-            "guru/modul/absen/daftar_hadir.html",
-            data=data,
-            form=form,
-            wali_kelas=check_wali(),
+
+            if sql_kehadiran.all():
+                response = make_response(
+                    render_template(
+                        "guru/modul/absen/rekap_kehadiran.html",
+                        sqlToday=get_kelas_today(),
+                        sql_kehadiran=sql_kehadiran,
+                        data=data,
+                        sql_tgl_absen=sql_tgl_absen,
+                        AbsensiModel=AbsensiModel,
+                        func=func,
+                    )
+                )
+                return response
+            else:
+                flash(
+                    "Ma'af!\\nData yang dimaksud tidak ditemukan. Coba periksa kembali..!",
+                    "error",
+                )
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
-    )
-    return response
+        response = make_response(
+            render_template(
+                "guru/modul/absen/daftar_hadir.html",
+                data=data,
+                form=form,
+                wali_kelas=check_wali(),
+            )
+        )
+        return response
+
+    abort(401)
 
 
 @guru2.route("data-kehadiran-siswa")
@@ -775,11 +824,21 @@ def data_kehadiran():
             .order_by(MengajarModel.jam_ke.asc())
         )
 
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
+        )
+
         render = render_template(
             "guru/modul/absen/daftar_hadir_harian.html",
             wali_kelas=check_wali(),
             data=data,
             sqlToday=sql_daftar_kelas.all(),
+        )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
 
         response = make_response(render)
@@ -807,6 +866,11 @@ def get_data_kehadiran():
                     # HariModel.hari == hari,
                 ),
             )
+        )
+
+        user = dbs.get_one(GuruModel, user_id=current_user.id)
+        session.update(
+            first_name=user.first_name.title(), last_name=user.last_name.title()
         )
 
         render = render_template("helper/daftar_hadir_siswa.html", data=sql_absen)

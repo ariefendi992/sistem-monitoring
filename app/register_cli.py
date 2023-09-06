@@ -1,4 +1,4 @@
-from app.backup_db_cli import db
+from app.cli.db_cli import db
 
 
 def register_cli(app):

@@ -1,6 +1,9 @@
+import os
+import click
 from flask import Flask
 from app.api.register_app import register_app
 from app.models.user_model import UserModel
+from app.register_cli import register_cli
 from app.web.register_app import register_app_web
 from settings import Config
 from app.lib.date_time import *
@@ -16,6 +19,7 @@ def create_app():
     extended_ext(app)
     register_app(app)
     register_app_web(app)
+    register_cli(app)
     # loginManager(app)
 
     register_filters(app)

@@ -37,3 +37,7 @@ class Config(object):
     ACCESS_REFRESH = timedelta(minutes=7200)
     JWT_REFRESH_TOKEN_EXPIRES = ACCESS_REFRESH
     TEMPLATES_AUTO_RELOAD = str(os.getenv("TEMPLATES_AUTO_RELOAD"))
+
+    duration = timedelta(seconds=3600)
+    PERMANENT_SESSION_LIFETIME = duration
+    REMEMBER_COOKIE_DURATION = duration

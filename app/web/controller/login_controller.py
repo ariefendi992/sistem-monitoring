@@ -154,7 +154,7 @@ def login():
                     db.session.commit()
 
                     flash(
-                        message=f"Login Sukses...\\nHi.. {sql_guru.first_name} {sql_guru.last_name} Selamat Datang Di Sistem E-Monitoring.",
+                        message=f"Login Sukses...\\nHi.. {sql_guru.first_name} {sql_guru.last_name} Selamat Datang Di Sistem Monitoring Siswa.",
                         category="success",
                     )
 
@@ -166,7 +166,7 @@ def login():
                         return response
 
                 else:
-                    if current_user.is_active == "0":
+                    if sql_user.is_active == "0":
                         flash(
                             "Ma'af..!\\nUntuk sementara waktu hak akses anda sendang di tangguhkan.",
                             "error",

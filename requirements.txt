@@ -4,7 +4,6 @@ Flask-Login
 Flask-Migrate
 Flask-SQLAlchemy
 Flask-WTF
-Jinja2
 Pillow
 PyJWT
 PyMySQL

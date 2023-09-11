@@ -23,7 +23,7 @@ class DBStatement:
         """Like :meth:`Result.scalar() <sqlalchemy.engine.Result.scalar>`, but aborts
         with a ``404 Not Found`` error instead of returning ``None``.
 
-        :param statement: The ``select`` statement to execute.
+        :param statement: The ``select`` stateme nt to execute.
         :param description: A custom message to show on the error page.
 
         .. versionadded:: 3.0
@@ -43,7 +43,7 @@ class DBStatement:
         value = self.session.query(entity).filter_by(**ident).first()
         return value
 
-    def get_all(self, entity: type[_O], **filter_by: t.Any) -> _O:
+    def get_all(self, entity: type[_O], *filter: t.Any, **filter_by: t.Any) -> _O:
         """AI is creating summary for get_all
 
         Args:
@@ -52,8 +52,13 @@ class DBStatement:
         Returns:
             _O: [Get All Data Query]
         """
+        if filter is not None and filter_by == None:
+            value = self.session.query(entity).filter(*filter).all()
+        elif filter_by is not None and filter == None:
+            value = self.session.query(entity).filter_by(**filter_by).all()
+        else:
+            value = self.session.query(entity).all()
 
-        value = self.session.query(entity).filter_by(**filter_by).all()
         return value
 
     def delete_data(self, statement: type[_O]) -> _O:

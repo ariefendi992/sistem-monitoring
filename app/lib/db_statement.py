@@ -43,6 +43,19 @@ class DBStatement:
         value = self.session.query(entity).filter_by(**ident).first()
         return value
 
+    def get_all(self, entity: type[_O], **filter_by: t.Any) -> _O:
+        """AI is creating summary for get_all
+
+        Args:
+            entity (type[_O]): [DataBase Model]
+
+        Returns:
+            _O: [Get All Data Query]
+        """
+
+        value = self.session.query(entity).filter_by(**filter_by).all()
+        return value
+
     def delete_data(self, statement: type[_O]) -> _O:
         self.session.delete(statement)
         return self.session.commit()

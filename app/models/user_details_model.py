@@ -48,6 +48,7 @@ class SiswaModel(db.Model):
     alamat = sa.Column(sa.String(250), nullable=True)
     qr_code = sa.Column(sa.Text(), nullable=True)
     pic: str | None = sa.Column(sa.Text(), nullable=True)
+    id_card: str = sa.Column(sa.String(128), nullable=True)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey("auth_user.id", ondelete="CASCADE", onupdate="CASCADE"),

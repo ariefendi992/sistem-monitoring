@@ -430,14 +430,15 @@ class PenggunaSiswa:
 
             dir_foto = os.getcwd() + "/app/api/static/img/siswa/foto/"
             dir_qr = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+            dir_idcard = os.getcwd() + "/app/api/static/img/siswa/id_card/"
 
             if sql_user:
                 sql_siswa = SiswaModel.query.filter_by(user_id=sql_user.id).first()
 
                 if sql_siswa.pic and sql_siswa.qr_code:
                     os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
-
                     os.remove(os.path.join(dir_qr, f"{sql_siswa.qr_code}"))
+                    os.remove(os.path.join(dir_idcard, f"{sql_siswa.id_card}"))
                 elif sql_siswa.pic:
                     os.remove(os.path.join(dir_foto, f"{sql_siswa.pic}"))
                 elif sql_siswa.qr_code:
@@ -472,13 +473,18 @@ class PenggunaSiswa:
     def delete_foto():
         if current_user.group == "admin":
             path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
-
+            path_idcard = os.getcwd() + "/app/api/static/img/siswa/id_card/"
             user_id = request.args.get("siswa", type=int)
             sql_siswa = dbs.get_one(entity=SiswaModel, user_id=user_id)
 
-            os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
+            if sql_siswa.id_card is not None or sql_siswa.id_card != "":
+                os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
+                os.remove(os.path.join(path_idcard, f"{sql_siswa.id_card}"))
+            else:
+                os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
 
             sql_siswa.pic = None
+            sql_siswa.id_card = None
             dbs.commit_data()
 
             direct = redirect(url_for("admin2.getSiswa"))
@@ -493,12 +499,18 @@ class PenggunaSiswa:
     def delete_qr():
         if current_user.group == "admin":
             path_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
+            path_idcard = os.getcwd() + "/app/api/static/img/siswa/id_card/"
 
             user_id = request.args.get("siswa", type=int)
             sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
 
-            os.remove(os.path.join(path_file, sql_siswa.qr_code))
+            if sql_siswa.id_card is not None or sql_siswa.id_card != "":
+                os.remove(os.path.join(path_file, sql_siswa.qr_code))
+                os.remove(os.path.join(path_idcard, sql_siswa.id_card))
+            else:
+                os.remove(os.path.join(path_file, sql_siswa.qr_code))
             sql_siswa.qr_code = None
+            sql_siswa.id_card = None
             dbs.commit_data()
 
             direct = redirect(url_for("admin2.getSiswa"))
@@ -535,6 +547,62 @@ class PenggunaSiswa:
             sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
 
             unduh = send_from_directory(dir_file, sql_siswa.qr_code, as_attachment=True)
+            response = make_response(unduh)
+            return response
+        else:
+            abort(401)
+
+    @admin2.route("siswa/idcard")
+    @login_required
+    def id_card_siswa():
+        if current_user.group == "admin":
+            sql_siswa = dbs.get_all(SiswaModel)
+            render = render_template("admin/siswa/id_card.html", data=sql_siswa)
+            response = make_response(render)
+            return response
+
+        else:
+            abort(401)
+
+    @admin2.route("siswa/search/id-card")
+    @login_required
+    def search_idcard():
+        if current_user.group == "admin":
+            q = request.args.get("q")
+
+            if q != "":
+                results = (
+                    SiswaModel.query.join(UserModel)
+                    .filter(
+                        SiswaModel.first_name.icontains(q)
+                        | SiswaModel.last_name.icontains(q)
+                        | UserModel.username.icontains(q)
+                    )
+                    .order_by(SiswaModel.first_name.asc())
+                    .order_by(SiswaModel.last_name.asc())
+                    .limit(100)
+                )
+            else:
+                results = dbs.get_all(SiswaModel)
+
+            render = render_template(
+                "admin/siswa/htmx/search_idcard.html", results=results
+            )
+            response = make_response(render)
+            return response
+        else:
+            abort(401)
+
+    @admin2.route("siswa/id-card/unduh", methods=["GET", "POST"])
+    @login_required
+    def unduh_idcard():
+        if current_user.group == "admin":
+            dir = os.getcwd() + "/app/api/static/img/siswa/id_card/"
+            siswa = request.args.get("siswa", int)
+
+            sql_siswa = dbs.get_one(SiswaModel, user_id=siswa)
+
+            unduh = send_from_directory(dir, sql_siswa.id_card, as_attachment=True)
             response = make_response(unduh)
             return response
         else:

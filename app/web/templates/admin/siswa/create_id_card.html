@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML ID Card</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/idcard.css')}}">
+</head>
+
+<body>
+    <div class="container-card">
+        <div class="bg">
+            <div class="circle1"></div>
+            <div class="circle2"></div>
+        </div>
+        <div class="info">
+            <p>ID CARD</p>
+            <br>
+            <h1>UPT SPF SMPN 2</h1>
+            <h1>MAKASSAR</h1>
+            <img src="{{ file.foto}}" alt="">
+            <br>
+
+            <h3>{{ data.first_name.title() }} {{ data.last_name.title() }}</h3>
+            <br>
+
+            <img class="qr" src="{{ file.qr }}" alt="">
+            <h4 class="label">Kelas : <span class="value">{{ data.kelas.kelas }}</span></h4>
+
+
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>

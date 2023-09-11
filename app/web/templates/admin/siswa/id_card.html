@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+
+{#
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> #}
+<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/template_idcard.css')}}">
+
+{% endblock head %}
+{% set filename='idcard' %}
+{% block content %}
+<div class="row">
+  <div class="col-md-12 text-center">
+    <div class="input-group col-md-4 float-right">
+      <input type="text" name="q" hx-get="{{ url_for('admin2.search_idcard') }}" hx-trigger="keyup changed delay:500ms"
+        hx-target="#searchResult" placeholder="Cari ... [nisn atau nama]" class="form-control">
+      <span class="input-group-append">
+        <a href="#" class="btn btn-success"><i class=" fas fa-search"></i></a>
+      </span>
+    </div>
+  </div>
+</div>
+<div id="searchResult" class="row mt-3">
+  {% for i in data %}
+  {% if i.id_card %}
+  <div class="col-md-3 text-center">
+    <div class="row">
+      <div class="col">
+        <img src="{{ url_for('siswa.static', filename='img/siswa/id_card/'+ i.id_card) }}" alt="">
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col">
+        <a href="{{ url_for('admin2.unduh_idcard', siswa=i.user_id)}}" class="btn btn-sm btn-outline-primary"
+          data-tooltip="tooltip" data-placement="bottom"
+          title="Unduh ID Card {{ i.first_name.title() }} {{ i.last_name.title() | truncate(7)}}" target="_blank">
+          <i class="fas fa-download"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+{% endblock content %}
+{% block js %}
+<script src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
+<script>
+  $(function () {
+    $('[data-tooltip="tooltip"]').tooltip()
+  })
+</script>
+{% endblock js %}

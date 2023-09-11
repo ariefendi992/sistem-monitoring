@@ -2,7 +2,7 @@ import click
 import os
 from flask import Blueprint
 
-db = Blueprint("db", __name__)
+db = Blueprint("database", __name__)
 
 
 @db.cli.command("backup")

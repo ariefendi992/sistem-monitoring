@@ -474,10 +474,11 @@ class PenggunaSiswa:
         if current_user.group == "admin":
             path_file = os.getcwd() + "/app/api/static/img/siswa/foto/"
             path_idcard = os.getcwd() + "/app/api/static/img/siswa/id_card/"
+            list_dir_idcard = os.listdir(path_idcard)
             user_id = request.args.get("siswa", type=int)
             sql_siswa = dbs.get_one(entity=SiswaModel, user_id=user_id)
 
-            if sql_siswa.id_card is not None or sql_siswa.id_card != "":
+            if sql_siswa.id_card and sql_siswa.id_card in list_dir_idcard:
                 os.remove(os.path.join(path_file, f"{sql_siswa.pic}"))
                 os.remove(os.path.join(path_idcard, f"{sql_siswa.id_card}"))
             else:
@@ -500,11 +501,11 @@ class PenggunaSiswa:
         if current_user.group == "admin":
             path_file = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
             path_idcard = os.getcwd() + "/app/api/static/img/siswa/id_card/"
-
+            list_dir_idcard = os.listdir(path_idcard)
             user_id = request.args.get("siswa", type=int)
             sql_siswa = dbs.get_one(SiswaModel, user_id=user_id)
 
-            if sql_siswa.id_card is not None or sql_siswa.id_card != "":
+            if sql_siswa.id_card and sql_siswa.id_card in list_dir_idcard:
                 os.remove(os.path.join(path_file, sql_siswa.qr_code))
                 os.remove(os.path.join(path_idcard, sql_siswa.id_card))
             else:

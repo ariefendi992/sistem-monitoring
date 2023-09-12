@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request, url_for
 from flask_jwt_extended import get_jwt_identity, jwt_required
+from sqlalchemy import and_
 from app.lib.base_model import BaseModel
 from app.lib.date_time import (
     format_date_today,
@@ -680,17 +681,31 @@ def update_password():
 def get_daftar_riwayat():
     guru_id = get_jwt_identity().get("id")
     sql_mengajar = MengajarModel.query.filter_by(guru_id=guru_id).first()
-    sql_absen_by_tgl = (
+    # sql_absen_by_tgl = (
+    #     db.session.query(AbsensiModel)
+    #     .filter(AbsensiModel.mengajar_id == sql_mengajar.id)
+    #     .order_by(AbsensiModel.tgl_absen.desc())
+    #     .all()
+    # )
+    sql_absen = (
         db.session.query(AbsensiModel)
-        .filter(AbsensiModel.mengajar_id == sql_mengajar.id)
+        .join(MengajarModel)
+        .join(SemesterModel)
+        .join(TahunAjaranModel)
+        .filter(
+            and_(
+                MengajarModel.guru_id == guru_id,
+                SemesterModel.is_active == "1",
+                TahunAjaranModel.is_active == "1",
+            )
+        )
         .order_by(AbsensiModel.tgl_absen.desc())
         .all()
     )
-
     group_data = {}
     group_data2 = {}
 
-    for i in sql_absen_by_tgl:
+    for i in sql_absen:
         tanggal = f"{format_indo(i.tgl_absen)}"
 
         if tanggal in group_data:
@@ -705,7 +720,7 @@ def get_daftar_riwayat():
                 group_data2[tanggal].append(
                     dic_data(
                         id=i.id,
-                        nama_siswa=f"{i.siswa.first_name} {i.siswa.last_name}",
+                        nama_siswa=f"{i.siswa.first_name.title()} {i.siswa.last_name.title()}",
                         kelas=i.siswa.kelas.kelas,
                         mapel=i.mengajar.mapel.mapel,
                         nama_guru=f"{i.mengajar.guru.first_name} {i.mengajar.guru.last_name}",

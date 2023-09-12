@@ -171,11 +171,11 @@ def login():
 def logout():
     jti = get_jwt()["jti"]
     now = utc_makassar()
-    db.session.add(TokenBlockList(jti=jti, created_at=now))
+    id = get_jwt_identity()["id"]
+    db.session.add(TokenBlockList(jti=jti, created_at=now, user_id=id))
     db.session.commit()
 
     model = BaseModel(UserModel)
-    id = get_jwt_identity()["id"]
     user = model.get_one_or_none(id=id)
     user.user_logout = utc_makassar()
     model.edit()

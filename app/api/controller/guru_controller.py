@@ -184,8 +184,8 @@ def get_single_guru():
             guru.user.username = nip
             guru.first_name = first_name
             guru.last_name = last_name[0]
-            guru.gender = guru.gender if not gender else gender
-            guru.agama = guru.agama if not agama else agama
+            guru.gender = guru.gender if not gender else gender.lower()
+            guru.agama = guru.agama if not agama else agama.lower()
             guru.alamat = guru.alamat if not alamat else alamat
             guru.telp = guru.telp if not telp else telp
 
@@ -692,6 +692,7 @@ def get_daftar_riwayat():
         .join(MengajarModel)
         .join(SemesterModel)
         .join(TahunAjaranModel)
+        .join(SiswaModel)
         .filter(
             and_(
                 MengajarModel.guru_id == guru_id,
@@ -700,6 +701,7 @@ def get_daftar_riwayat():
             )
         )
         .order_by(AbsensiModel.tgl_absen.desc())
+        .order_by(SiswaModel.kelas_id.asc())
         .all()
     )
     group_data = {}
@@ -722,6 +724,13 @@ def get_daftar_riwayat():
                         id=i.id,
                         nama_siswa=f"{i.siswa.first_name.title()} {i.siswa.last_name.title()}",
                         kelas=i.siswa.kelas.kelas,
+                        ket="Hadir"
+                        if i.ket == "H"
+                        else "Sakit"
+                        if i.ket == "S"
+                        else "Izin"
+                        if i.ket == "I"
+                        else "Alpa",
                         mapel=i.mengajar.mapel.mapel,
                         nama_guru=f"{i.mengajar.guru.first_name} {i.mengajar.guru.last_name}",
                         tgl_absen=format_indo(i.tgl_absen),
@@ -733,6 +742,13 @@ def get_daftar_riwayat():
                         id=i.id,
                         nama_siswa=f"{i.siswa.first_name} {i.siswa.last_name}",
                         kelas=i.siswa.kelas.kelas,
+                        ket="Hadir"
+                        if i.ket == "H"
+                        else "Sakit"
+                        if i.ket == "S"
+                        else "Izin"
+                        if i.ket == "I"
+                        else "Alpa",
                         mapel=i.mengajar.mapel.mapel,
                         nama_guru=f"{i.mengajar.guru.first_name} {i.mengajar.guru.last_name}",
                         tgl_absen=format_indo(i.tgl_absen),

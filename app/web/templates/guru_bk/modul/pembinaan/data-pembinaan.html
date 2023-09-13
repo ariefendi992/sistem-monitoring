@@ -54,7 +54,7 @@
                 {% for i in data %}
                 <tr class="align-items-center">
                   <td class="text-center ">{{ loop.index}}</td>
-                  <td>{{ i.pelanggaran.siswa.first_name }} {{ i.pelanggaran.siswa.last_name }}</td>
+                  <td>{{ i.pelanggaran.siswa.first_name.title() }} {{ i.pelanggaran.siswa.last_name.title() }}</td>
                   <td class="text-center">{{ i.pelanggaran.siswa.kelas.kelas }}</td>
                   <td class="text-center"><a href="{{ url_for('.detail_all_pelanggaran', id=i.siswa_id ) }}"
                       class="btn btn-link btn-sm" data-toggle="tooltip" data-placement="top"

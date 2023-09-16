@@ -22,7 +22,7 @@ from app.lib.date_time import (
     utc_makassar,
 )
 from app.lib.status_code import *
-from app.models.data_model import PelanggaranModel
+from app.models.data_model import PelanggaranModel, PembinaanModel
 from app.models.master_model import (
     HariModel,
     KelasModel,
@@ -216,6 +216,7 @@ def get_single():
                 else None,
                 wali_kelas=f"{sql_wali.guru.first_name} {sql_wali.guru.last_name}",
                 hari=hari,
+                idCard = url_for('siswa.static', filename=f'img/siswa/id_card/{model.id_card}') if model.id_card else None
             ),
             HTTP_200_OK,
         )
@@ -713,28 +714,40 @@ def riwayat_absen():
 def riwayat_pelanggaran():
     user_id = get_jwt_identity().get("id")
     sql_siswa = SiswaModel.query.filter_by(user_id=user_id).first()
-    sql_pelanggaran = (
-        db.session.query(PelanggaranModel)
-        .filter(
-            PelanggaranModel.siswa_id == sql_siswa.user_id,
-        )
-        .all()
+    sql_pelanggaran = db.session.query(PelanggaranModel).filter(
+        PelanggaranModel.siswa_id == sql_siswa.user_id,
     )
 
     data = []
-
-    if sql_pelanggaran:
-        for item in sql_pelanggaran:
+    count_pelanggaran = sql_pelanggaran.count()
+    count_pembinaan = PembinaanModel.query.filter_by(
+        siswa_id=user_id, status="1"
+    ).count()
+    count_belum_dibina = PembinaanModel.query.filter_by(
+        siswa_id=user_id, status="0"
+    ).count()
+    if sql_pelanggaran.all():
+        for item in sql_pelanggaran.all():
             data.append(
                 dic_data(
                     id=item.id,
                     nama_siswa=f"{item.siswa.first_name.title()} {item.siswa.last_name.title()}",
-                    pelapor=f"{item.pelapor}",
-                    note=item.jenis_pelanggaran.jenis_pelanggaran,
+                    pelapor=f"{item.guru.first_name.title()} {item.guru.last_name.title()}",
+                    jenis_pelanggaran=item.jenis_pelanggaran.jenis_pelanggaran,
+                    note=item.note.capitalize(),
+                    status=item.status.title(),
                     tgl_melanggar=format_indo(item.tgl_report),
                 )
             )
-        return jsonify(status="ok", data=data), HTTP_200_OK
+        return (
+            jsonify(
+                status="ok",
+                data=data,
+                countPelanggaran=count_pelanggaran,
+                countPembinaan=count_pembinaan,
+            ),
+            HTTP_200_OK,
+        )
 
     return jsonify(msg="Tidak ada pelanggaran."), HTTP_404_NOT_FOUND
 

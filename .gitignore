@@ -12,3 +12,6 @@ cert.pem
 *.pyc
 *.txt
 z/
+*.png
+*.jpg
+*.jpeg

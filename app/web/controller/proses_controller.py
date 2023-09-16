@@ -4,7 +4,6 @@ import hashlib
 from werkzeug.utils import secure_filename
 from flask import (
     Blueprint,
-    abort,
     flash,
     make_response,
     redirect,

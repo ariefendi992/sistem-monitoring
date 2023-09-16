@@ -4,12 +4,12 @@ Flask-Login
 Flask-Migrate
 Flask-SQLAlchemy
 Flask-WTF
+html2image
 Pillow
-PyJWT
 PyMySQL
 python-dotenv
 pytz
 qrcode
 requests
-xlwt
 WTForms-SQLAlchemy
+xlwt

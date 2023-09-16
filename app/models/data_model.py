@@ -135,7 +135,7 @@ class PembinaanModel(db.Model):
         backref="pembinaan",
     )
     siswa_id = db.Column(
-        sa.ForeignKey("detail_siswa.id", ondelete="CASCADE", onupdate="CASCADE"),
+        sa.ForeignKey("detail_siswa.user_id", ondelete="CASCADE", onupdate="CASCADE"),
         nullable=False,
     )
     siswa = db.relationship("SiswaModel", backref="pembinaan")

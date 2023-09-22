@@ -32,8 +32,5 @@ def idcard():
         return "User tidak ada"
     path = os.getcwd() + f"/app/api/static/img/siswa/id_card/"
 
-    unduh = send_from_directory(
-        path,
-        user.id_card,
-    )
+    unduh = send_from_directory(path, user.id_card, as_attachment=True)
     return unduh, HTTP_200_OK

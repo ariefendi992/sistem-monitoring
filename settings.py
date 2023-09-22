@@ -17,7 +17,8 @@ class Config(object):
     db = str(os.getenv("DB"))
     #
 
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root@localhost:3306/{db}"
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root@localhost/{db}"
+    # SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{}@localhost/{db}"
     # SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root:Ari19920905@localhost:3306/{db}"
     """
         Jika menggunakan `pymysql` variabel user harus disesuaikan dengan

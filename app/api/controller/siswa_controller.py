@@ -119,6 +119,7 @@ def get():
                 if user.user.user_last_login
                 else "-",
                 "logout": user.user.user_logout if user.user.user_logout else "-",
+                "id_card": user.id_card,
             }
         )
         # file = path_file + user.pic if user.pic else ""
@@ -216,7 +217,11 @@ def get_single():
                 else None,
                 wali_kelas=f"{sql_wali.guru.first_name} {sql_wali.guru.last_name}",
                 hari=hari,
-                idCard = url_for('siswa.static', filename=f'img/siswa/id_card/{model.id_card}') if model.id_card else None
+                idCard=url_for(
+                    "siswa.static", filename=f"img/siswa/id_card/{model.id_card}"
+                )
+                if model.id_card
+                else None,
             ),
             HTTP_200_OK,
         )

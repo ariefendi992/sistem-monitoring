@@ -609,6 +609,40 @@ class PenggunaSiswa:
         else:
             abort(401)
 
+    @admin2.route("siswa/id-card/cetak", methods=["GET", "POST"])
+    @login_required
+    def cetak_idcard():
+        if current_user.group == "admin":
+            if request.method == "POST":
+                list_cetak = request.form.getlist("idcardCheck")
+                if len(list_cetak) == 0:
+                    flash("Harap Pilih data yang ingin dicetak!", "error")
+
+                else:
+                    print(list_cetak)
+                    data = []
+                    for i in list_cetak:
+                        user = dbs.get_one(SiswaModel, user_id=i)
+
+                        data.append(
+                            dict(
+                                userid=i,
+                                idcard=url_for(
+                                    "siswa.static",
+                                    filename=f"img/siswa/id_card/{user.id_card}",
+                                ),
+                            ),
+                        )
+
+                    render = render_template('admin/siswa/result_idcard.html', data=data)
+                    response = make_response(render)
+                    return response
+
+                direct = redirect(url_for("admin2.id_card_siswa"))
+                return direct
+        else:
+            abort(401)
+
     # eksport data
     @admin2.route("/export-siswa")
     def export_siswa():

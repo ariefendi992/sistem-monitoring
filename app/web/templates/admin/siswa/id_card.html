@@ -13,6 +13,7 @@
 <div class="row">
   <div class="col-md-12 text-center">
     <div class="input-group col-md-4 float-right">
+      {# <a href="" class="btn btn-primary"></a> #}
       <input type="text" name="q" hx-get="{{ url_for('admin2.search_idcard') }}" hx-trigger="keyup changed delay:500ms"
         hx-target="#searchResult" placeholder="Cari ... [nisn atau nama]" class="form-control">
       <span class="input-group-append">
@@ -21,28 +22,64 @@
     </div>
   </div>
 </div>
-<div id="searchResult" class="row mt-3">
-  {% for i in data %}
-  {% if i.id_card %}
-  <div class="col-md-3 text-center">
-    <div class="row">
-      <div class="col">
-        <img src="{{ url_for('siswa.static', filename='img/siswa/id_card/'+ i.id_card) }}" alt="">
-      </div>
-    </div>
-    <div class="row mt-2">
-      <div class="col">
-        <a href="{{ url_for('admin2.unduh_idcard', siswa=i.user_id)}}" class="btn btn-sm btn-outline-primary"
-          data-tooltip="tooltip" data-placement="bottom"
-          title="Unduh ID Card {{ i.first_name.title() }} {{ i.last_name.title() | truncate(7)}}" target="_blank">
-          <i class="fas fa-download"></i>
-        </a>
+<form id="myForm" action="{{ url_for('admin2.cetak_idcard') }}" method="post">
+  <div class="row mt-2">
+    <div class="col-md-12">
+      <div class="col-md-4 float-right">
+        {# <a href="" class="btn btn-primary btn-sm float-lg-right">
+          <i class="fas fa-print"></i>
+          <span>Print Selected</span>
+        </a> #}
+        <button class="btn btn-primary btn-sm float-right">
+          <i class="fas fa-print"></i>
+          <span>Print Selected</span>
+        </button>
       </div>
     </div>
   </div>
-  {% endif %}
-  {% endfor %}
-</div>
+  <div class="row pl-2">
+    <div class="col">
+      <div id="searchResult" class="row mt-1">
+        {% for i in data %}
+        {% if i.id_card %}
+        <div class="row">
+          <div class="col">
+            <img src="{{ url_for('siswa.static', filename='img/siswa/id_card/'+ i.id_card) }}" alt="" class="pr-3">
+            <div class="row align-items-center mt-1">
+              <div class="col">
+                <input class="custom-checkbox float-right" value="{{ i.user_id }}" type="checkbox" name="idcardCheck"
+                  data-tooltip="tooltip" title="Ceklist" data-placement="bottom">
+              </div>
+              <div class="col">
+                <a href="{{ url_for('admin2.unduh_idcard', siswa=i.user_id)}}"
+                  class="btn btn-xs btn-outline-primary border-0 float-left" data-tooltip="tooltip"
+                  data-placement="bottom"
+                  title="Unduh ID Card {{ i.first_name.title() }} {{ i.last_name.title() | truncate(7)}}"
+                  target="_blank">
+                  <i class="fas fa-download"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {# <div class="row mt-2 align-items-center">
+          <div class="col">
+            <input class="custom-checkbox float-right" value="{{ i.user_id }}" type="checkbox" name="idcardCheck">
+          </div>
+          <div class="col">
+            <a href="{{ url_for('admin2.unduh_idcard', siswa=i.user_id)}}"
+              class="btn btn-xs btn-outline-primary border-0 float-left" data-tooltip="tooltip" data-placement="bottom"
+              title="Unduh ID Card {{ i.first_name.title() }} {{ i.last_name.title() | truncate(7)}}" target="_blank">
+              <i class="fas fa-download"></i>
+            </a>
+          </div>
+        </div> #}
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</form>
 {% endblock content %}
 {% block js %}
 <script src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
@@ -50,5 +87,27 @@
   $(function () {
     $('[data-tooltip="tooltip"]').tooltip()
   })
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var formElement = document.getElementById('myForm');
+
+    formElement.addEventListener('submit', function (event) {
+      var checkItem = true;
+      var checkeditems = formElement.querySelectorAll('input:checked');
+
+      for (var i = 0; i < checkeditems.length; i++) {
+        var checkeditem = checkeditems[i];
+        var checkedValue = checkeditem.value;
+
+        if (checkedValue !== null) {
+          formElement.target = "_blank";
+        } else {
+          formElement.removeAttribute('target');
+        }
+      }
+    });
+  });
 </script>
 {% endblock js %}

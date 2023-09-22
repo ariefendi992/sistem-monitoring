@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ID CARD</title>
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='plugins/fontawesome-free/css/all.min.css') }}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/adminlte.min.css') }}" />
+
+  {# <style type="text/css" media="print">
+    .page {
+      -webkit-transform: rotate(-90deg);
+      -moz-transform: rotate(-90deg);
+      filter: progid: DXImageTransform.Microsoft.BasicImage(rotate=3);
+    }
+  </style> #}
+
+  <style type="text/css" media="print">
+    @page {
+      size: landscape;
+    }
+  </style>
+
+</head>
+
+
+<body style="margin: 0; padding: 0;">
+
+  <div class="container">
+    <div class="row">
+      {% for i in data %}
+      <img src="{{ i.idcard }}" class="pr-3 mb-4" alt="">
+      {% endfor %}
+    </div>
+  </div>
+
+
+  <!-- jQuery -->
+  <script src="{{ url_for('admin2.static', filename='plugins/jquery/jquery.min.js') }}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{ url_for('admin2.static', filename='plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <!-- AdminLTE App -->
+  <script src="{{ url_for('admin2.static', filename='js/adminlte.min.js') }}"></script>
+
+  <script>
+    window.print();
+  </script>
+</body>
+
+</html>

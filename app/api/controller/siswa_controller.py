@@ -199,7 +199,7 @@ def get_single():
                 kelas=model.kelas.kelas if model.kelas.kelas else None,
                 kelas_id=model.kelas_id if model.kelas_id else None,
                 gender=model.gender.title() if model.gender else None,
-                tempat_lahir=model.tempat_lahir.title() if model.tempat_lahir else None,
+                tempat_lahir=model.tempat_lahir.title() if model.tempat_lahir else "-",
                 tgl_lahir=str(model.tgl_lahir) if model.tgl_lahir else None,
                 agama=model.agama.title() if model.agama else None,
                 alamat=model.alamat.title() if model.alamat else None,

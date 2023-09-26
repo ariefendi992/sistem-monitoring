@@ -863,7 +863,7 @@ def result_pelanggaran():
             db.session.query(PembinaanModel)
             .filter(PembinaanModel.siswa_id == siswa_id)
             .order_by(PembinaanModel.siswa_id.desc())
-            .first()
+            .count()
         )
 
         siswa = SiswaModel.query.filter_by(user_id=siswa_id).first()

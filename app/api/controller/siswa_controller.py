@@ -410,6 +410,8 @@ def upload_photo():
         )
         user_first_name = first_name.replace(" ", "_").lower()
         up_risize = upload_resize_photo(f, user_first_name, model.kelas.kelas)
+        file_size = len(f.read())
+        # print(f"file size => {file_size}")
 
         # upload_file = uploads(f, user_first_name, model.kelas.kelas)
         # if upload_file["status"] == "ok":

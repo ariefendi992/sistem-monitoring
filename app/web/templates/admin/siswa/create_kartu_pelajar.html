@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Pelajar</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/kartu_pelajar.css') }}">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="bg">
+            <img src="{{ url_for('static', filename='images/bg_kartu_pelajar.png') }}" alt="">
+        </div>
+
+        <div class="foto">
+            <img id="siswa" src="{{file.foto}}" alt="">
+
+        </div>
+        <div class="info">
+            <div class="nama">
+                <h3 id="title">{{ data.first_name.title() }} {{ data.last_name.title() }}</h3>
+                <h3 id="value">{{ data.kelas.kelas }}</h3>
+            </div>
+            <div class="qr">
+                <img src="{{ file.qr }}" alt="">
+                <h3 id="nisn">{{ data.user.username }}</h3>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

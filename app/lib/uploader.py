@@ -64,12 +64,21 @@ def upload_resize_photo(f, nama_user, kelas):
             filename = f"{kelas}_{nama_user}_{encryptFile}.{fileExt}"
             path_file = UPLOAD_FOLDER + filename
             img = Image.open(f)
-            width = int(img.size[0] / 10) * 2
-            height = int(img.size[1] / 10) * 2
+            # print(f"IMAGE SIZE == {img.size}")
+            if img.size[0] <= 1000 & img.size[1] <= 1000:
+                img.save(
+                    os.path.join(UPLOAD_FOLDER, filename), optimize=True, quality=95
+                )
 
-            re_image = img.resize((width, height), Image.ADAPTIVE)
-            re_image.save(
-                os.path.join(UPLOAD_FOLDER, filename), optimize=True, quality=95
-            )
-            response = dict(status="Ok", filename=filename, path=path_file)
-            return response
+                response = dict(status="Ok", filename=filename, path=path_file)
+                return response
+            else:
+                width = int(img.size[0] / 10) * 2
+                height = int(img.size[1] / 10) * 2
+
+                re_image = img.resize((width, height), Image.ADAPTIVE)
+                re_image.save(
+                    os.path.join(UPLOAD_FOLDER, filename), optimize=True, quality=95
+                )
+                response = dict(status="Ok", filename=filename, path=path_file)
+                return response

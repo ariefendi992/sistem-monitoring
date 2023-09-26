@@ -44,7 +44,8 @@
         {% if i.id_card %}
         <div class="row">
           <div class="col">
-            <img src="{{ url_for('siswa.static', filename='img/siswa/id_card/'+ i.id_card) }}" alt="" class="pr-3">
+            <img src="{{ url_for('siswa.static', filename='img/siswa/id_card/'+ i.id_card) }}" height="325" alt=""
+              class="pr-3">
             <div class="row align-items-center mt-1">
               <div class="col">
                 <input class="custom-checkbox float-right" value="{{ i.user_id }}" type="checkbox" name="idcardCheck"

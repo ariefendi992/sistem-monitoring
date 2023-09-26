@@ -38,7 +38,10 @@ def get_idcard():
 
     file = dict(foto=foto, qr=qr)
     render = render_template(
-        "admin/siswa/create_id_card.html", data=sql_siswa, file=file
+        "admin/siswa/create_kartu_pelajar.html",
+        data=sql_siswa,
+        file=file
+        # "admin/siswa/create_id_card.html", data=sql_siswa, file=file
     )
     response = make_response(render)
     return response
@@ -61,7 +64,8 @@ def generate_idcard():
     url_link = f"{url.scheme}://{url.netloc}{html}"
 
     dir = os.getcwd() + "/app/api/static/img/siswa/id_card/"
-    hti.size = (204, 325)
+    # hti.size = (204, 325)
+    hti.size = (295, 500)
     hti.output_path = dir
     hti.screenshot(
         url=url_link,

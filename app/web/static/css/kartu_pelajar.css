@@ -1,0 +1,94 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: none;
+}
+
+.container {
+    background: white;
+    /* border: 1px solid; */
+    /* width: 350px; */
+    width: 295px;
+    height: 500px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    border-radius: 12px;
+    text-align: center;
+    align-items: center;
+
+
+}
+
+.bg img {
+    height: 505px;
+    /* width: 350px; */
+    width: 100%;
+    position: relative;
+}
+
+.foto {
+    /* border: 1px solid; */
+    border-radius: 16px;
+    transform: translate(37%, -180%);
+    width: 170px;
+    overflow: hidden;
+    position: relative;
+
+}
+
+#siswa {
+    height: 220px;
+}
+
+.info {
+    position: relative;
+    top: -390px;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+}
+
+.info .nama {
+    float: left;
+    /* border: 1px solid black; */
+    width: 54%;
+    padding-left: 22px;
+}
+
+.nama #title {
+    text-align: left;
+    font-size: 16px;
+}
+
+.nama #value {
+    text-align: left;
+    color: darkslategray;
+    font-size: 14px;
+}
+
+.info .qr {
+    float: right;
+    width: auto;
+    float: right;
+    padding-right: 12px;
+    text-align: center;
+    /* border: 1px solid green; */
+}
+
+.info img {
+    height: 90px;
+    /* padding-right: 20px; */
+}
+
+#nisn {
+    color: darkslategray;
+    text-align: center;
+    font-size: 14px;
+
+}

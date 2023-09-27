@@ -199,7 +199,7 @@ def get_single():
                 kelas=model.kelas.kelas if model.kelas.kelas else None,
                 kelas_id=model.kelas_id if model.kelas_id else None,
                 gender=model.gender.title() if model.gender else None,
-                tempat_lahir=model.tempat_lahir.title() if model.tempat_lahir else "-",
+                tempat_lahir=model.tempat_lahir.title() if model.tempat_lahir else "",
                 tgl_lahir=str(model.tgl_lahir) if model.tgl_lahir else None,
                 agama=model.agama.title() if model.agama else None,
                 alamat=model.alamat.title() if model.alamat else None,
@@ -231,8 +231,9 @@ def get_single():
             return jsonify(msg="Data not found."), HTTP_404_NOT_FOUND
         else:
             nisn = request.json.get("nisn")
-            first_name = request.json.get("first_name")
-            last_name = request.json.get("last_name")
+            # first_name = request.json.get("first_name")
+            # last_name = request.json.get("last_name")
+            fullname = request.json.get("fullname")
             gender = request.json.get("gender")
             tmpt_lahir = request.json.get("tempat")
             tgl_lahir = request.json.get("tgl")
@@ -243,44 +244,57 @@ def get_single():
             nama_ortu = request.json.get("nama_ortu")
             # active = request.json.get('active')
 
+            first_name, *last_name = fullname.split(" ", 1)
+
             model.user.username = nisn
-            model.firs_name = first_name
-            model.last_name = last_name
-            model.gender = gender
+            model.firs_name = first_name.title()
+            model.last_name = last_name[0].title()
+            model.gender = gender.lower()
             model.tempat_lahir = tmpt_lahir
             model.tgl_lahir = tgl_lahir
             # model.tgl_lahir = string_format(tgl_lahir)
-            model.alamat = alamat
-            model.agama = agama
+            model.alamat = alamat.title()
+            model.agama = agama.lower()
             model.no_telp = telp
             model.kelas_id = kelas
             model.nama_ortu_or_wali = nama_ortu
             model.user.update_date = utc_makassar()
             # model.user.is_active = active
 
-            base.edit()
+            # base.edit()
+            # print(f"NISN == {nisn}")
+            # print(f"fullname ==> {first_name} {last_name[0]}")
+            # print(f"Gender ==> {gender}")
+            # print(f"Agama ==> {agama}")
+            # print(f"tgl lahir ==> {tgl_lahir}")
+            # print(f"Ortu ==> {nama_ortu}")
+            # print(f"telp ==> {telp}")
+            # print(f"kelas ==> {kelas}")
+            # print(f"Alamat ==> {alamat}")
 
             baseKelas = BaseModel(KelasModel)
-            kelasModel = baseKelas.get_one(id=kelas)
-            countSiswaGender = (
-                db.session.query(func.count(SiswaModel.kelas_id))
-                .filter(SiswaModel.kelas_id == kelas)
-                .filter(SiswaModel.gender == gender)
-                .scalar()
-            )
-            countSiswaAll = (
-                db.session.query(func.count(SiswaModel.kelas_id))
-                .filter(SiswaModel.kelas_id == kelas)
-                .scalar()
-            )
+            if kelas:
+                kelasModel = baseKelas.get_one(id=kelas)
+                countSiswaGender = (
+                    db.session.query(func.count(SiswaModel.kelas_id))
+                    .filter(SiswaModel.kelas_id == kelas)
+                    .filter(SiswaModel.gender == gender)
+                    .scalar()
+                )
+                countSiswaAll = (
+                    db.session.query(func.count(SiswaModel.kelas_id))
+                    .filter(SiswaModel.kelas_id == kelas)
+                    .scalar()
+                )
 
-            if gender == "laki-laki":
-                kelasModel.jml_laki = countSiswaGender
-            elif gender == "perempuan":
-                kelasModel.jml_perempuan = countSiswaGender
+                if gender == "laki-laki":
+                    kelasModel.jml_laki = countSiswaGender
+                elif gender == "perempuan":
+                    kelasModel.jml_perempuan = countSiswaGender
 
-            kelasModel.jml_seluruh = countSiswaAll
-            baseKelas.edit()
+                kelasModel.jml_seluruh = countSiswaAll
+                # baseKelas.edit()
+            db.session.commit()
 
             return (
                 jsonify(msg=f"Update data {model.first_name} successfull."),

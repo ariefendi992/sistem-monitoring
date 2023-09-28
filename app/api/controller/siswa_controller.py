@@ -2,6 +2,7 @@ import hashlib
 from time import sleep
 import qrcode, os
 from sqlalchemy import and_, func
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.moduledrawers import *
@@ -801,3 +802,48 @@ def getSiswaSingleObject():
     # return jsonify(msg=f"Data dengan ID {user_id} tidak ditemukan!")
 
     # return jsonify(id=sql_siswa.id)
+
+
+@siswa.get("/check-password")
+@jwt_required()
+def check_password():
+    user_id = get_jwt_identity().get("id")
+    base = BaseModel(UserModel)
+
+    sql_user = base.get_one(id=user_id)
+
+    if not sql_user:
+        return jsonify(msg="Data user tidak ditemukan."), HTTP_404_NOT_FOUND
+    else:
+        password = request.json.get("password")
+        check_password = check_password_hash(sql_user.password, password)
+        if check_password:
+            return jsonify(msg="Kata sandi valid."), HTTP_200_OK
+        else:
+            return (
+                jsonify(msg="Kata sandi tidak valid, silahkan periksa kembali!"),
+                HTTP_403_FORBIDDEN,
+            )
+
+@siswa.route("/update-password", methods=["GET", "PUT"])
+@jwt_required()
+def update_password():
+    user_id = get_jwt_identity().get("id")
+    base = BaseModel(UserModel)
+
+    sql_user = base.get_one(id=user_id)
+
+    if not sql_user:
+        return jsonify(msg="Data user tidak ditemukan."), HTTP_404_NOT_FOUND
+    else:
+        password = request.json.get("password")
+        if len(password) < 8:
+            return (
+                jsonify(msg="Panjang karakter minimal 8."),
+                HTTP_400_BAD_REQUEST,
+            )
+        else:
+            hash_pswd = generate_password_hash(password=password)
+            sql_user.password = hash_pswd
+            base.edit()
+            return jsonify(msg="Kata sandi telah diperbaharui."), HTTP_200_OK

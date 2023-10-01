@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 {% endblock %}
 {% block title %}Beranda Staff{% endblock %}
+{% block nama_user %}Selamat Datang, <strong>{{ session.first_name}} {{ session.last_name if session.last_name !=
+  session.first_name else ''}} </strong> {% endblock %}
 {% block content %}
 <div class="row">
   <div class="col col-12 col-md-12 col-xs-12">

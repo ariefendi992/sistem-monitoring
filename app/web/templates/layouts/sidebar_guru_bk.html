@@ -51,7 +51,7 @@
           <a href="{{ url_for('guru_bk.fetch_data_pelanggaran') }}"
             class="nav-link {{ 'active' if filename=='daftar-pelanggar' or filename=='detail-pelanggaran' else '' }}">
             <i class="nav-icon fas fa-layer-group"></i>
-            <p>Data Pelanggar</p>
+            <p>Data Pelanggaran</p>
           </a>
         </li>
         <li class="nav-item">
@@ -72,14 +72,14 @@
           <a href="{{ url_for('guru_bk.laporan_kehadiran')}}"
             class="nav-link {{ 'active' if filename == 'rekap-bulan' else none }}"><i
               class="nav-icon fas fa-file-alt"></i>
-            <p>Laporan Kehadiran</p>
+            <p>Rekap Kehadiran</p>
           </a>
         </li>
         <li class="nav-item">
           <a href="{{ url_for('guru_bk.laporan_pelanggaran' ) }}"
             class="nav-link {{'active' if filename=='laporan-pelanggaran' else ''}}">
             <i class="nav-icon fas fa-file-alt"></i>
-            <p>Laporan Pelanggaran</p>
+            <p>Rekap Pelanggaran</p>
           </a>
         </li>
 

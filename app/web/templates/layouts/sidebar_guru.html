@@ -5,7 +5,7 @@
       <img src="{{ url_for('admin2.static', filename='img/logo.png') }}" alt="Admin2LTE Logo"
         class="brand-image img-circle elevation-3 mt-0" style="opacity: 0.8" />
       <div class="col p-0">
-        <span class="brand-text font-weight-light text-bold">SMN</span>
+        <span class="brand-text font-weight-light text-bold">SMS</span>
         <p style="font-size: 12px; color: #ccc; opacity:0.7;" class="p-0 m-0">Sistem Monitoring Siswa</p>
       </div>
     </div>
@@ -35,7 +35,7 @@
         <li class="nav-item {{'menu-open' if page=='absen' or page=='update-absensi' else None}}">
           <a href="#" class="nav-link {{'active' if page=='absen' or page=='update-absensi' else None}}">
             <i class="nav-icon fas fa-clipboard-check "></i>
-            <p>Absen Siswa Manual</p>
+            <p>Absen Siswa</p>
             <i class="right fa fa-angle-left"></i>
           </a>
           <ul class="nav nav-treeview">
@@ -63,7 +63,7 @@
         <li class="nav-item {{'menu-open' if page=='daftar-hadir' else None}}">
           <a href="#" class="nav-link {{'active' if page=='daftar-hadir' else None}}">
             <i class="nav-icon fas fa-clipboard-check "></i>
-            <p>Data Kehadiran Siswa</p>
+            <p>Daftar Hadir Harian</p>
             <i class="right fa fa-angle-left"></i>
           </a>
           <ul class="nav nav-treeview">
@@ -89,6 +89,14 @@
             {% endif %}
           </ul>
         </li>
+
+        <li class="nav-item">
+          <a href="{{ url_for('guru2.daftar_kehadiran') }}"
+            class="nav-link {{ 'active' if filename=='daftar-hadir' or filename=='rekap-data'  or filename=='result-absen' else None }}">
+            <i class="nav-icon fas fa-file-export"></i>
+            <p>Rekap Kehadiran</p>
+          </a>
+        </li>
         <!-- <li class="nav-item">
           <a href="{{ url_for('guru2.daftar_kehadiran') }}"
             class="nav-link {{ 'active' if filename=='daftar-hadir' else None }}">
@@ -97,12 +105,14 @@
           </a>
         </li> -->
 
-        <li
+
+
+        {# <li
           class="nav-item {{ 'menu-open' if filename=='daftar-hadir' or filename=='rekap-data' or filename=='result-absen' else None }}">
           <a href="#"
             class="nav-link {{ 'active' if filename=='daftar-hadir' or filename=='rekap-data'  or filename=='result-absen' else None }} ">
             <i class="nav-icon fas fa-file-export"></i>
-            <p>Laporan Kehadiran</p>
+            <p>Rekap Kehadiran</p>
             <i class="right fa fa-angle-left"></i>
 
           </a>
@@ -123,7 +133,7 @@
               </a>
             </li> -->
           </ul>
-        </li>
+        </li> #}
 
       </ul>
     </nav>

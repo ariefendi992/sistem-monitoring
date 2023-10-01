@@ -37,7 +37,7 @@
         <h3 class="h4 font-weight-bold">UPT SPF SMPN2 MAKASSAR</h3>
       </div> -->
       <div class="card-body mt-0 pt-0">
-        <p class="login-box-msg" style="font-weight: 600;">Sistem Monitoring & Absensi Siswa</p>
+        <p class="login-box-msg" style="font-weight: 600;">Sistem Monitoring Siswa</p>
         <!-- <p class="login-box-msg">Sign in untuk memulai sesi</p> -->
 
         <form action="{{ url_for('auth2.login')}}" method="post">
@@ -46,7 +46,8 @@
           {{ form.username.label(class="mb-1")}}
           <div class="input-group mb-1">
             {% if form.username.errors %}
-            {{ form.username(class="form-control is-invalid", aria_invalid=true,  placeholder="[Masukkan Username Anda]")}}
+            {{ form.username(class="form-control is-invalid", aria_invalid=true, placeholder="[Masukkan Username
+            Anda]")}}
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -77,7 +78,8 @@
           {{ form.password.label(class="mb-1")}}
           <div class="input-group mb-1">
             {% if form.password.errors %}
-            {{ form.password(class="form-control is-invalid", aria_invalid=true,  placeholder="[Masukkan Kata Sandi Anda]")}}
+            {{ form.password(class="form-control is-invalid", aria_invalid=true, placeholder="[Masukkan Kata Sandi
+            Anda]")}}
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
@@ -108,7 +110,7 @@
           {{ form.level.label(class="mb-1")}}
           <div class="input-group mb-3">
             {% if form.level.errors %}
-            {{ form.level(class="form-control is-invalid", aria_invalid=true,  placeholder="level")}}
+            {{ form.level(class="form-control is-invalid", aria_invalid=true, placeholder="level")}}
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user-graduate"></span>

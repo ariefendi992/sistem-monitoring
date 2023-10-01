@@ -115,7 +115,7 @@
             class="nav-link {{'active' if filename=='data-jadwal' or filename=='tambah-jadwal' or filename=='edit-jadwal'  else ''}} ">
             <i class="nav-icon fas fa-clipboard-list"></i>
             <p>
-              Data Pembelajaran
+              Jadwal
               <i class="right fas fa-angle-left"></i>
             </p>
           </a>
@@ -124,14 +124,14 @@
               <a href="{{ url_for('admin2.add_jadwal') }}"
                 class="nav-link {{'active' if filename=='tambah-jadwal' else ''}} ">
                 <i class="nav-icon far fa-circle {{'fa-dot-circle' if filename=='tambah-jadwal' else ''}} "></i>
-                <p>Tambah Pembelajaran</p>
+                <p>Tambah Jadwal</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ url_for('admin2.get_jadwal')}}"
                 class="nav-link {{'active' if filename == 'data-jadwal' else ''}} ">
                 <i class="nav-icon far fa-circle {{'fa-dot-circle' if filename=='data-jadwal' else ''}} "></i>
-                <p>Daftar Pembelajaran</p>
+                <p>Daftar Jadwal</p>
               </a>
             </li>
           </ul>
@@ -207,12 +207,12 @@
             <p>Akun Pengguna</p>
           </a>
         </li>
-        <li class="nav-item">
+        {# <li class="nav-item">
           <a href="{{ url_for('admin2.tambah_admin')}}" class="nav-link {{'active' if filename == 'tambah-admin'}}">
             <i class="fas fa-user-plus nav-icon"></i>
             <p>Tambah Admin</p>
           </a>
-        </li>
+        </li> #}
 
         {#<li class="nav-header">Laporan</li>
         <li

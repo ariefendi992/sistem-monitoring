@@ -24,7 +24,7 @@ class KelasModel(db.Model):
 
     def __repr__(self) -> str:
         return f"{self.kelas}"
-    
+
     @classmethod
     def get_all(cls):
         return cls.query.all()
@@ -104,8 +104,25 @@ class WaliKelasModel(db.Model):
     kelas_id = sa.Column(sa.Integer, sa.ForeignKey("master_kelas.id"))
     kelas = rs.relationship("KelasModel", backref="kelas_didik")
 
+    def __init__(self, guru_id: int, kelas_id: int) -> int:
+        self.guru_id = guru_id
+        self.kelas_id = kelas_id
+
     def __repr__(self) -> str:
         return "{}".format(self.kelas)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def get_all(cls):
+        data = cls.query.all()
+        return data
+
+    @classmethod
+    def get_filter_by(cls, id : int):
+        return cls.query.filter_by(id=id).first()
 
 
 class JamMengajarModel(db.Model):

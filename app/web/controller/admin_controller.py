@@ -1856,6 +1856,7 @@ class MasterData:
                 form=form,
                 jsonGuru=jsonRespGuru,
                 jsonKelas=jsonRespKelas["data"],
+                r=request,
             )
         else:
             abort(401)
@@ -1866,7 +1867,31 @@ class MasterData:
         if current_user.group == "admin":
             form = FormWaliKelas(request.form)
             url = base_url + "api/v2/master/wali-kelas/create"
-            if request.method == "POST":
+            data_wali = WaliKelasModel.get_all()
+            data_guru = GuruModel.get_all()
+            data_kelas = KelasModel.get_all()
+
+            for g in data_guru:
+                form.namaGuru.choices.append(
+                    (g.id, f"{g.first_name.title()} {g.last_name.title()}")
+                )
+
+            for item in data_kelas:
+                form.kelas.choices.append((item.id, item.kelas))
+
+            data = []
+            for i in data_wali:
+                data.append(
+                    dict(
+                        id=i.id,
+                        nip=i.guru.user.username,
+                        first_name=i.guru.first_name.title(),
+                        last_name=i.guru.last_name.title(),
+                        kelas=i.kelas.kelas,
+                    ),
+                )
+
+            if request.method == "POST" and form.validate_on_submit():
                 guru = form.namaGuru.data
                 kelas = form.kelas.data
                 payload = json.dumps({"guru_id": guru, "kelas_id": kelas})
@@ -1884,32 +1909,98 @@ class MasterData:
                         message=f'{msg["msg"]} Status : {resp.status_code}',
                         category="error",
                     )
-                    return redirect(url_for("admin2.get_wali"))
+                    return render_template(
+                        "admin/master/wali_kelas/data_wali.html",
+                        form=form,
+                        model=dict(data=data),
+                        r=request,
+                    )
             else:
-                flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
+                return render_template(
+                    "admin/master/wali_kelas/data_wali.html",
+                    form=form,
+                    model=dict(data=data),
+                    r=request,
                 )
-                abort(401)
 
-    @admin2.route("update-wali/<int:id>", methods=["GET", "POST"])
+        # flash(
+        #     f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
+        #     "error",
+        # )
+        abort(401)
+
+    @admin2.route("update-wali", methods=["GET", "POST"])
     @login_required
-    def edit_wali(id):
+    def edit_wali():
         if current_user.group == "admin":
-            url = base_url + f"api/v2/master/wali-kelas/get-one/{id}"
+            # url = base_url + f"api/v2/master/wali-kelas/get-one/{id}"
+            # if request.method == "POST":
+            #     guru_id = request.form.get("namaGuru")
+            #     kelas_id = request.form.get("namaKelas")
+            #     paylaod = json.dumps({"guru_id": guru_id, "kelas_id": kelas_id})
+            #     headers = {"Content-Type": "application/json"}
+            #     resp = req.put(url=url, data=paylaod, headers=headers)
+            #     msg = resp.json()
+            #     if resp.status_code == 200:
+            #         flash(f'{msg["msg"]} Status : {resp.status_code}', "info")
+            #         return redirect(url_for("admin2.get_wali"))
+            #     else:
+            #         flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
+            #         return redirect(url_for("admin2.get_wali"))
+
+            form = FormEditWaliKelas()
+            id = request.args.get("id")
+            data_kelas = KelasModel.get_all()
+            data_guru = GuruModel.get_all()
+            data_wali = WaliKelasModel.get_all()
+
+            for i in data_guru:
+                form.namaGuru.choices.append(
+                    (i.user_id, f"{i.first_name.title()} {i.last_name.title()}")
+                )
+
+            for i in data_kelas:
+                form.kelas.choices.append((i.id, i.kelas))
+
+            wali = WaliKelasModel.get_filter_by(id)
+
+            form.namaGuru.default = wali.guru_id
+            form.kelas.default = wali.kelas_id
+            form.process()
+
+            data = []
+            for i in data_wali:
+                data.append(
+                    dict(
+                        id=i.id,
+                        nip=i.guru.user.username,
+                        first_name=i.guru.first_name.title(),
+                        last_name=i.guru.last_name.title(),
+                        kelas=i.kelas.kelas,
+                    ),
+                )
+
             if request.method == "POST":
                 guru_id = request.form.get("namaGuru")
-                kelas_id = request.form.get("namaKelas")
-                paylaod = json.dumps({"guru_id": guru_id, "kelas_id": kelas_id})
-                headers = {"Content-Type": "application/json"}
-                resp = req.put(url=url, data=paylaod, headers=headers)
-                msg = resp.json()
-                if resp.status_code == 200:
-                    flash(f'{msg["msg"]} Status : {resp.status_code}', "info")
-                    return redirect(url_for("admin2.get_wali"))
-                else:
-                    flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
-                    return redirect(url_for("admin2.get_wali"))
+                kelas_id = request.form.get("kelas")
+
+                wali.guru_id = guru_id
+                wali.kelas_id = kelas_id
+
+                db.session.commit()
+
+                flash("Data wali kelas\\ntelah diperbaharui.", "success")
+
+                return redirect(url_for("admin2.get_wali"))
+
+            return render_template(
+                "admin/master/wali_kelas/data_wali.html",
+                form=form,
+                model=dict(data=data),
+                r=request,
+                id=id,
+            )
+
         else:
             abort(401)
 

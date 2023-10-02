@@ -129,3 +129,8 @@ class GuruModel(db.Model):
 
     def __str__(self) -> str:
         return f"{self.first_name.title()} {self.last_name.title()}"
+
+    @classmethod
+    def get_all(cls):
+        data = cls.query.all()
+        return data

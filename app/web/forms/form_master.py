@@ -126,13 +126,19 @@ class FormWaliKelas(FlaskForm):
     kelas = SelectField("Nama Kelas", choices=[("", "- Pilih -")])
     submit = SubmitField("Submit Data")
 
-    # def validate_namaGuru(self, field):
-    #     if field.data == '':
-    #         raise ValidationError('*Pilih nama guru terlebih dahulu.')
+    def validate_namaGuru(self, field):
+        if field.data == "":
+            raise ValidationError("*Pilih nama guru terlebih dahulu.")
 
-    # def validate_kelas(self, field):
-    #     if field.data == '':
-    #         raise ValidationError('*Pilih nama kelas terlebih dahulu.')
+    def validate_kelas(self, field):
+        if field.data == "":
+            raise ValidationError("*Pilih nama kelas terlebih dahulu.")
+
+
+class FormEditWaliKelas(FlaskForm):
+    namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
+    kelas = SelectField("Nama Kelas", choices=[("", "- Pilih -")])
+    submit = SubmitField("Submit Data")
 
 
 class FormGuruBK(FlaskForm):

@@ -121,7 +121,7 @@ class WaliKelasModel(db.Model):
         return data
 
     @classmethod
-    def get_filter_by(cls, id : int):
+    def get_filter_by(cls, id: int):
         return cls.query.filter_by(id=id).first()
 
 
@@ -233,12 +233,24 @@ class GuruBKModel(db.Model):
     guru = rs.relationship("GuruModel", backref="guru_bk")
     status = sa.Column(sa.String(1), nullable=True)
 
-    def __init__(self, guruId: int, status: str):
+    def __init__(self, guruId: int, status: str | None = "0"):
         self.guru_id = guruId
         self.status = status
 
     def __repr__(self) -> str:
         return "Nama Guru : {}".format(self.guru.first_name)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
+
+    @classmethod
+    def get_filter_by(cls, id):
+        return cls.query.filter_by(id=id).first()
 
 
 class NamaBulanModel(db.Model):

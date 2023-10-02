@@ -2052,6 +2052,7 @@ class MasterData:
                 model=jsonResp,
                 form=form,
                 jsonGuru=jsonRespGuru,
+                r=request,
             )
         else:
             abort(401)
@@ -2060,20 +2061,61 @@ class MasterData:
     @login_required
     def add_bk():
         if current_user.group == "admin":
-            url = base_url + f"api/v2/master/guru-bk/create"
-            guru_id = request.form.get("namaGuru")
-            status = request.form.get("status")
-            payload = json.dumps({"guru_id": guru_id, "status": status})
-            headers = {"Content-Type": "application/json"}
-            resp = req.post(url=url, data=payload, headers=headers)
+            form = FormGuruBK()
+            data_bk = GuruBKModel.get_all()
+            data_guru = GuruModel.get_all()
 
-            msg = resp.json()
-            if resp.status_code == 201:
-                flash(f'{msg["msg"]} Status : {resp.status_code}', "success")
+            for i in data_guru:
+                form.namaGuru.choices.append(
+                    (
+                        i.user_id,
+                        f"{i.first_name.title()} {i.last_name.title()}",
+                    ),
+                )
+
+            data = []
+            for i in data_bk:
+                data.append(
+                    dict(
+                        id=i.id,
+                        nip=i.guru.user.username,
+                        first_name=i.guru.first_name.title(),
+                        last_name=i.guru.last_name.title(),
+                        status=i.status,
+                    ),
+                )
+
+            if form.validate_on_submit() and request.method == "POST":
+                guru = form.namaGuru.data
+                bk_data = GuruBKModel(guru)
+                bk_data.save()
+
+                flash("Data Guru BK\\ntelah ditambahkan.", "success")
+
                 return redirect(url_for("admin2.get_bk"))
-            else:
-                flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
-                return redirect(url_for("admin2.get_bk"))
+
+                # url = base_url + f"api/v2/master/guru-bk/create"
+                # guru_id = request.form.get("namaGuru")
+                # status = request.form.get("status")
+                # payload = json.dumps({"guru_id": guru_id, "status": status})
+                # headers = {"Content-Type": "application/json"}
+                # resp = req.post(url=url, data=payload, headers=headers)
+                # msg = resp.json()
+                # if resp.status_code == 201:
+                #     flash(f'{msg["msg"]} Status : {resp.status_code}', "success")
+                #     return redirect(url_for("admin2.get_bk"))
+                # else:
+                #     flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
+                #     # return redirect(url_for("admin2.get_bk"))
+                #     return render_template(
+                #         "admin/master/guru_bk/data_guru_bk.html", form=form
+                #     )
+            return render_template(
+                "admin/master/guru_bk/data_guru_bk.html",
+                form=form,
+                model=dict(data=data),
+                r=request,
+            )
         else:
             abort(401)
 
@@ -2081,19 +2123,68 @@ class MasterData:
     @login_required
     def edit_bk(id):
         if current_user.group == "admin":
-            url = base_url + f"api/v2/master/guru-bk/get-one/{id}"
-            status = request.form.get("status")
-            payload = json.dumps({"status": status})
-            headers = {"Content-Type": "application/json"}
+            form = FormEditGuruBK()
 
-            resp = req.put(url=url, data=payload, headers=headers)
-            msg = resp.json()
-            if resp.status_code == 200:
-                flash(f'{msg["msg"]} Status : {resp.status_code}', "info")
+            data_guru = GuruModel.get_all()
+            data_bk = GuruBKModel.get_all()
+            get_bk = GuruBKModel.get_filter_by(id=id)
+
+            form.namaGuru.default = get_bk.guru_id
+            form.process()
+
+            data = list()
+
+            for i in data_bk:
+                data.append(
+                    dict(
+                        id=i.id,
+                        nip=i.guru.user.username,
+                        first_name=i.guru.first_name.title(),
+                        last_name=i.guru.last_name.title(),
+                        status=i.status,
+                    )
+                )
+
+            for i in data_guru:
+                form.namaGuru.choices.append(
+                    (
+                        i.user_id,
+                        f"{i.first_name.title()} {i.last_name.title()}",
+                    ),
+                )
+
+            # url = base_url + f"api/v2/master/guru-bk/get-one/{id}"
+            # status = request.form.get("status")
+            # payload = json.dumps({"status": status})
+            # headers = {"Content-Type": "application/json"}
+
+            # resp = req.put(url=url, data=payload, headers=headers)
+            # msg = resp.json()
+            # if resp.status_code == 200:
+            #     flash(f'{msg["msg"]} Status : {resp.status_code}', "info")
+            #     return redirect(url_for("admin2.get_bk"))
+            # else:
+            #     flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
+            #     return redirect(url_for("admin2.get_bk"))
+
+            if request.method == "POST":
+                guru_id = request.form.get("namaGuru")
+
+                get_bk.guru_id = guru_id
+                db.session.commit()
+
+                flash("Data Guru BK\\ntelah diperbaharui.", "success")
+
                 return redirect(url_for("admin2.get_bk"))
-            else:
-                flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
-                return redirect(url_for("admin2.get_bk"))
+
+            return render_template(
+                "admin/master/guru_bk/data_guru_bk.html",
+                form=form,
+                model=dict(data=data),
+                r=request,
+                id=id,
+            )
+
         else:
             abort(401)
 
@@ -2215,7 +2306,7 @@ class MasterData:
             abort(401)
 
 
-class JadwalMengajara:
+class JadwalMengajar:
     # NOTE: ================== DATA JADWAL MENGAAJAR =====================================
     @admin2.route("data-jawdwal-mengajar")
     @login_required

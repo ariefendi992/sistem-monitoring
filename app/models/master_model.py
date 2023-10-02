@@ -31,8 +31,25 @@ class MapelModel(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
     mapel = sa.Column(sa.String(64), nullable=False)
 
+    def __init__(self, mapel: str) -> str:
+        self.mapel = mapel
+
     def __repr__(self) -> str:
         return self.mapel
+
+    @classmethod
+    def get_all(cls):
+        data = cls.query.all()
+        return data
+
+    @classmethod
+    def get_filter_by(cls, id: int) -> int:
+        data = cls.query.filter_by(id=id).first()
+        return data
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class HariModel(db.Model):

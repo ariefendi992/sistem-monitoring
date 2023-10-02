@@ -10,15 +10,18 @@ from sqlalchemy import func
 from app.extensions import jwt
 from app.lib.base_model import BaseModel
 from app.lib.date_time import format_datetime_id, format_indo, utc_makassar
+from app.lib.db_statement import DBStatement
 from app.models.master_model import KelasModel
+from app.models.notifikasi_model import NotifikasiSiswaModel
 from app.models.user_details_model import *
 from app.models.user_model import StatusUserLogin, TokenBlockList, UserModel
 from app.extensions import db
 from app.lib.status_code import *
 from werkzeug.security import generate_password_hash
 from app.models.master_model import MengajarModel
-
 from app.lib.date_time import *
+
+dbs = DBStatement()
 
 auth = Blueprint("auth", __name__, url_prefix="/api/v2/auth")
 
@@ -59,6 +62,10 @@ def login():
                     "first_name": sql_siswa.first_name,
                     "last_name": sql_siswa.last_name,
                 }
+
+                data = NotifikasiSiswaModel(sql_siswa.user_id, msg="Login Berhasil...")
+                dbs.add_data(data)
+                dbs.commit_data()
 
                 access_token = create_access_token(identity=user_identity)
                 refresh_token = create_refresh_token(identity=user_identity)
@@ -166,30 +173,35 @@ def login():
             )
 
 
-@auth.route("/logout", methods=["DELETE"])
+@auth.route("/logout")
 @jwt_required(verify_type=False)
 def logout():
-    jti = get_jwt()["jti"]
+    jwt = get_jwt()
+    jti = jwt["jti"]
+
     now = utc_makassar()
     id = get_jwt_identity()["id"]
-    db.session.add(TokenBlockList(jti=jti, created_at=now, user_id=id))
-    db.session.commit()
+    # db.session.add(TokenBlockList(jti=jti, created_at=now, user_id=id))
+    # db.session.commit()
 
-    model = BaseModel(UserModel)
-    user = model.get_one_or_none(id=id)
-    user.user_logout = utc_makassar()
-    model.edit()
+    # model = BaseModel(UserModel)
+    # user = model.get_one_or_none(id=id)
+    # user.user_logout = utc_makassar()
+    # model.edit()
 
-    status_login_model = BaseModel(StatusUserLogin)
-    check_user_login = status_login_model.get_one_or_none(user_login_id=id)
-    if check_user_login:
-        check_user_login.status_login = False
-        status_login_model.edit()
+    # status_login_model = BaseModel(StatusUserLogin)
+    # check_user_login = status_login_model.get_one_or_none(user_login_id=id)
+    # if check_user_login:
+    #     check_user_login.status_login = False
+    #     status_login_model.edit()
+    token_type = jwt["type"]
+    token_b = TokenBlockList(jti, now, id)
+    token_b.save()
 
     return (
         jsonify(
-            msg="JWT revoked",
-            status_login=check_user_login.status_login if check_user_login else None,
+            msg=f"Token {token_type} revoked success",
+            # status_login=check_user_login.status_login if check_user_login else None,
         ),
         HTTP_200_OK,
     )
@@ -219,6 +231,8 @@ def create():
     username = request.json.get("username")
     password = request.json.get("password")
     group = request.json.get("group")
+
+    db.session.add()
 
     hash_pswd = generate_password_hash(password=password)
     user = BaseModel(

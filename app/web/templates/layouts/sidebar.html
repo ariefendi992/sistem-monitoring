@@ -5,8 +5,8 @@
       <img src="{{ url_for('admin2.static', filename='img/logo.png') }}" alt="Admin2LTE Logo"
         class="brand-image img-circle elevation-3 mt-0" style="opacity: 0.8" />
       <div class="col p-0">
-        <span class="brand-text font-weight-light text-bold">SMS</span>
-        <p style="font-size: 12px; color: #ccc; opacity:0.7;" class="p-0 m-0">Sistem Monitoring Siswa</p>
+        <span class="brand-text font-weight-light text-bold">SISTEM</span>
+        <p style="font-size: 12px; color: #ccc; opacity:0.7;" class="p-0 m-0">Monitoring Siswa</p>
       </div>
     </div>
   </a>
@@ -49,7 +49,7 @@
                 <p>Mapel</p>
               </a>
             </li>
-            <li class="nav-item">
+            {# <li class="nav-item">
               <a href="{{ url_for('admin2.get_semester')}}"
                 class="nav-link {{'active' if filename=='data-semester' or filename=='tambah-semester' or filename=='edit-semester' else ''}}">
                 <i
@@ -64,7 +64,7 @@
                   class="far fa-circle nav-icon {{'fa-dot-circle' if filename=='tahun-ajaran' or filename=='tambah-ajaran' else ''}}"></i>
                 <p>Tahun Ajaran</p>
               </a>
-            </li>
+            </li> #}
             <li class="nav-item">
               <a href="{{ url_for('admin2.get_kelas')}}"
                 class="nav-link {{'active' if filename=='data-kelas' or filename=='tambah-kelas' or filename=='edit-kelas' else ''}}">
@@ -73,14 +73,14 @@
                 <p>Kelas</p>
               </a>
             </li>
-            <li class="nav-item">
+            {# <li class="nav-item">
               <a href="{{ url_for('admin2.get_hari')}}"
                 class="nav-link {{'active' if filename=='data-hari' or filename=='tambah-hari' else ''}}">
                 <i
                   class="far fa-circle nav-icon {{'fa-dot-circle' if filename=='data-hari' or filename=='tambah-hari' else ''}}"></i>
                 <p>Hari</p>
               </a>
-            </li>
+            </li> #}
             {# <li class="nav-item">
               <a href="{{ url_for('admin2.get_jam') }}" class="nav-link {{'active' if filename=='data-jam' else ''}}">
                 <i class="far fa-circle nav-icon {{'fa-dot-circle' if filename=='data-jam' else ''}}"></i>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set filename = 'tambah-jadwal'  %}
+{% set filename = 'tambah-jadwal' %}
 {% block title %}tambah-jadwal{% endblock %}
 {% block head %}
 {{ super() }}
@@ -21,12 +21,12 @@
       {{ form.csrf_token }}
       <div class="col-md-8 ml-3">
         <div class="row">
-          <div class="col-md-4">
+          {# <div class="col-md-4">
             <div class="form-group">
               {{ form.kode.label }}
               {{ form.kode(class="form-control", readonly=true)}}
             </div>
-          </div>
+          </div> #}
           <div class="col-md-4">
             <div class="form-group">
               {{ form.tahunAjaran.label }}
@@ -180,7 +180,7 @@
               <span class="error invalid-feedback">{{msg}}</span>
               {% endfor %}
               {% elif form.jamKe.data %}
-              {{ form.jamKe(class="form-control", aria_invalid=false,  placeholder="1 - 10")}}
+              {{ form.jamKe(class="form-control", aria_invalid=false, placeholder="1 - 10")}}
               {% else %}
               {{ form.jamKe(class="form-control", placeholder="1 - 10")}}
               {% endif %}

@@ -47,6 +47,18 @@ class TokenBlockList(db.Model):
         sa.ForeignKey("auth_user.id", ondelete="CASCADE", onupdate="CASCADE"),
     )
 
+    def __init__(self, jti: str, created_at: any, user_id: int) -> str:
+        self.jti = jti
+        self.created_at = created_at
+        self.user_id = user_id
+
+    def __repr__(self) -> str:
+        return f"{self.jti}"
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
 
 class StatusUserLogin(db.Model):
     __tablename__ = "auth_status_user_login"

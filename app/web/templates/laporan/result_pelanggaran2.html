@@ -196,7 +196,7 @@
         </div>
         <div class="row">
           <div class="col-md-6" style="margin-top: 6rem;">
-            <p>{{'-' if not siswa.nama_ortu_or_wali or siswa.nama_ortu_or_wali == '' else
+            <p>{{'------------------' if not siswa.nama_ortu_or_wali or siswa.nama_ortu_or_wali == '' else
               siswa.nama_ortu_or_wali.title() }}<br></p>
           </div>
           <div class="col-md-6"></div>
@@ -206,7 +206,7 @@
         <div class="row">
           <div class="col-md-4"></div>
           <div class="col text-center">
-            <p style="line-height: 1.2rem;">Makassar, {{ today | format_indo }} <br>Yang
+            <p style="line-height: 1.2rem;">Makassar, {{ today | tgl_surat }} <br>Yang
               membuat
               pernyataan</p>
           </div>

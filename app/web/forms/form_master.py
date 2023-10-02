@@ -4,12 +4,21 @@ from wtforms.validators import ValidationError
 
 
 class FormMapel(FlaskForm):
-    mapel = StringField(label="Mata Pelajaran")
+    mapel = StringField(label="Nama Mata Pelajaran")
     submit = SubmitField(label="Submit Data")
 
     def validate_mapel(self, field):
         if len(field.data) == 0:
             raise ValidationError("*Inputan Mapel tidak boleh kosong.")
+
+
+class FormEditMapel(FlaskForm):
+    mapel = StringField(label="Nama Mata Pelajaran")
+    submit = SubmitField(label="Submit Data")
+
+    # def validate_mapel(self, field):
+    #     if len(field.data) == 0:
+    #         raise ValidationError("*Inputan Mapel tidak boleh kosong.")
 
 
 class FormSemester(FlaskForm):

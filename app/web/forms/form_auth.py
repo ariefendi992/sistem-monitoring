@@ -30,7 +30,7 @@ class FormLogin(FlaskForm):
             ("bk", "Guru BK"),
         ],
     )
-    remember = BooleanField("Remember Me")
+    remember = BooleanField("Ingat Saya?")
     submit = SubmitField("Masuk")
 
     def validate_username(self, field):

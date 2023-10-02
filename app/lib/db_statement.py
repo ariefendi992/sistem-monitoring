@@ -17,6 +17,15 @@ class DBStatement:
             return self.session.add_all(data)
         return self.session.add(data)
 
+    # def add_data(self, entity: type[_O], data: t.Any):
+    #     if type(data) == t.List:
+    #         model = entity(data)
+    #         return self.session.add_all(model)
+
+    #     else:
+    #         model = entity(data)
+    #         return self.session.add(data)
+
     def get_first_or_404(
         self, statement: db.sql.Select[t.Any], *, description: str | None = None
     ) -> t.Any:

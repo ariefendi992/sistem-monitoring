@@ -9,6 +9,7 @@ from app.lib.date_time import (
     format_indo,
     today_,
 )
+from app.lib.filters import tgl_absen
 from app.lib.status_code import *
 from app.models.data_model import AbsensiModel
 from app.models.master_model import (
@@ -269,7 +270,7 @@ def get_single_siswa():
                 HTTP_200_OK,
             )
         else:
-            return jsonify(msg="Tidak ada jadwal hari ini"), HTTP_404_NOT_FOUND
+            return jsonify(msg="Tidak ada jadwal!"), HTTP_404_NOT_FOUND
     else:
         return jsonify(msg="QR Code tidak sah."), HTTP_404_NOT_FOUND
 
@@ -312,7 +313,7 @@ def get_jadwal_harian():
         return jsonify(data=data), HTTP_200_OK
 
     else:
-        return jsonify(msg="Tidak ada jadwal mengajar."), HTTP_404_NOT_FOUND
+        return jsonify(msg="Tidak ada jadwal!"), HTTP_404_NOT_FOUND
 
 
 @guru.get("/jadwal-hari")
@@ -756,3 +757,41 @@ def get_daftar_riwayat():
                 ]
 
     return jsonify(group_data2)
+
+
+@guru.route("/absen-siswa-qr", methods=["GET", "POST"])
+@jwt_required()
+def absen_siswa_qr():
+    mengajar_id = request.json.get("mengajar_id")
+    siswa_id = request.json.get("siswa_id")
+    tgl_absen = datetime.date(datetime.today())
+    ket = request.json.get("keterangan")
+
+    sql_pertemuan = (
+        db.session.query(AbsensiModel)
+        .filter(AbsensiModel.mengajar_id == mengajar_id)
+        .filter(AbsensiModel.tgl_absen == tgl_absen)
+        .filter(AbsensiModel.siswa_id == siswa_id)
+        # .count()
+    )
+
+    if request.method == "POST":
+        # pertemuan = 0
+        if sql_pertemuan.count() == 0:
+            pertemuan = 1
+        else:
+            pertemuan = sql_pertemuan.count() + 1
+
+        if sql_pertemuan.count() > 0:
+            msg = f"Siswa {sql_pertemuan.siswa.first_name.title()} {sql_pertemuan.siswa.last_name.title()} telah diabsen."
+            return jsonify(msg=msg), HTTP_409_CONFLICT
+        else:
+            absen = AbsensiModel(mengajar_id, siswa_id, tgl_absen, ket, pertemuan)
+            absen.save()
+
+            msg = f"Absen {sql_pertemuan.siswa.first_name.title()} {sql_pertemuan.siswa.last_name.title()} berhasil."
+
+            return jsonify(msg=msg, status="success")
+
+    else:
+        return jsonify(msg="Cek API Guru controller absen siswa guru mapel")

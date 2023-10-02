@@ -46,6 +46,10 @@ class AbsensiModel(db.Model):
     def __repr__(self):
         return "{}".format(self.ket)
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
 
 class PelanggaranModel(db.Model):
     __tablename__ = "data_pelanggaran"

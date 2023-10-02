@@ -1,8 +1,9 @@
 import os
 import click
 from flask import Flask
+from .extensions import jwt
 from app.api.register_app import register_app
-from app.models.user_model import UserModel
+from app.models.user_model import TokenBlockList, UserModel
 from app.register_cli import register_cli
 from app.web.register_app import register_app_web
 from settings import Config
@@ -34,6 +35,14 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return UserModel.query.get(int(user_id))
+
+    @jwt.token_in_blocklist_loader
+    def token_in_blocklist_callback(jwt_header, jwt_data):
+        jti = jwt_data["jti"]
+
+        token = TokenBlockList.query.filter_by(jti=jti).scalar()
+
+        return token is not None
 
     return app
 

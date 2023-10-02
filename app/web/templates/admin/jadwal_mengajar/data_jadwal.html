@@ -24,15 +24,15 @@
   </div>
   <!-- /.card-header -->
   <div class="card-body">
-    <a href="{{ url_for('admin2.add_jadwal')}}" class="btn btn-sm btn-primary mb-3">
+    {# <a href="{{ url_for('admin2.add_jadwal')}}" class="btn btn-sm btn-primary mb-3">
       <i class="fa fa-plus"></i>
       Tambah Data
-    </a>
+    </a> #}
     <table id="example1" class="table table-bordered table-striped table-sm">
       <thead>
         <tr>
           <th>NO.</th>
-          <th>Kode Mengajar</th>
+          {# <th>Kode Mengajar</th> #}
           <th>Nama Guru</th>
           <th>Mapel</th>
           <th>Hari/Jam</th>
@@ -45,7 +45,7 @@
         {% for _ in model['data'] %}
         <tr>
           <td class="align-middle text-center" style="width: 12px;">{{ loop.index }}</td>
-          <td>{{_.kode_mengajar}}</td>
+          {# <td>{{_.kode_mengajar}}</td> #}
           <td>{{_.first_name | title}} {{ _.last_name}}</td>
           <td>{{_.mapel | title}}</td>
           <td>{{_.hari | title}}, {{_.jam_mulai}}-{{_.jam_selesai}}</td>

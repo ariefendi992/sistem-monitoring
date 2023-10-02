@@ -69,8 +69,11 @@ def index():
         jml_siswa = sql(
             x=db.session.query(UserModel).filter(UserModel.group == "siswa").count()
         )
-        jml_guru = sql(
-            x=db.session.query(UserModel).filter(UserModel.group == "guru").count()
+
+        jml_bk = db.session.query(UserModel).filter(UserModel.group == "bk").count()
+        jml_guru = (
+            sql(x=db.session.query(UserModel).filter(UserModel.group == "guru").count())
+            + jml_bk
         )
         jml_admin = sql(
             x=db.session.query(UserModel).filter(UserModel.group == "admin").count()
@@ -634,7 +637,9 @@ class PenggunaSiswa:
                             ),
                         )
 
-                    render = render_template('admin/siswa/result_idcard.html', data=data)
+                    render = render_template(
+                        "admin/siswa/result_idcard.html", data=data
+                    )
                     response = make_response(render)
                     return response
 
@@ -1116,8 +1121,17 @@ class MasterData:
             url = base_url + f"api/v2/master/mapel/get-all"
             response = req.get(url)
             jsonRespon = response.json()
+
+            """
+            NOTE : Form add data
+            """
+
+            form = FormMapel()
             return render_template(
-                "admin/master/mapel/data_mapel.html", model=jsonRespon
+                "admin/master/mapel/data_mapel.html",
+                model=jsonRespon,
+                form=form,
+                r=request,
             )
         else:
             abort(401)
@@ -1127,74 +1141,117 @@ class MasterData:
     def add_mapel():
         if current_user.group == "admin":
             form = FormMapel(request.form)
-            URL = base_url + f"api/v2/master/mapel/create"
-            if request.method == "POST" and form.validate_on_submit():
+            # URL = base_url + f"api/v2/master/mapel/create"
+            # if request.method == "POST" and form.validate_on_submit():
+            #     mapel = form.mapel.data
+            #     payload = json.dumps({"mapel": mapel})
+            #     headers = {"Content-Type": "application/json"}
+            #     response = req.post(url=URL, data=payload, headers=headers)
+            #     msg = response.json()
+            #     if response.status_code == 201:
+            #         flash(
+            #             message=f"{msg['msg']}. Status : {response.status_code}",
+            #             category="success",
+            #         )
+            #         return redirect(url_for("admin2.get_mapel"))
+            #     else:
+            #         flash(
+            #             message=f"{msg['msg']}. Status : {response.status_code}",
+            #             category="error",
+            #         )
+            #         direct = redirect(url_for("admin2.get_mapel"))
+            #         response = make_response(direct)
+            #         return response
+
+            # direct = redirect(url_for("admin2.get_mapel"))
+            # response = make_response(direct)
+            # return response
+
+            if form.validate_on_submit() and request.method == "POST":
                 mapel = form.mapel.data
-                payload = json.dumps({"mapel": mapel})
-                headers = {"Content-Type": "application/json"}
-                response = req.post(url=URL, data=payload, headers=headers)
-                msg = response.json()
-                if response.status_code == 201:
-                    flash(
-                        message=f"{msg['msg']}. Status : {response.status_code}",
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.get_mapel"))
-                else:
-                    flash(
-                        message=f"{msg['msg']}. Status : {response.status_code}",
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/mapel/tambah_mapel.html", form=form
-                    )
+                data = MapelModel(mapel)
+                data.save()
+
+                flash("Data mapel\\n telah ditambahkan.", "success")
+
+                return redirect(url_for("admin2.get_mapel"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
-            return render_template("admin/master/mapel/tambah_mapel.html", form=form)
+            model = MapelModel.get_all()
+
+            return render_template(
+                "admin/master/mapel/data_mapel.html",
+                model=dict(data=model),
+                form=form,
+                r=request,
+            )
         else:
             abort(401)
 
-    @admin2.route("edit-mapel/<int:id>", methods=["GET", "POST"])
+    @admin2.route("edit-mapel", methods=["GET", "POST"])
     @login_required
-    def edit_mapel(id):
+    def edit_mapel():
         if current_user.group == "admin":
-            URL = base_url + f"api/v2/master/mapel/get-one/{id}"
+            # URL = base_url + f"api/v2/master/mapel/get-one/{id}"
 
-            # NOTE: GET ONE DATA BY ID
-            responGetMapel = req.get(url=URL)
-            jsonResponse = responGetMapel.json()
+            # # NOTE: GET ONE DATA BY ID
+            # responGetMapel = req.get(url=URL)
+            # jsonResponse = responGetMapel.json()
 
-            form = FormMapel(request.form)
-            form.mapel.data = jsonResponse["mapel"]
-            if request.method == "POST" and form.validate_on_submit():
-                mapel = request.form.get("mapel")
-                payload = json.dumps({"mapel": mapel})
-                headers = {"Content-Type": "application/json"}
-                response = req.put(url=URL, data=payload, headers=headers)
-                msg = response.json()
-                if response.status_code == 200:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="info",
-                    )
-                    return redirect(url_for("admin2.get_mapel"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/mapel/edit_mapel.html", form=form
-                    )
+            # form = FormMapel(request.form)
+            # form.mapel.data = jsonResponse["mapel"]
+            # if request.method == "POST" and form.validate_on_submit():
+            #     mapel = request.form.get("mapel")
+            #     payload = json.dumps({"mapel": mapel})
+            #     headers = {"Content-Type": "application/json"}
+            #     response = req.put(url=URL, data=payload, headers=headers)
+            #     msg = response.json()
+            #     if response.status_code == 200:
+            #         flash(
+            #             message=f'{msg["msg"]} Status : {response.status_code}',
+            #             category="info",
+            #         )
+            #         return redirect(url_for("admin2.get_mapel"))
+            #     else:
+            #         flash(
+            #             message=f'{msg["msg"]} Status : {response.status_code}',
+            #             category="error",
+            #         )
+            #         return render_template(
+            #             "admin/master/mapel/edit_mapel.html", form=form
+            #         )
+
+            form = FormEditMapel()
+            id = request.args.get("id")
+            mapels = MapelModel.get_all()
+            get_mapel = MapelModel.get_filter_by(id=id)
+
+            form.mapel.data = get_mapel.mapel
+
+            if request.method == "POST":
+                get_mapel.mapel = request.form.get("mapel")
+
+                dbs.commit_data()
+
+                flash("Data mapel\\ntelah diperbaharui.", "success")
+
+                return redirect(url_for("admin2.get_mapel"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
+
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
-            return render_template("admin/master/mapel/edit_mapel.html", form=form)
+            return render_template(
+                "admin/master/mapel/data_mapel.html",
+                model=dict(data=mapels),
+                form=form,
+                r=request,
+                id=get_mapel.id,
+            )
         else:
             abort(401)
 

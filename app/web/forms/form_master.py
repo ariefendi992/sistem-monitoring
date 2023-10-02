@@ -157,6 +157,25 @@ class FormGuruBK(FlaskForm):
 
 class FormKepsek(FlaskForm):
     namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
+    # status = SelectField(
+    #     label="Status",
+    #     choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
+    # )
+    submit = SubmitField("Submit Data")
+
+    def validate_namaGuru(self, field):
+        if field.data == "":
+            raise ValidationError("*Pilih nama guru terlebih dahulu.")
+
+
+class FormKepsek(FlaskForm):
+    namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
+
+    submit = SubmitField("Submit Data")
+
+
+class FormEditKepsek(FlaskForm):
+    namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
     status = SelectField(
         label="Status",
         choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],

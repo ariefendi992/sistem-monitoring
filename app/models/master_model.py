@@ -223,6 +223,18 @@ class KepsekModel(db.Model):
     def __repr__(self) -> str:
         return f"Kepsek : {self.guru.first_name}"
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
+
+    @classmethod
+    def get_filter_by(cls, id):
+        return cls.query.filter_by(id=id).first()
+
 
 class GuruBKModel(db.Model):
     __tablename__ = "master_guru_bk"

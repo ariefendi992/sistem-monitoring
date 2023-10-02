@@ -2167,7 +2167,7 @@ class MasterData:
             #     flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
             #     return redirect(url_for("admin2.get_bk"))
 
-            if request.method == "POST":
+            if request.method == "POST" and request.method == "POST":
                 guru_id = request.form.get("namaGuru")
 
                 get_bk.guru_id = guru_id
@@ -2248,19 +2248,55 @@ class MasterData:
     @login_required
     def add_kepsek():
         if current_user.group == "admin":
-            url = base_url + f"api/v2/master/kepsek/create"
-            guru_id = request.form.get("namaGuru")
-            payload = json.dumps({"guru_id": guru_id})
-            headers = {"Content-Type": "application/json"}
-            resp = req.post(url=url, data=payload, headers=headers)
+            # url = base_url + f"api/v2/master/kepsek/create"
+            # guru_id = request.form.get("namaGuru")
+            # payload = json.dumps({"guru_id": guru_id})
+            # headers = {"Content-Type": "application/json"}
+            # resp = req.post(url=url, data=payload, headers=headers)
 
-            if resp.status_code == 201:
-                msg = resp.json()
-                flash(f'{msg["msg"]} Status : {resp.status_code}', "success")
+            # if resp.status_code == 201:
+            #     msg = resp.json()
+            #     flash(f'{msg["msg"]} Status : {resp.status_code}', "success")
+            #     return redirect(url_for("admin2.get_kepsek"))
+            # else:
+            #     flash(f"Ma'af! Terjadi kesalahan menginput data.", "error")
+            #     return redirect(url_for("admin2.get_kepsek"))
+            form = FormKepsek()
+            data_guru = GuruModel.get_all()
+            data_kepsek = KepsekModel.get_all()
+            data = []
+
+            for i in data_kepsek:
+                data.append(
+                    dict(
+                        id=i.id,
+                        nip=i.guru.user.username,
+                        firs_name=i.guru.first_name.title(),
+                        last_name=i.guru.last_name.title(),
+                        status="Aktif" if i.status == "1" else "Tidak",
+                    )
+                )
+
+            for i in data_guru:
+                form.namaGuru.choices.append(
+                    (i.user_id, f"{i.first_name.title()} {i.last_name.title()}")
+                )
+
+            if form.validate_on_submit() and request.method == "POST":
+                guru_id = form.namaGuru.data
+
+                data = KepsekModel(guru_id)
+                data.save()
+
+                flash("Data Kepala sekolah\\n telah ditambahkan.", "success")
+
                 return redirect(url_for("admin2.get_kepsek"))
-            else:
-                flash(f"Ma'af! Terjadi kesalahan menginput data.", "error")
-                return redirect(url_for("admin2.get_kepsek"))
+
+            return render_template(
+                "admin/master/kepsek/data_kepsek.html",
+                form=form,
+                model=dict(data=data),
+            )
         else:
             abort(401)
 

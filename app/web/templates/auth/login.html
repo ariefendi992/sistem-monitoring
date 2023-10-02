@@ -23,11 +23,20 @@
   <link rel="stylesheet" href="{{ url_for('admin2.static', filename='css/adminlte.min.css') }}">
   <!-- favicon -->
   <link rel="icon" type="image/x-icon" href="{{ url_for('admin2.static', filename='img/icon/favicon.ico') }}" />
+
+  <style>
+    .login-page {
+      background-image: url("../../../static/images/spendu4.png");
+      background-repeat: no-repeat;
+      background-size: cover;
+      -webkit-background-clip: content-box;
+
+    }
+  </style>
 </head>
 
 <body class="hold-transition login-page">
   <div class="login-box">
-
     <div class="card" style="border-radius: 4%;">
       <div class="login-logo mt-4 mb-0">
         <img src="{{ url_for('static', filename='images/logo_smpn2.png') }}" alt="" height="160">

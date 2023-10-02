@@ -24,6 +24,10 @@ class KelasModel(db.Model):
 
     def __repr__(self) -> str:
         return f"{self.kelas}"
+    
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
 
 
 class MapelModel(db.Model):

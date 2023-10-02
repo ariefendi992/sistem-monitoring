@@ -5,78 +5,127 @@
 {{super()}}
 <!-- Tempusdominus Bootstrap 4 -->
 <link rel="stylesheet"
-    href="{{ url_for('.static', filename='plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+  href="{{ url_for('.static', filename='plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
 <!-- DataTables -->
 <link rel="stylesheet"
-    href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+  href="{{ url_for('.static', filename='plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
 <link rel="stylesheet"
-    href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+  href="{{ url_for('.static', filename='plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
 <link rel="stylesheet"
-    href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+  href="{{ url_for('.static', filename='plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
 {% endblock %}
 {% block content %}
-<div class="card">
-    <div class="card-header">
+<div class="row">
+  <div class="col-md-4">
+    <div class="card card-blue card-outline">
+      <div class="card-header">
+        <h3 class="card-title font-weight-bold text-lg">&nbsp;{{"Tambah Data" if r.url_rule | string ==
+          url_for('admin2.get_kelas') | string else 'Ubah Data'}}</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+        </div>
+      </div>
+      <form
+        action="{{ url_for('admin2.add_kelas') if r.url_rule | string == url_for('admin2.get_kelas') | string else url_for('admin2.edit_kelas', id=id) }}"
+        method="post">
+        <div class="card-body">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            {{ form.kelas.label}}
+            {% if form.kelas.errors %}
+            {{ form.kelas(class="form-control form-control-sm is-invalid" ,aria_invalid="true", placeholder="Nama
+            Kelas")}}
+            {% for msg in form.kelas.errors %}
+            <span class="error invalid-feedback">{{ msg }}</span>
+            {% endfor %}
+            {% elif form.kelas.data %}
+            {{ form.kelas(class="form-control form-control-sm", aria_invalid="false", placeholder="Nama Kelas")}}
+            {% else %}
+            {{ form.kelas(class="form-control form-control-sm", placeholder="Nama Kelas")}}
+            {% endif %}
+          </div>
+          {% if r.url_rule | string == url_for('admin2.edit_kelas') %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                {{ form.jumlahLaki.label}}
+                {{ form.jumlahLaki(class="form-control form-control-sm", placeholder="Nama Kelas")}}
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                {{ form.jumlahPerempuan.label}}
+                {{ form.jumlahPerempuan(class="form-control form-control-sm", placeholder="Nama Kelas")}}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-footer">{{ form.submit(class="btn btn-primary btn-sm") }}</div>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card card-blue card-outline">
+      <div class="card-header">
         <h3 class="card-title font-weight-bold text-lg">&nbsp;Data Kelas</h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
+          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+            <i class="fas fa-minus"></i>
+          </button>
         </div>
-    </div>
-    <div class="card-body">
-        <a href="{{ url_for('admin2.add_kelas') }}" class="btn btn-sm btn-primary mb-3">
-            <i class="fas fa-plus"></i>
-            Tambah Data Kelas
-        </a>
-        <div class="col-md-9">
-            <table id="tabel" class="table table-bordered table-striped table-sm">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kelas</th>
-                        <th>Laki-Laki</th>
-                        <th>Perempuan</th>
-                        <th>Jumlah Siswa</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for _ in model['data'] %}
-                    <tr>
-                        <td class="align-middle text-center" style="width: 12px;">{{ loop.index}}</td>
-                        <td class="align-middle">{{ _.kelas }}</td>
-                        <td class="align-middle">{{ _.laki }}</td>
-                        <td class="align-middle">{{ _.perempuan }}</td>
-                        <td class="align-middle">{{ _.jum_seluruh }}</td>
-                        <!-- AKSI -->
-                        <td class="align-middle text-center" style="width: 120px;">
-                            <a href="{{ url_for('admin2.edit_kelas',  id=_.id)}}" class="btn btn-warning btn-xs" title="Edit Data">
-                                <i class="fas fa-pencil-alt"></i>
-                                Edit
-                            </a>
-                            <button class="btn btn-danger btn-xs" title="Delete Data." data-toggle="modal"
-                                data-target="#delete-{{_.id}}">
-                                <i class="fas fa-trash-alt"></i>
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                    {% include 'modal/master/kelas/delete.html' %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="card-footer"></div>
-</div>
+      </div>
+      <div class="card-body">
+        <table id="tabel" class="table table-bordered table-striped table-sm">
+          <thead>
+            <tr>
+              <th class="text-center align-middle">No</th>
+              <th class="text-center align-middle">Kelas</th>
+              <th class="text-center align-middle">Laki-Laki</th>
+              <th class="text-center align-middle">Perempuan</th>
+              <th class="text-center align-middle">Jumlah Siswa</th>
+              <th class="text-center align-middle">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for _ in model['data'] %}
+            <tr>
+              <td class="align-middle text-center" style="width: 12px;">{{ loop.index}}</td>
+              <td class="align-middle text-center">{{ _.kelas }}</td>
+              <td class="align-middle text-center">{{ _.laki }}</td>
+              <td class="align-middle text-center">{{ _.perempuan }}</td>
+              <td class="align-middle text-center">{{ _.jum_seluruh }}</td>
+              <!-- AKSI -->
+              <td class="align-middle text-center" style="width: 120px;">
+                <a href="{{ url_for('admin2.edit_kelas',  id=_.id)}}" class="btn btn-outline-warning btn-xs"
+                  title="Edit Data" data-tooltip="tooltip">
+                  <i class="fas fa-pencil-alt"></i>
+                </a>
+                <button class="btn btn-outline-danger btn-xs" title="Delete Data." data-toggle="modal"
+                  data-target="#delete-{{_.id}}" data-tooltip="tooltip">
+                  <i class="fas fa-trash-alt"></i>
 
+                </button>
+              </td>
+            </tr>
+            {% include 'modal/master/kelas/delete.html' %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer"></div>
+    </div>
+
+  </div>
+</div>
 {% endblock %}
 {% block js %}
 <!-- Tempusdominus Bootstrap 4 -->
 <script
-    src="{{ url_for('.static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}">
-</script>
+  src="{{ url_for('.static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}">
+  </script>
 <!-- DataTables  & Plugins -->
 <script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
@@ -92,16 +141,18 @@
 <!-- bs-custom-file-input -->
 <script src="{{ url_for('.static', filename='plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
 <script>
-    $(function () {
-        bsCustomFileInput.init();
-        $('#tabel').DataTable({
-            processing: true
-        });
-        $('#reservationdate').datetimepicker({
-            format: 'L'
-        });
-
+  $(function () {
+    bsCustomFileInput.init();
+    $('#tabel').DataTable({
+      processing: true
     });
+    $('#reservationdate').datetimepicker({
+      format: 'L'
+    });
+
+    $('[data-tooltip="tooltip"]').tooltip()
+
+  });
 </script>
 
 {% endblock %}

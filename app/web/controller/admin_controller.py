@@ -1511,6 +1511,7 @@ class MasterData:
     @login_required
     def get_kelas():
         if current_user.group == "admin":
+            form = FormKelas()
             URL = base_url + "api/v2/master/kelas/get-all"
             response = req.get(URL)
             jsonResp = response.json()
@@ -1519,7 +1520,12 @@ class MasterData:
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
-            return render_template("admin/master/kelas/data_kelas.html", model=jsonResp)
+            return render_template(
+                "admin/master/kelas/data_kelas.html",
+                model=jsonResp,
+                form=form,
+                r=request,
+            )
         else:
             abort(401)
 
@@ -1549,7 +1555,7 @@ class MasterData:
                         category="error",
                     )
                     return render_template(
-                        "admin/master/kelas/tambah_kelas.html", form=form
+                        "admin/master/kelas/data_kelas.html", form=form
                     )
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
@@ -1557,15 +1563,16 @@ class MasterData:
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
 
-            return render_template("admin/master/kelas/tambah_kelas.html", form=form)
+            return render_template("admin/master/kelas/data_kelas.html", form=form)
         else:
             abort(401)
 
-    @admin2.route("edit-kelas/<int:id>", methods=["GET", "POST"])
+    @admin2.route("edit-kelas", methods=["GET", "POST"])
     @login_required
-    def edit_kelas(id):
+    def edit_kelas():
         if current_user.group == "admin":
             form = FormEditKelas(request.form)
+            id = request.args.get("id")
             URL = base_url + f"api/v2/master/kelas/get-one/{id}"
 
             response = req.get(URL)
@@ -1575,11 +1582,14 @@ class MasterData:
             form.jumlahPerempuan.data = jsonResp["perempuan"]
             form.jumlahSiswa.data = jsonResp["seluruh"]
 
+            data_kelas = KelasModel.get_all()
+
             if request.method == "POST":
                 kelas = request.form.get("kelas")
                 laki = request.form.get("jumlahLaki")
                 perempuan = request.form.get("jumlahPerempuan")
-                seluruh = request.form.get("jumlahSiswa")
+                # seluruh = request.form.get("jumlahSiswa")
+                seluruh = int(laki) + int(perempuan)
 
                 payload = json.dumps(
                     {
@@ -1600,7 +1610,11 @@ class MasterData:
                 else:
                     flash(f'{msg["msg"]} Status : {response.status_code}', "error")
                     return render_template(
-                        "admin/master/kelas/edit_kelas.html", form=form
+                        "admin/master/kelas/data_kelas.html",
+                        form=form,
+                        r=request,
+                        model=dict(data=data_kelas),
+                        id=id,
                     )
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
@@ -1608,7 +1622,13 @@ class MasterData:
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
 
-            return render_template("admin/master/kelas/edit_kelas.html", form=form)
+            return render_template(
+                "admin/master/kelas/data_kelas.html",
+                form=form,
+                r=request,
+                model=dict(data=data_kelas),
+                id=id,
+            )
         else:
             abort(401)
 

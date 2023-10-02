@@ -71,7 +71,7 @@ class FormTahunAJaran(FlaskForm):
 
 
 class FormKelas(FlaskForm):
-    kelas = StringField(label="Kelas")
+    kelas = StringField(label="Nama Kelas")
     submit = SubmitField(label="Sumbit Data")
 
     def validate_kelas(self, field):
@@ -81,8 +81,8 @@ class FormKelas(FlaskForm):
 
 class FormEditKelas(FlaskForm):
     kelas = StringField(label="Kelas")
-    jumlahLaki = StringField(label="Jumlah Laki-Laki")
-    jumlahPerempuan = StringField(label="Jumlah Perempuan")
+    jumlahLaki = StringField(label="Laki-Laki")
+    jumlahPerempuan = StringField(label="Perempuan")
     jumlahSiswa = StringField(label="Jumlah Siswa")
     submit = SubmitField(label="Sumbit Data")
 

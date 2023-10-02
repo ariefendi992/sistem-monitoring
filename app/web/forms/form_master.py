@@ -72,7 +72,7 @@ class FormTahunAJaran(FlaskForm):
 
 class FormKelas(FlaskForm):
     kelas = StringField(label="Nama Kelas")
-    submit = SubmitField(label="Sumbit Data")
+    submit = SubmitField(label="Submit Data")
 
     def validate_kelas(self, field):
         if field.data == "":
@@ -84,7 +84,7 @@ class FormEditKelas(FlaskForm):
     jumlahLaki = StringField(label="Laki-Laki")
     jumlahPerempuan = StringField(label="Perempuan")
     jumlahSiswa = StringField(label="Jumlah Siswa")
-    submit = SubmitField(label="Sumbit Data")
+    submit = SubmitField(label="Submit Data")
 
     # def validate_kelas(self, field):
     #     if field.data == '':
@@ -114,7 +114,7 @@ class FormHari(FlaskForm):
 
 class FormJam(FlaskForm):
     jam = StringField("Jam")
-    submit = SubmitField("Sumbit Data")
+    submit = SubmitField("Submit Data")
 
     # def validate_jam(self, field):
     #     if field.data == '':

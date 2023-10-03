@@ -2219,10 +2219,12 @@ class MasterData:
             urlGuru = base_url + "api/v2/guru/get-all"
             respGuru = req.get(urlGuru)
             jsonRespGuru = respGuru.json()
-            for i in jsonRespGuru:
-                form.namaGuru.choices.append(
-                    (i["id"], i["first_name"] + "" + i["last_name"])
-                )
+
+            if not jsonResp["data"]:
+                for i in jsonRespGuru:
+                    form.namaGuru.choices.append(
+                        (i["id"], i["first_name"] + "" + i["last_name"])
+                    )
 
             status = [
                 {"id": "0", "status": "tidak aktif"},

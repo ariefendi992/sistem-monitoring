@@ -741,7 +741,7 @@ def get_daftar_riwayat():
                 group_data2[tanggal] = [
                     dic_data(
                         id=i.id,
-                        nama_siswa=f"{i.siswa.first_name} {i.siswa.last_name}",
+                        nama_siswa=f"{i.siswa.first_name.title()} {i.siswa.last_name.title()}",
                         kelas=i.siswa.kelas.kelas,
                         ket="Hadir"
                         if i.ket == "H"

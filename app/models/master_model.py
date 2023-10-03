@@ -218,7 +218,7 @@ class KepsekModel(db.Model):
 
     def __init__(self, guruId=None):
         self.guru_id = guruId
-        self.status = 0
+        self.status = 1
 
     def __repr__(self) -> str:
         return f"Kepsek : {self.guru.first_name}"

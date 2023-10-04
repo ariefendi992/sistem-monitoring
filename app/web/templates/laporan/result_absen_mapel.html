@@ -80,10 +80,10 @@
         <div style="font-size: 14pt; margin-top: -5px;">DINAS PENDIDIKAN</div>
         <div style="font-size: 14pt; margin-top: -5px;">UPT SATUAN PENDIDIKAN FORMAL</div>
         <div style="font-size: 14pt;  font-weight: 600 ; margin-top: -5px;">SMP NEGERI 2 MAKASSAR</div>
-        <div style="font-size: 10pt; margin-top: -5px;">Jl. Amanagappa No. 4 Makassar (90111) - Telp. (0411)
+        <div style="font-size: 10pt; margin-top: -5px;">Jl. Amanagappa No. 4 Makassar (90111) - Telp. (0411) 3611404
         </div>
         <div style="font-size: 10pt; margin-top: -5px; color: blue; font-style: italic;">Email:
-          smp02makassar78@gmail.com</div>
+          smpn02makassar@gmail.com</div>
 
       </div>
       <div class="col-md-3 text-right">
@@ -113,7 +113,7 @@
           <tr>
             <td width="130">Pertemuan Bulan</td>
             <td width="10">:</td>
-            <td width="170">{{ data.bulan }}</td>
+            <td width="500">{{ data.bulan }}</td>
             <td width="100">Semester</td>
             <td width="10">:</td>
             <td>{{ data.semester }}</td>
@@ -178,7 +178,7 @@
                 <td class=" text-center">{{ loop.index }}.</td>
                 <td class="pl-2">{{ i.siswa.first_name.title() }} {{ i.siswa.last_name.title() }}</td>
                 <td class="text-center">{{'L' if i.siswa.gender == 'laki-laki' else 'P' }}</td>
-                {% for index in tglPertemuan.all() %}
+                {% for index in tglPertemuan.filter(AM.siswa_id==i.siswa.user_id) %}
                 <td class="text-center">
                   {% if index.ket == 'H' %}
                   <div id="ket">{{ index.ket }}</div>
@@ -192,16 +192,16 @@
                 </td>
                 {% endfor %}
                 <td class="text-center align-items-center">
-                  {{ tglPertemuan.filter(AM.ket=='H').count() }}
+                  {{ tglPertemuan.filter(AM.ket=='H').filter(AM.siswa_id==i.siswa.user_id).count() }}
                 </td>
                 <td class="text-center align-items-center">
-                  {{ tglPertemuan.filter(AM.ket=='S').count() }}
+                  {{ tglPertemuan.filter(AM.ket=='S').filter(AM.siswa_id==i.siswa.user_id).count() }}
                 </td>
                 <td class="text-center align-items-center">
-                  {{ tglPertemuan.filter(AM.ket=='I').count() }}
+                  {{ tglPertemuan.filter(AM.ket=='I').filter(AM.siswa_id==i.siswa.user_id).count() }}
                 </td>
                 <td class="text-center align-items-center">
-                  {{ tglPertemuan.filter(AM.ket=='A').count() }}
+                  {{ tglPertemuan.filter(AM.ket=='A').filter(AM.siswa_id==i.siswa.user_id).count() }}
                 </td>
 
               </tr>

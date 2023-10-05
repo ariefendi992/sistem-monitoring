@@ -412,7 +412,9 @@ def absensi(mengajar_id):
             .count()
         )
 
-        data_mengajar.update(count_pertemuan=sql_pertemuan if sql_pertemuan != 0 else 1)
+        data_mengajar.update(
+            count_pertemuan=sql_pertemuan + 1 if sql_pertemuan != 0 else 1
+        )
 
         """
             mengambil semua id dan nama kelas pada tabel kelas melalui tabel siswa

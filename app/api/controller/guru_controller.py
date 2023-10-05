@@ -250,14 +250,49 @@ def get_single_siswa():
             .first()
         )
 
-        sql_pertemuan = (
+        sql_riwayat_absen = (
             db.session.query(AbsensiModel)
             .join(MengajarModel)
             .filter(AbsensiModel.siswa_id == sql_siswa.user_id)
-            .filter(MengajarModel.mapel_id == sql_mengajar.mapel_id)
+            .filter(MengajarModel.guru_id == guru_id)
         )
 
+        # print([i for i in sql_riwayat_absen])
+        # print(f"Pertemuan Hari ini ===> {sql_status_absen}")
+
         if sql_mengajar:
+            sql_status_absen = (
+                db.session.query(AbsensiModel)
+                .join(MengajarModel)
+                .filter(AbsensiModel.siswa_id == sql_siswa.user_id)
+                .filter(AbsensiModel.tgl_absen == datetime.date(datetime.today()))
+                .filter(AbsensiModel.mengajar_id == sql_mengajar.id)
+                .first()
+            )
+            sql_count_pertemuan = (
+                db.session.query(AbsensiModel)
+                .join(MengajarModel)
+                .filter(AbsensiModel.siswa_id == sql_siswa.user_id)
+                .filter(MengajarModel.mapel_id == sql_mengajar.mapel_id)
+            )
+
+            data_riwayat_absen = []
+            for i in sql_riwayat_absen:
+                data_riwayat_absen.append(
+                    dict(
+                        tgl_absen=format_indo(i.tgl_absen),
+                        keterangan="Hadir"
+                        if i.ket == "H"
+                        else "Izin"
+                        if i.ket == "I"
+                        else "Sakit"
+                        if i.ket == "S"
+                        else "Tanpe Ket",
+                        ket_char=i.ket,
+                        pertemuan=i.pertemuan_ke,
+                    )
+                )
+
             data = dic_data(
                 siswa_id=sql_siswa.user_id,
                 nisn=sql_user.username,
@@ -273,8 +308,13 @@ def get_single_siswa():
                 kelas_id=sql_siswa.kelas_id,
                 mengajar_id=sql_mengajar.id,
                 mapel_id=sql_mengajar.mapel_id,
-                count_pertemuan=sql_pertemuan.count(),
+                count_pertemuan=sql_count_pertemuan.count() + 1
+                if not sql_status_absen
+                else sql_count_pertemuan.count(),
+                status_absen="Belum Absen" if not sql_status_absen else "Telah Absen",
+                riwayat_absen=data_riwayat_absen,
             )
+
             return (
                 jsonify(status="success", data=data),
                 HTTP_200_OK,
@@ -526,7 +566,7 @@ def absen_siswa_guru_mapel():
         .count()
     )
 
-    print(f"COUNT PERTEMUAN ===> {count_pertemuan}")
+    # print(f"COUNT PERTEMUAN ===> {count_pertemuan}")
 
     if request.method == "POST":
         if count_pertemuan == 0:
@@ -556,10 +596,10 @@ def absen_siswa_guru_mapel():
             )
             absen.save()
 
-            notif = NotifikasiSiswaModel(
-                siswa_id, msg=f"Absen mapel {absen.mengajar.mapel.mapel}"
-            )
-            notif.save()
+            # notif = NotifikasiSiswaModel(
+            #     siswa_id, msg=f"Absen mapel {absen.mengajar.mapel.mapel} sukses."
+            # )
+            # notif.save()
 
             return (
                 jsonify(

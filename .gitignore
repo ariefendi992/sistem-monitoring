@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 env/
+venv/
 __pycache__/
 app/__pycache__/
 alchemydumps/

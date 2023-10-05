@@ -389,6 +389,7 @@ def absensi(mengajar_id):
                 .where(AbsensiModel.tgl_absen == datetime.date(datetime.today()))
                 .where(AbsensiModel.mengajar_id == mengajar_id)
             )
+            .order_by(SiswaModel.first_name.asc())
             .all()
         )
 
@@ -575,8 +576,15 @@ def update_absen(mengajar_id):
         base_siswa = BaseModel(SiswaModel)
         sql_siswa = base_siswa.get_all_filter_by(kelas_id=data["kelas_id"])
 
-        base_absensi = BaseModel(AbsensiModel)
-        sql_absensi = base_absensi.get_all_filter_by(mengajar_id=mengajar_id)
+        # base_absensi = BaseModel(AbsensiModel)
+        # sql_absensi = base_absensi.get_all_filter_by(mengajar_id=mengajar_id)
+        sql_absensi = (
+            db.session.query(AbsensiModel)
+            .join(SiswaModel)
+            .filter(AbsensiModel.mengajar_id == mengajar_id)
+            .order_by(SiswaModel.first_name.asc())
+            .all()
+        )
 
         if request.method == "POST":
             for i in range(1, len(sql_absensi) + 1):

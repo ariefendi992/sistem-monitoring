@@ -5,6 +5,7 @@ from app.api.controller.master_controller import master
 from app.api.controller.data_controller import data
 from app.api.controller.download_controller import download
 from app.api.controller.jadwal_belajar_siswa import jadwal
+from app.api.controller.push_notifikasi_controller import notifikasi
 
 
 def register_app(app):
@@ -15,3 +16,4 @@ def register_app(app):
     app.register_blueprint(data)
     app.register_blueprint(download)
     app.register_blueprint(jadwal)
+    app.register_blueprint(notifikasi)

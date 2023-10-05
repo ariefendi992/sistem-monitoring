@@ -19,6 +19,7 @@ from app.models.master_model import (
     TahunAjaranModel,
     WaliKelasModel,
 )
+from app.models.notifikasi_model import NotifikasiSiswaModel
 from app.models.user_details_model import GuruModel, SiswaModel
 from app.models.user_model import UserModel
 from app.extensions import db
@@ -264,6 +265,7 @@ def get_single_siswa():
                 today=today,
                 kelas_id=sql_siswa.kelas_id,
                 mengajar_id=sql_mengajar.id,
+                mapel_id=sql_mengajar.mapel_id,
             )
             return (
                 jsonify(status="success", data=data),
@@ -497,6 +499,7 @@ def absen_siswa_guru_mapel():
     mengajar_id = request.json.get("mengajar_id")
     siswa_id = request.json.get("siswa_id")
     tgl_absen = datetime.date(datetime.today())
+    mapel_id = request.json.get("mapel_id")
     ket = request.json.get("keterangan")
 
     sql_pertemuan = (
@@ -507,26 +510,48 @@ def absen_siswa_guru_mapel():
         .count()
     )
 
+    count_pertemuan = (
+        db.session.query(AbsensiModel)
+        .join(MengajarModel)
+        .filter(MengajarModel.mapel_id == mapel_id)
+        .filter(AbsensiModel.siswa_id == siswa_id)
+        .count()
+    )
+
+    print(f"COUNT PERTEMUAN ===> {count_pertemuan}")
+
     if request.method == "POST":
-        pertemuan = 0
-        if sql_pertemuan == 0:
-            pertemuan += 1
+        if count_pertemuan == 0:
+            pertemuan = 1
         else:
-            pertemuan = sql_pertemuan + 1
+            pertemuan = count_pertemuan + 1
         if sql_pertemuan > 0:
             return jsonify(msg="Telah melakukan absensi hari ini."), HTTP_409_CONFLICT
 
         else:
-            base = BaseModel(
-                AbsensiModel(
-                    mengajar_id=mengajar_id,
-                    siswa_id=siswa_id,
-                    tgl_absen=tgl_absen,
-                    ket=ket,
-                    pertemuanKe=pertemuan,
-                )
+            # base = BaseModel(
+            #     AbsensiModel(
+            #         mengajar_id=mengajar_id,
+            #         siswa_id=siswa_id,
+            #         tgl_absen=tgl_absen,
+            #         ket=ket,
+            #         pertemuanKe=pertemuan,
+            #     )
+            # )
+            # base.create()
+            absen = AbsensiModel(
+                mengajar_id=mengajar_id,
+                siswa_id=siswa_id,
+                tgl_absen=tgl_absen,
+                ket=ket,
+                pertemuanKe=pertemuan,
             )
-            base.create()
+            absen.save()
+
+            notif = NotifikasiSiswaModel(
+                siswa_id, msg=f"Absen mapel {absen.mengajar.mapel.mapel}"
+            )
+            notif.save()
 
             return (
                 jsonify(
@@ -699,6 +724,7 @@ def get_daftar_riwayat():
                 MengajarModel.guru_id == guru_id,
                 SemesterModel.is_active == "1",
                 TahunAjaranModel.is_active == "1",
+                MengajarModel.kelas_id == SiswaModel.kelas_id,
             )
         )
         .order_by(AbsensiModel.tgl_absen.desc())

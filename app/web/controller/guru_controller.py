@@ -1,3 +1,4 @@
+from calendar import c
 from re import I
 from flask import (
     abort,
@@ -357,26 +358,11 @@ def absensi(mengajar_id):
         base_mengajar = BaseModel(MengajarModel)
         mengajar = base_mengajar.get_all_filter_by(id=mengajar_id)
 
-        sql_pertemuan = (
-            db.session.query(AbsensiModel)
-            .join(MengajarModel)
-            .join(SemesterModel)
-            .join(TahunAjaranModel)
-            .filter(
-                and_(
-                    MengajarModel.guru_id == current_user.id,
-                    MengajarModel.id == mengajar,
-                    SemesterModel.is_active == "1",
-                    TahunAjaranModel.is_active == "1",
-                )
-            )
-            .count()
-        )
-        pertemuan = 0
-        if sql_pertemuan == 0:
-            pertemuan += 1
-        else:
-            pertemuan = sql_pertemuan + 1
+        # pertemuan = 0
+        # if sql_pertemuan == 0:
+        #     pertemuan += 1
+        # else:
+        #     pertemuan = sql_pertemuan + 1
 
         data_mengajar = {}
         for i in mengajar:
@@ -385,6 +371,7 @@ def absensi(mengajar_id):
             data_mengajar["mengajar_id"] = i.id
             data_mengajar["mapel_id"] = i.mapel_id
             data_mengajar["mapel"] = i.mapel.mapel
+
         """
             mengambil semua data siswa dengan filter kelas id pada tabel siswa
             dan di join dengan kelas id pada tabel master mengajar. Dan data
@@ -404,6 +391,29 @@ def absensi(mengajar_id):
             )
             .all()
         )
+
+        sql_pertemuan = (
+            db.session.query(AbsensiModel)
+            .join(MengajarModel)
+            .filter(
+                and_(
+                    # AbsensiModel.mengajar_id==mengajar_id,
+                    # MengajarModel.guru_id == current_user.id,
+                    AbsensiModel.siswa_id
+                    == [
+                        i.user_id
+                        for i in SiswaModel.query.filter_by(
+                            kelas_id=data_mengajar["kelas_id"]
+                        ).all()
+                    ][0],
+                    MengajarModel.mapel_id == data_mengajar["mapel_id"],
+                )
+            )
+            .count()
+        )
+
+        data_mengajar.update(count_pertemuan=sql_pertemuan if sql_pertemuan != 0 else 1)
+
         """
             mengambil semua id dan nama kelas pada tabel kelas melalui tabel siswa
             yang sudah di relasikan dengan tabel kelas, lalu di simpan dalam
@@ -459,7 +469,20 @@ def absensi(mengajar_id):
                 siswa_id = request.form.get(f"userId-{n}")
                 mengajar_id = request.form.get(f"mengajarId")
                 tgl_absen = request.form["today"]
+
                 ket = request.form.get(f"ket-{n}")
+
+                count_pertemuan = (
+                    db.session.query(AbsensiModel)
+                    .join(MengajarModel)
+                    .filter(AbsensiModel.siswa_id == siswa_id)
+                    .filter(MengajarModel.mapel_id == data_mengajar["mapel_id"])
+                    .count()
+                )
+                if count_pertemuan == 0:
+                    pertemuan = 1
+                else:
+                    pertemuan = count_pertemuan + 1
 
                 absen.append(ket)
                 base_absesn = BaseModel(

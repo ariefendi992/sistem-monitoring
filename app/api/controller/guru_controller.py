@@ -250,6 +250,13 @@ def get_single_siswa():
             .first()
         )
 
+        sql_pertemuan = (
+            db.session.query(AbsensiModel)
+            .join(MengajarModel)
+            .filter(AbsensiModel.siswa_id == sql_siswa.user_id)
+            .filter(MengajarModel.mapel_id == sql_mengajar.mapel_id)
+        )
+
         if sql_mengajar:
             data = dic_data(
                 siswa_id=sql_siswa.user_id,
@@ -266,6 +273,7 @@ def get_single_siswa():
                 kelas_id=sql_siswa.kelas_id,
                 mengajar_id=sql_mengajar.id,
                 mapel_id=sql_mengajar.mapel_id,
+                count_pertemuan=sql_pertemuan.count(),
             )
             return (
                 jsonify(status="success", data=data),

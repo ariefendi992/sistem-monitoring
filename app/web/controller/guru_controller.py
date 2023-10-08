@@ -93,7 +93,7 @@ def check_wali():
 @guru2.route("/")
 @login_required
 def index():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         sqlToday = day(
             sql=(
                 db.session.query(MengajarModel)
@@ -164,7 +164,7 @@ def index():
 @guru2.route("/profile")
 @login_required
 def profile_guru():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         baseJadwal = BaseModel(MengajarModel)
         mengajar = baseJadwal.get_all_filter_by(
             baseJadwal.model.hari_id.asc(), guru_id=current_user.id
@@ -199,7 +199,7 @@ def profile_guru():
 @guru2.route("/profile/<int:id>", methods=["GET", "POST"])
 @login_required
 def update_profile(id):
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         base = BaseModel(GuruModel)
         guru = base.get_one(user_id=id)
         form = FormGetProfileGuru(request.form)
@@ -240,7 +240,7 @@ def update_profile(id):
 @guru2.route("update-password", methods=["POST", "GET", "PUT"])
 @login_required
 def update_pswd():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         base = BaseModel(GuruModel)
         guru = base.get_one(user_id=current_user.id)
         form = FormUpdatePassword()
@@ -274,7 +274,7 @@ def update_pswd():
 @guru2.route("jadwal-mengajar")
 @login_required
 def jadwal_mengajar():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         # mengajar = base.get_all_filter_by(
         #     base.model.hari_id.asc(), guru_id=current_user.id
         # )
@@ -349,7 +349,7 @@ def jadwal_mengajar():
 @guru2.route("/absensi-pelajaran/<int:mengajar_id>", methods=["GET", "POST"])
 @login_required
 def absensi(mengajar_id):
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         form = AbsensiForm()
         """
             mengambil smua data pada tabel master mengajar dengan filter by mengajar id
@@ -544,7 +544,7 @@ def absensi(mengajar_id):
 @guru2.route("update-absensi/<int:mengajar_id>", methods=["GET", "POST"])
 @login_required
 def update_absen(mengajar_id):
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         data = {}
         """
         Mengambil semua data pada Tabel Mengajar
@@ -618,7 +618,7 @@ def update_absen(mengajar_id):
 @guru2.route("/daftar-hadir", methods=["GET", "POST"])
 @login_required
 def daftar_kehadiran():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         form = FormSelectKehadiranSiswa()
         data = dict()
 
@@ -723,7 +723,7 @@ def daftar_kehadiran():
 @guru2.route("/rekap-kehadiran", methods=["GET", "POST"])
 @login_required
 def rekap_kehadiran():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         data = {}
         form = FormSelectKehadiranSiswa()
         data["filename"] = "rekap-data"
@@ -826,7 +826,7 @@ def rekap_kehadiran():
 @guru2.route("data-kehadiran-siswa")
 @login_required
 def data_kehadiran():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         hari = today_()
         data = dict()
         mengajar_id = request.args.get("mengajar", type=int)
@@ -875,7 +875,7 @@ def data_kehadiran():
 @guru2.route("get-data-kehadiran")
 @login_required
 def get_data_kehadiran():
-    if current_user.group == "guru":
+    if current_user.group == "guru" and session["tipe_akun"] == "guru_mapel":
         today = datetime.date(datetime.today())
         data = dict()
         mengajar_id = request.args.get("mengajar", type=int)

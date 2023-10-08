@@ -27,15 +27,15 @@
         {% elif current_user.group == 'bk' %}
         (GURU BK)
         {% elif current_user.group == 'guru' %}
-        {% if sql_wali_ %}
+        {% if session.tipe_akun == 'wali_kelas' %}
         (WALI KELAS)
-        {% else %}
+        {% elif session.tipe_akun == 'guru_mapel' %}
         (GURU MAPEL)
         {% endif %}
         {% endif %}
       </a>
       <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        {% if current_user.group == 'guru' and wali_kelas %}
+        {# {% if current_user.group == 'guru' and wali_kelas %}
         <span class="dropdown-header dropdown-item">AKSES SEBAGAI</span>
         <div class="dropdown-divider"></div>
         <a href="{{ url_for('wali_kelas.index') }}" class="dropdown-item">
@@ -52,7 +52,7 @@
           Guru Mapel
         </a>
         <div class="dropdown-divider"></div>
-        {% endif %}
+        {% endif %} #}
         <span class="dropdown-header dropdown-item">ATUR PROFIL</span>
         <div class="dropdown-divider"></div>
         <!-- ADMIN -->
@@ -80,7 +80,7 @@
         </a>
 
         <!-- GURU -->
-        {% elif current_user.group == 'guru' %}
+        {% elif current_user.group == 'guru' and session.tipe_akun == 'guru_mapel' %}
         <a href="{{ url_for('guru2.profile_guru') }}" class="dropdown-item">
           <i class="fas fa-user-edit mr-1"></i>
           Ubah Data

@@ -11,6 +11,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy import func, and_
+from app.lib.base_model import BaseModel
 from app.lib.date_time import format_indo
 from app.lib.db_statement import DBStatement
 from app.lib.filters import hari_minggu, hari_sabtu
@@ -29,6 +30,7 @@ from app.models.master_model import (
     WaliKelasModel,
 )
 from app.models.user_details_model import GuruModel, SiswaModel
+from app.web.forms.form_guru import FormGetProfileGuru
 from app.web.forms.form_letter_report import FormRekapAbsenWali, FormSelectMapel
 from ...extensions import db
 
@@ -57,7 +59,11 @@ def sql_wali_():
 @wali_kelas.route("/index")
 @login_required
 def index():
-    if current_user.group == "guru" and sql_wali_():
+    if (
+        current_user.group == "guru"
+        and sql_wali_()
+        and session["tipe_akun"] == "wali_kelas"
+    ):
         count_siswa = SiswaModel.query.filter_by(kelas_id=sql_wali_().kelas_id).count()
         count_laki2 = SiswaModel.query.filter_by(
             kelas_id=sql_wali_().kelas_id, gender="laki-laki"
@@ -101,7 +107,11 @@ def index():
 @wali_kelas.route("data-siswa")
 @login_required
 def data_siswa():
-    if current_user.group == "guru" and sql_wali_():
+    if (
+        current_user.group == "guru"
+        and sql_wali_()
+        and session["tipe_akun"] == "wali_kelas"
+    ):
         sql_siswa = (
             db.session.query(SiswaModel)
             .filter(SiswaModel.kelas_id == sql_wali_().kelas_id)
@@ -125,7 +135,11 @@ def data_siswa():
 @wali_kelas.route("rekap-absen", methods=["GET", "POST"])
 @login_required
 def rekap_absen():
-    if current_user.group == "guru" and sql_wali_():
+    if (
+        current_user.group == "guru"
+        and sql_wali_()
+        and session["tipe_akun"] == "wali_kelas"
+    ):
         form = FormRekapAbsenWali()
         data = dict()
 
@@ -221,7 +235,11 @@ def rekap_absen():
 @wali_kelas.route("rekap-absen/mapel", methods=["GET", "POST"])
 @login_required
 def rekap_absen_mapel():
-    if current_user.group == "guru" and sql_wali_():
+    if (
+        current_user.group == "guru"
+        and sql_wali_()
+        and session["tipe_akun"] == "wali_kelas"
+    ):
         form = FormSelectMapel()
         data = dict()
 
@@ -325,7 +343,11 @@ def rekap_absen_mapel():
 @wali_kelas.route("pelanggaran-siswa")
 @login_required
 def get_pelanggaran_siswa():
-    if current_user.group == "guru" and sql_wali_():
+    if (
+        current_user.group == "guru"
+        and sql_wali_()
+        and session["tipe_akun"] == "wali_kelas"
+    ):
         id = request.args.get("id")
         detail_data = PelanggaranModel.query.filter_by(siswa_id=id).first()
         sql_jenisP = JenisPelanggaranModel2.query.all()
@@ -359,7 +381,11 @@ def get_pelanggaran_siswa():
 @wali_kelas.route("/jadwal-pelajaran-siswa")
 @login_required
 def get_jadwal_siswa():
-    if current_user.group == "guru" and sql_wali_():
+    if (
+        current_user.group == "guru"
+        and sql_wali_()
+        and session["tipe_akun"] == "wali_kelas"
+    ):
         sql_semester = SemesterModel.query.filter_by(is_active="1").first()
         sql_tahun_ajaran = TahunAjaranModel.query.filter_by(is_active="1").first()
 

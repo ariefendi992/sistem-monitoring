@@ -22,10 +22,11 @@ class FormLogin(FlaskForm):
     username = StringField("Nama Pengguna")
     password = PasswordField("Kata Sandi")
     level = SelectField(
-        "Nama Pengguna",
+        "Tipe Pengguna",
         choices=[
             ("", "- Pilih -"),
             ("admin", "Admin"),
+            ("wali", "Wali Kelas"),
             ("guru", "Guru Mata Pelajaran"),
             ("bk", "Guru BK"),
         ],

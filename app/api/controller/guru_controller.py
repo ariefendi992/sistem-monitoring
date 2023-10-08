@@ -544,6 +544,7 @@ def get_siswa_kelas():
 
                 siswa.append(
                     {
+                        "username": i.user.username,
                         "siswa_id": i.user_id,
                         "first_name": i.first_name.title(),
                         "last_name": i.last_name.title(),

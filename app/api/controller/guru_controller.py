@@ -170,6 +170,7 @@ def get_single_guru():
                     alamat=guru.alamat.title() if guru.alamat else None,
                     telp=guru.telp if guru.telp else None,
                     mapel=sql_guru_mapel.mapel.mapel.title(),
+                    tgl=format_indo(datetime.date(datetime.today())),
                 ),
                 HTTP_200_OK,
             )
@@ -255,6 +256,7 @@ def get_single_siswa():
             .join(MengajarModel)
             .filter(AbsensiModel.siswa_id == sql_siswa.user_id)
             .filter(MengajarModel.guru_id == guru_id)
+            .order_by(AbsensiModel.id.desc())
         )
 
         # print([i for i in sql_riwayat_absen])
@@ -340,10 +342,13 @@ def get_jadwal_harian():
         .filter(HariModel.hari == hari)
         .all()
     )
+
     data = []
     today = format_date_today(datetime.today())
     if sql_mengajar:
         for i in sql_mengajar:
+            sql_wali = WaliKelasModel.get_filter_by(kelas_id=i.kelas_id)
+            # print(sql_wali)
             data.append(
                 {
                     "id": i.id,
@@ -355,8 +360,10 @@ def get_jadwal_harian():
                     "jam_selesai": i.jam_selesai,
                     "semester": i.semester.semester.title(),
                     "kelas": i.kelas.kelas,
+                    "kelas_id": i.kelas_id,
                     "hari": i.hari.hari.title(),
                     "today": today,
+                    "wali_kelas": f"{sql_wali.guru.first_name.title()} {sql_wali.guru.last_name.title()}",
                 }
             )
 
@@ -512,20 +519,52 @@ def get_siswa_kelas():
 
     data = {}
     siswa = []
+
+    siswa_absen = (
+        db.session.query(AbsensiModel)
+        .join(SiswaModel)
+        .filter(
+            AbsensiModel.tgl_absen
+            == datetime.date(
+                datetime.today(),
+            )
+        )
+        .filter(SiswaModel.kelas_id == kelas_id)
+        .all()
+    )
+
+    # print(f"SISWA ADA ==> {siswa_absen}")
     if sql_wali:
         sql_siswa = db.session.query(SiswaModel).filter(
             SiswaModel.kelas_id == sql_wali.kelas_id
         )
         for i in sql_siswa:
-            siswa.append(
-                {
-                    "siswa_id": i.user_id,
-                    "first_name": i.first_name.title(),
-                    "last_name": i.last_name.title(),
-                    "kelas": i.kelas.kelas,
-                    "kelas_id": i.kelas_id,
-                }
-            )
+            if i.user_id not in [i.siswa.user_id for i in siswa_absen]:
+                # print(f"Ada ==> {i.first_name} {i.last_name}")
+
+                siswa.append(
+                    {
+                        "siswa_id": i.user_id,
+                        "first_name": i.first_name.title(),
+                        "last_name": i.last_name.title(),
+                        "foto": url_for(".static", filename=f"img/siswa/foto/{i.pic}")
+                        if i.pic
+                        else None,
+                        "kelas": i.kelas.kelas,
+                        "kelas_id": i.kelas_id,
+                    }
+                )
+
+            # else:
+            #     siswa.append(
+            #         {
+            #             "siswa_id": i.user_id,
+            #             "first_name": i.first_name.title(),
+            #             "last_name": i.last_name.title(),
+            #             "kelas": i.kelas.kelas,
+            #             "kelas_id": i.kelas_id,
+            #         }
+            #     )
 
         data.update(
             siswa=siswa,

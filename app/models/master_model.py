@@ -121,8 +121,8 @@ class WaliKelasModel(db.Model):
         return data
 
     @classmethod
-    def get_filter_by(cls, id: int):
-        return cls.query.filter_by(id=id).first()
+    def get_filter_by(cls, **data):
+        return cls.query.filter_by(**data).first()
 
 
 class JamMengajarModel(db.Model):

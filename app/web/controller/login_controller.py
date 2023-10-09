@@ -58,7 +58,11 @@ def index():
                 if is_safe_url(session["next"]):
                     return redirect(session["next"])
             else:
-                response = make_response(redirect(url_for("guru_bk.index")))
+                response = make_response(
+                    redirect(
+                        url_for("guru_bk.index"),
+                    ),
+                )
                 return response
 
     return redirect(url_for("auth2.login"))
@@ -185,9 +189,7 @@ def login():
                 )
 
     session["next"] = request.args.get("next")
-    print(session["next"])
     response = make_response(render_template("auth/login.html", form=form))
-
     return response
 
 

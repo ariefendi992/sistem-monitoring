@@ -49,14 +49,15 @@
                         </td>
                         <!-- AKSI -->
                         <td class="align-middle text-center" style="width: 120px;">
-                            <a href="{{ url_for('admin2.edit_semester',  id=_.id)}}" class="btn btn-warning btn-xs" title="Edit Data">
+                            <a href="{{ url_for('admin2.edit_semester',  id=_.id)}}" class="btn btn-warning btn-xs"
+                                title="Ubah Data">
                                 <i class="fas fa-pencil-alt"></i>
-                                Edit
+                                Ubah
                             </a>
-                            <button class="btn btn-danger btn-xs" title="Delete Data." data-toggle="modal"
+                            <button class="btn btn-danger btn-xs" title="Hapus Data." data-toggle="modal"
                                 data-target="#delete-{{_.id}}">
                                 <i class="fas fa-trash-alt"></i>
-                                Delete
+                                Hapus
                             </button>
                         </td>
                     </tr>
@@ -74,7 +75,7 @@
 <!-- Tempusdominus Bootstrap 4 -->
 <script
     src="{{ url_for('.static', filename='plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}">
-</script>
+    </script>
 <!-- DataTables  & Plugins -->
 <script src="{{ url_for('.static', filename='plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ url_for('.static', filename='plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>

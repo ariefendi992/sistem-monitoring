@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set filename = 'tambah-guru'  %}
+{% set filename = 'tambah-guru' %}
 {% block title %}Tambah Guru{% endblock %}
 
 {% block head %}
@@ -9,7 +9,7 @@
 {% block content %}
 <div class="card">
   <div class="card-header">
-    <h3 class="card-title fas fa-user-plus font-weight-bold text-lg">&nbsp;Form Tambah Data Guru</h3>
+    <h3 class="card-title fas fa-user-plus font-weight-bold text-lg">&nbsp;Form Tambah Data</h3>
     <div class="card-tools">
       <button type="button" class="btn btn-tool" data-card-widget="collapse">
         <i class="fas fa-minus"></i>
@@ -28,7 +28,8 @@
             <div class="form-group">
               {{ form.username.label}}
               {% if form.username.errors %}
-              {{ form.username(class="form-control form-control-sm is-invalid", placeholder="NIP" ,aria_invalid="true")}}
+              {{ form.username(class="form-control form-control-sm is-invalid", placeholder="NIP"
+              ,aria_invalid="true")}}
               {% for msg in form.username.errors %}
               <span class="error invalid-feedback">{{ msg }}</span>
               {% endfor %}
@@ -44,7 +45,8 @@
             <div class="form-group">
               {{ form.password.label}}
               {% if form.password.errors %}
-              {{ form.password(class="form-control form-control-sm is-invalid", placeholder="Password" ,aria_invalid="true")}}
+              {{ form.password(class="form-control form-control-sm is-invalid", placeholder="Password"
+              ,aria_invalid="true")}}
               {% for msg in form.password.errors %}
               <span class="error invalid-feedback">{{ msg }}</span>
               {% endfor %}
@@ -72,7 +74,8 @@
             <div class="form-group">
               {{ form.fullname.label}}
               {% if form.fullname.errors %}
-              {{ form.fullname(class="form-control form-control-sm is-invalid", placeholder="Nama Lengkap", aria_invalid="true")}}
+              {{ form.fullname(class="form-control form-control-sm is-invalid", placeholder="Nama Lengkap",
+              aria_invalid="true")}}
               {% for msg in form.fullname.errors %}
               <span class="error invalid-feedback">{{msg}}</span>
               {% endfor %}
@@ -111,7 +114,8 @@
               {% elif form.agama.data %}
               {{ form.agama(class="form-control form-control-sm", aria_invalid="false")}}
               {% else %}
-              {{ form.agama(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",  onchange='this.size=0;', onblur="this.size=0;")}}
+              {{ form.agama(class="form-control form-control-sm", onmousedown="if(this.options.length>6){this.size=6;}",
+              onchange='this.size=0;', onblur="this.size=0;")}}
               {% endif %}
             </div>
           </div>
@@ -119,7 +123,8 @@
             <div class="form-group">
               {{ form.alamat.label}}
               {% if form.alamat.errors %}
-              {{ form.alamat(class="form-control form-control-sm is-invalid", placeholder="Nama Lengkap", aria_invalid="true")}}
+              {{ form.alamat(class="form-control form-control-sm is-invalid", placeholder="Nama Lengkap",
+              aria_invalid="true")}}
               {% for msg in form.alamat.errors %}
               <span class="error invalid-feedback">{{msg}}</span>
               {% endfor %}
@@ -136,7 +141,8 @@
             <div class="form-group">
               {{ form.telp.label}}
               {% if form.telp.errors %}
-              {{ form.telp(class="form-control form-control-sm is-invalid", placeholder="Nama Lengkap", aria_invalid="true")}}
+              {{ form.telp(class="form-control form-control-sm is-invalid", placeholder="Nama Lengkap",
+              aria_invalid="true")}}
               {% for msg in form.telp.errors %}
               <span class="error invalid-feedback">{{msg}}</span>
               {% endfor %}

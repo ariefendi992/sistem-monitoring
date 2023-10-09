@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set filename = 'edit-ajaran'  %}
+{% set filename = 'edit-ajaran' %}
 {% block title %}Edit Tahun Ajaran{% endblock %}
 
 {% block head %}
@@ -9,7 +9,7 @@
 {% block content %}
 <div class="card">
   <div class="card-header">
-    <h3 class="card-title font-weight-bold text-lg">&nbsp;Form Edit Data Tahun Ajaran</h3>
+    <h3 class="card-title font-weight-bold text-lg">&nbsp;Ubah Data</h3>
     <div class="card-tools">
       <button type="button" class="btn btn-tool" data-card-widget="collapse">
         <i class="fas fa-minus"></i>
@@ -25,7 +25,8 @@
             <div class="form-group">
               {{ form.tahunAjaran.label}}
               {% if form.tahunAjaran.errors %}
-              {{ form.tahunAjaran(class="form-control form-control-sm is-invalid", placeholder="Tahun Ajaran. Ex.(2020-2021)" ,aria_invalid="true")}}
+              {{ form.tahunAjaran(class="form-control form-control-sm is-invalid", placeholder="Tahun Ajaran.
+              Ex.(2020-2021)" ,aria_invalid="true")}}
               {% for msg in form.tahunAjaran.errors %}
               <span class="error invalid-feedback">{{ msg }}</span>
               {% endfor %}

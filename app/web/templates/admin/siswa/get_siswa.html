@@ -74,7 +74,7 @@
                 {% else %}
                 <a href="{{ url_for('admin2.generate_qc', id=i.id) }}" class="btn btn-xs btn-primary">
                   <i class="fas fa-qrcode"></i>
-                  Generate
+                  Buat QR
                 </a>
                 {% endif %}
               </td>
@@ -98,13 +98,13 @@
                 <span>|</span>
                 <a href="{{ url_for('proses.generate_idcard', siswa=i.id)}}"
                   class="btn btn-outline-info btn-xs border-0 {{'disabled' if i.id_card != None else None}}"
-                  data-tooltip="tooltip" title="Generate Kartu Pelajar">
+                  data-tooltip="tooltip" title="Buat Kartu Pelajar">
                   <i class="fas fa-id-card"></i>
                 </a>
                 {% endif %}
                 {% else %}
                 <button class="btn btn-outline-warning btn-xs" data-toggle="modal" data-target="#upload-{{i.id}}">
-                  <i class="fas fa-upload"></i> Upload
+                  <i class="fas fa-upload"></i> Unggah
                 </button>
 
                 {% endif %}

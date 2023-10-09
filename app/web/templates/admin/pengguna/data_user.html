@@ -31,11 +31,11 @@
       <thead>
         <tr>
           <th>NO</th>
-          <th class="text-center">Username</th>
-          <th class="text-center">Group</th>
+          <th class="text-center">Nama Pengguna</th>
+          <th class="text-center">Tpen Akun</th>
           <th class="text-center">Taggal Buat</th>
-          <th class="text-center">Last Update</th>
-          <th class="text-center">Las Login</th>
+          <th class="text-center">Tanggal Ubah</th>
+          <th class="text-center">Terakhir Masuk</th>
           <th class="text-center" style="width: 70px;">Aksi</th>
         </tr>
       </thead>
@@ -54,8 +54,8 @@
               title="{{'Aktifkan' if _.is_active == '0' else 'Non-Aktifkan'}}">
               <i class="fas fa-{{'user' if _.is_active == '1' else 'user-slash'}}"></i>
             </a>
-            <button class="btn btn-xs btn-outline-warning" title="Ubah Password" data-toggle="modal"
-              data-tooltip="tooltip" title="Ubah Password" data-target="#modal-user-{{_.id}}">
+            <button class="btn btn-xs btn-outline-warning" title="Ubah Kata Sandi" data-toggle="modal"
+              data-tooltip="tooltip" data-target="#modal-user-{{_.id}}">
               <i class="fas fa-sync"></i>
             </button>
           </td>

@@ -55,7 +55,7 @@
           {{ form.username.label(class="mb-1")}}
           <div class="input-group mb-1">
             {% if form.username.errors %}
-            {{ form.username(class="form-control is-invalid", aria_invalid=true, placeholder="[Masukkan Username
+            {{ form.username(class="form-control is-invalid", aria_invalid=true, placeholder="[Masukkan Nama Pengguna
             Anda]")}}
             <div class="input-group-append">
               <div class="input-group-text">
@@ -66,14 +66,14 @@
             <span class="error invalid-feedback">{{msg}}</span>
             {% endfor %}
             {% elif form.username.data %}
-            {{ form.username(class="form-control", aria_invalid=false, placeholder="[Masukkan Username Anda]")}}
+            {{ form.username(class="form-control", aria_invalid=false, placeholder="[Masukkan Nama Pengguna Anda]")}}
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
               </div>
             </div>
             {% else %}
-            {{ form.username(class="form-control", placeholder="[Masukkan Username Anda]")}}
+            {{ form.username(class="form-control", placeholder="[Masukkan Nama Pengguna Anda]")}}
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>

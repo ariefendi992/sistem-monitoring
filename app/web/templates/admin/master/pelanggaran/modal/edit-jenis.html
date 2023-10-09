@@ -2,7 +2,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Update Jenis Pelanggaran</h4>
+        <h4 class="modal-title">Ubah Data</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -15,7 +15,7 @@
             <select name="kategori" id="" class="form-control form-control-sm">
               <option value="">- Pilih -</option>
               {% for key in sql_kategori %}
-              <option value="{{ key.id }}" {{ 'selected' if key.id == i.kategori_pelanggaran_id else '' }}>
+              <option value="{{ key.id }}" {{ 'selected' if key.id==i.kategori_pelanggaran_id else '' }}>
                 {{ key.kategori }}
               </option>
               {% endfor %}

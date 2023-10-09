@@ -2,7 +2,7 @@
   <div class="modal-dialog overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title fas fa-image">&nbsp;Upload Photo</h4>
+        <h4 class="modal-title fas fa-image">&nbsp;Unggah Foto</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -10,18 +10,18 @@
       <form method="post" action="{{ url_for('admin2.upload_foto', id=i.id) }}" enctype="multipart/form-data">
         <div class="modal-body">
           <div class="form-group row">
-            <label for="exampleInputFile" class="col-sm-2 col-form-label">Images</label>
+            <label for="exampleInputFile" class="col-sm-2 col-form-label">Foto</label>
             <div class="input-group col-sm-10 ">
               <div class="custom-file">
                 <input type="file" name="file" class="custom-file-input">
-                <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                <label class="custom-file-label" for="exampleInputFile">Pilih Berkas</label>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer justify-content-end">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Upload</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+          <button type="submit" class="btn btn-primary">Unggah</button>
         </div>
       </form>
     </div>

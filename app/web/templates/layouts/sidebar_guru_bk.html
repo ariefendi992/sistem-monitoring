@@ -61,13 +61,13 @@
             <p>Data Pembinaan</p>
           </a>
         </li>
-        <li class="nav-item">
+        {# <li class="nav-item">
           <a href="{{ url_for('guru_bk.get_tata_tertib') }}"
             class="nav-link {{ 'active' if filename=='tata-tertib' else ''}}">
             <i class="nav-icon fas fa-layer-group"></i>
             <p>Tata Tertib</p>
           </a>
-        </li>
+        </li> #}
         <li class="nav-item">
           <a href="{{ url_for('guru_bk.laporan_kehadiran')}}"
             class="nav-link {{ 'active' if filename == 'rekap-bulan' else none }}"><i

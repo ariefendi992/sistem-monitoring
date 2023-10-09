@@ -603,6 +603,20 @@ def absen_siswa_guru_mapel():
     mapel_id = request.json.get("mapel_id")
     ket = request.json.get("keterangan")
 
+    sql_jadwal = (
+        db.session.query(MengajarModel).filter(MengajarModel.id == mengajar_id).first()
+    )
+
+    now = datetime.now().time()
+    jam_mulai = time(
+        int(sql_jadwal.jam_mulai.split(":")[0]),
+        minute=int(sql_jadwal.jam_mulai.split(":")[1]),
+    )
+    jam_selesai = time(
+        int(sql_jadwal.jam_selesai.split(":")[0]),
+        minute=int(sql_jadwal.jam_selesai.split(":")[1]),
+    )
+
     sql_pertemuan = (
         db.session.query(AbsensiModel)
         .filter(AbsensiModel.mengajar_id == mengajar_id)
@@ -640,6 +654,12 @@ def absen_siswa_guru_mapel():
             #     )
             # )
             # base.create()
+
+            if (now >= jam_mulai) and (now >= jam_selesai):
+                return (
+                    jsonify(status="Gagal", msg="Telah melewati batas waktu absen!"),
+                    HTTP_400_BAD_REQUEST,
+                )
             absen = AbsensiModel(
                 mengajar_id=mengajar_id,
                 siswa_id=siswa_id,

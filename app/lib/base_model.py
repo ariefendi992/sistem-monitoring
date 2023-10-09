@@ -1,11 +1,10 @@
 from app.extensions import db
 from flask import jsonify
-from typing import Optional
-from flask_sqlalchemy import Model
+from typing import Optional, Any
 
 
 class BaseModel:
-    def __init__(self, model: Optional[Model]) -> None:
+    def __init__(self, model: Any | None) -> None:
         self.model = model
 
     def create(self):

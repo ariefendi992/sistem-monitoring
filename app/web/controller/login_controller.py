@@ -62,6 +62,7 @@ def index():
                     else:
                         response = make_response(redirect(url_for("wali_kelas.index")))
                         return response
+            return redirect(url_for("auth2.login"))
         elif current_user.group == "bk":
             if "next" in session and session["next"]:
                 if is_safe_url(session["next"]):

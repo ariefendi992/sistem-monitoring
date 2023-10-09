@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 from flask import Blueprint, jsonify, request, url_for
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from sqlalchemy import and_
@@ -349,23 +349,47 @@ def get_jadwal_harian():
         for i in sql_mengajar:
             sql_wali = WaliKelasModel.get_filter_by(kelas_id=i.kelas_id)
             # print(sql_wali)
-            data.append(
-                {
-                    "id": i.id,
-                    "first_name": i.guru.first_name.title(),
-                    "last_name": i.guru.last_name.title(),
-                    "kode_mengajar": i.kode_mengajar,
-                    "mapel": i.mapel.mapel.title(),
-                    "jam_mulai": i.jam_mulai,
-                    "jam_selesai": i.jam_selesai,
-                    "semester": i.semester.semester.title(),
-                    "kelas": i.kelas.kelas,
-                    "kelas_id": i.kelas_id,
-                    "hari": i.hari.hari.title(),
-                    "today": today,
-                    "wali_kelas": f"{sql_wali.guru.first_name.title()} {sql_wali.guru.last_name.title()}",
-                }
-            )
+
+            # if (
+            #     time(
+            #         int(i.jam_mulai.split(":")[0]),
+            #         minute=int(i.jam_mulai.split(":")[1]),
+            #     )
+            #     <= datetime.today().time()
+            # ):
+            #     data = []
+            # else:
+
+            if (
+                datetime.today().time()
+                >= time(
+                    hour=int(i.jam_mulai.split(":")[0]),
+                    minute=int(i.jam_mulai.split(":")[1]),
+                )
+            ) and (
+                datetime.today().time()
+                <= time(
+                    int(i.jam_selesai.split(":")[0]),
+                    minute=int(i.jam_selesai.split(":")[1]),
+                )
+            ):
+                data.append(
+                    {
+                        "id": i.id,
+                        "first_name": i.guru.first_name.title(),
+                        "last_name": i.guru.last_name.title(),
+                        "kode_mengajar": i.kode_mengajar,
+                        "mapel": i.mapel.mapel.title(),
+                        "jam_mulai": i.jam_mulai,
+                        "jam_selesai": i.jam_selesai,
+                        "semester": i.semester.semester.title(),
+                        "kelas": i.kelas.kelas,
+                        "kelas_id": i.kelas_id,
+                        "hari": i.hari.hari.title(),
+                        "today": today,
+                        "wali_kelas": f"{sql_wali.guru.first_name.title()} {sql_wali.guru.last_name.title()}",
+                    }
+                )
 
         return jsonify(data=data), HTTP_200_OK
 

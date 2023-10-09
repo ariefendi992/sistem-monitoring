@@ -87,20 +87,21 @@ def login():
                 response = make_response(redirect(url_for("admin2.index")))
                 return response
         elif current_user.group == "guru":
-            if session["tipe_akun"] == "guru_mapel":
-                if "next" in session and session["next"]:
-                    if is_safe_url(session["next"]):
-                        return redirect(session["next"])
-                else:
-                    response = make_response(redirect(url_for("guru2.index")))
-                    return response
-            if session["tipe_akun"] == "wali_kelas":
-                if "next" in session and session["next"]:
-                    if is_safe_url(session["next"]):
-                        return redirect(session["next"])
-                else:
-                    response = make_response(redirect(url_for("wali_kelas.index")))
-                    return response
+            if "tipe_akun" in session:
+                if session["tipe_akun"] == "guru_mapel":
+                    if "next" in session and session["next"]:
+                        if is_safe_url(session["next"]):
+                            return redirect(session["next"])
+                    else:
+                        response = make_response(redirect(url_for("guru2.index")))
+                        return response
+                if session["tipe_akun"] == "wali_kelas":
+                    if "next" in session and session["next"]:
+                        if is_safe_url(session["next"]):
+                            return redirect(session["next"])
+                    else:
+                        response = make_response(redirect(url_for("wali_kelas.index")))
+                        return response
 
         elif current_user.group == "bk":
             if "next" in session and session["next"]:
@@ -169,49 +170,64 @@ def login():
                         sql_guru = GuruModel.query.filter_by(
                             user_id=current_user.id
                         ).first()
-                        session["first_name"] = sql_guru.first_name.upper()
-                        session["last_name"] = sql_guru.last_name.upper()
-                        session["tipe_akun"] = "guru_mapel"
 
-                        sql_user.user_last_login = utc_makassar()
-
-                        db.session.commit()
-
-                        flash(
-                            message=f"Login Sukses...\\nHi.. {sql_guru.first_name} {sql_guru.last_name} Selamat Datang Di Sistem E-Monitoring.",
-                            category="success",
-                        )
-
-                        if "next" in session and session["next"]:
-                            if is_safe_url(session["next"]):
-                                return redirect(session["next"])
+                        if not sql_guru:
+                            flash(
+                                "Login gagal...\\nSilahkan periksa kembali akun anda.",
+                                "error",
+                            )
                         else:
-                            response = make_response(redirect(url_for("guru2.index")))
-                            return response
+                            session["first_name"] = sql_guru.first_name.upper()
+                            session["last_name"] = sql_guru.last_name.upper()
+                            session["tipe_akun"] = "guru_mapel"
+
+                            sql_user.user_last_login = utc_makassar()
+
+                            db.session.commit()
+
+                            flash(
+                                message=f"Login Sukses...\\nHi.. {sql_guru.first_name} {sql_guru.last_name} Selamat Datang Di Sistem E-Monitoring.",
+                                category="success",
+                            )
+
+                            if "next" in session and session["next"]:
+                                if is_safe_url(session["next"]):
+                                    return redirect(session["next"])
+                            else:
+                                response = make_response(
+                                    redirect(url_for("guru2.index"))
+                                )
+                                return response
 
                     elif level == "wali":
                         sql_wali = WaliKelasModel.get_filter_by(guru_id=sql_user.id)
-                        session["first_name"] = sql_wali.guru.first_name.upper()
-                        session["last_name"] = sql_wali.guru.last_name.upper()
-                        session["tipe_akun"] = "wali_kelas"
-
-                        sql_user.user_last_login = utc_makassar()
-
-                        db.session.commit()
-
-                        flash(
-                            message=f"Login Sukses...\\nHi.. {sql_wali.guru.first_name} {sql_wali.guru.last_name} Selamat Datang Di Sistem E-Monitoring.",
-                            category="success",
-                        )
-
-                        if "next" in session and session["next"]:
-                            if is_safe_url(session["next"]):
-                                return redirect(session["next"])
-                        else:
-                            response = make_response(
-                                redirect(url_for("wali_kelas.index"))
+                        if not sql_wali:
+                            flash(
+                                "Login gagal...\\nSilahkan periksa kembali akun anda.",
+                                "error",
                             )
-                            return response
+                        else:
+                            session["first_name"] = sql_wali.guru.first_name.upper()
+                            session["last_name"] = sql_wali.guru.last_name.upper()
+                            session["tipe_akun"] = "wali_kelas"
+
+                            sql_user.user_last_login = utc_makassar()
+
+                            db.session.commit()
+
+                            flash(
+                                message=f"Login Sukses...\\nHi.. {sql_wali.guru.first_name} {sql_wali.guru.last_name} Selamat Datang Di Sistem E-Monitoring.",
+                                category="success",
+                            )
+
+                            if "next" in session and session["next"]:
+                                if is_safe_url(session["next"]):
+                                    return redirect(session["next"])
+                            else:
+                                response = make_response(
+                                    redirect(url_for("wali_kelas.index"))
+                                )
+                                return response
 
                 elif (
                     sql_user.group == "bk"

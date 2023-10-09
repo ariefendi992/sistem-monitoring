@@ -348,17 +348,6 @@ def get_jadwal_harian():
     if sql_mengajar:
         for i in sql_mengajar:
             sql_wali = WaliKelasModel.get_filter_by(kelas_id=i.kelas_id)
-            # print(sql_wali)
-
-            # if (
-            #     time(
-            #         int(i.jam_mulai.split(":")[0]),
-            #         minute=int(i.jam_mulai.split(":")[1]),
-            #     )
-            #     <= datetime.today().time()
-            # ):
-            #     data = []
-            # else:
 
             if (
                 datetime.today().time()

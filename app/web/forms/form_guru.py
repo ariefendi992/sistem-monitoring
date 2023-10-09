@@ -29,7 +29,7 @@ class FormAddGuru(FlaskForm):
     )
     alamat = StringField(label="Alamat")
     telp = StringField(label="No. Telp")
-    submit = SubmitField(label="Submit Data")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_username(self, field):
         if field.data == "":
@@ -76,7 +76,7 @@ class FormEditGuru(FlaskForm):
     )
     alamat = StringField("Alamat")
     telp = StringField("Telp")
-    submit = SubmitField("Save Changes")
+    submit = SubmitField("Perbaharui Data")
 
 
 class FormGetProfileGuru(FlaskForm):
@@ -103,9 +103,9 @@ class FormGetProfileGuru(FlaskForm):
     )
     alamat = StringField("Alamat")
     telp = StringField("Telp")
-    submit = SubmitField("Submit Data")
-    submit2 = SubmitField("Ubah Data")
-    cancel = SubmitField("Cancel")
+    submit = SubmitField("Tambah Data")
+    submit2 = SubmitField("Perbaharui Data")
+    cancel = SubmitField("Batal")
 
 
 class FormUpdatePassword(FlaskForm):

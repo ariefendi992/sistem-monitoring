@@ -35,7 +35,7 @@ class FormAddSiswa(FlaskForm):
     telp = StringField(label="No. Telp")
     alamat = StringField(label="Alamat")
     kelas = SelectField(label="Kelas")
-    submit = SubmitField(label="Submit Data")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_username(self, field):
         if len(field.data) == 0:
@@ -92,4 +92,4 @@ class FormEditSiswa(FlaskForm):
     alamat = StringField("Alamat")
     namaOrtu = StringField("Nama Orang Tua/Wali")
     telp = StringField("No. Telp")
-    submit = SubmitField("Submit")
+    submit = SubmitField("Perbaharui Data")

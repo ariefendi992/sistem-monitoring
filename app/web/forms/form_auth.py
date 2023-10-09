@@ -8,21 +8,21 @@ class FormEditStatus(FlaskForm):
 
 
 class FormEditPassword(FlaskForm):
-    kataSandi = PasswordField("Password")
-    submit = SubmitField("Save Changes")
+    kataSandi = PasswordField("Kata Sandi")
+    submit = SubmitField("Perbaharui Data")
 
     def validate_kataSandi(self, field):
         if field.data == None:
-            raise ValidationError("*Password tidak boleh kosong.")
+            raise ValidationError("*Kata sandi tidak boleh kosong.")
         elif len(field.data) < 6:
-            raise ValidationError("*Password minimal 6 karakter.")
+            raise ValidationError("*Kata sandi minimal 6 karakter.")
 
 
 class FormLogin(FlaskForm):
     username = StringField("Nama Pengguna")
     password = PasswordField("Kata Sandi")
     level = SelectField(
-        "Level Pengguna",
+        "Nama Pengguna",
         choices=[
             ("", "- Pilih -"),
             ("admin", "Admin"),
@@ -35,14 +35,14 @@ class FormLogin(FlaskForm):
 
     def validate_username(self, field):
         if field.data == "":
-            raise ValidationError("*Username harap di isi!")
+            raise ValidationError("*Nama pengguna harap di isi!")
 
     def validate_password(self, field):
         if len(field.data) < 6 and len(field.data) > 0:
             raise ValidationError("*Jumlah karakter minimal 6 digit!")
         elif field.data == "":
-            raise ValidationError("*Form Kata Sandi Tidak Boleh Kosong!")
+            raise ValidationError("*Kata Sandi Tidak Boleh Kosong!")
 
     def validate_level(self, field):
         if field.data == "":
-            raise ValidationError("*Pilih Level Pengguna Terlebih dahulu!")
+            raise ValidationError("*Pilih Tipe Pengguna Terlebih dahulu!")

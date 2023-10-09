@@ -47,7 +47,7 @@ class FormEditPelanggar(FlaskForm):
         label="Pilih Jenis Pelanggaran", choices=[("", "- Pilih -")]
     )
     keterangan = TextAreaField(label="Keterangan")
-    submit = SubmitField(label="Submit")
+    submit = SubmitField(label="Perbaharui Data")
 
 
 class FormJenisPelanggaran(FlaskForm):
@@ -56,7 +56,7 @@ class FormJenisPelanggaran(FlaskForm):
         label="Status",
         choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
     )
-    submit = SubmitField(label="Submit")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_jenisPelanggaran(self, field):
         if field.data == "":
@@ -78,7 +78,7 @@ class FormEditJenisPelanggaran(FlaskForm):
         label="Status",
         choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
     )
-    submit = SubmitField(label="Submit")
+    submit = SubmitField(label="Perbaharui Data")
 
     # def validate_jenisPelanggaran(self, field):
     #     if field.data == "":
@@ -92,23 +92,22 @@ class FormEditJenisPelanggaran(FlaskForm):
 
 class FormTambahTTertib(FlaskForm):
     tataTertib = TextAreaField(label="Tata tertib")
-    submit = SubmitField(label="Submit")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_tataTertib(self, field: str) -> str:
         if field.data == "":
             raise ValidationError("*Form tata-tertib wajib  diisi!")
 
         data = TataTertibModel.query.filter_by(tata_tertib=field.data).first()
-        
-        if data:
-            raise ValidationError('*Data tata tertib sudah ada.')
 
-        
+        if data:
+            raise ValidationError("*Data tata tertib sudah ada.")
+
 
 class FormEditTTertib(FlaskForm):
     pilihTTertib = SelectField(label="Pilih Tata Tertib", choices=[("", "- Pilih -")])
     tataTertib = TextAreaField(label="Tata tertib")
-    submit = SubmitField(label="Submit")
+    submit = SubmitField(label="Perbaharui Data")
 
     def validate_pilihTTertib(self, field: str) -> str:
         if field.data == "":
@@ -117,5 +116,3 @@ class FormEditTTertib(FlaskForm):
     def validate_tataTertib(self, field: str) -> str:
         if field.data == "":
             raise ValidationError("*Tata tertib tidak boleh kosong!")
-
-

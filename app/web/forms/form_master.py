@@ -5,7 +5,7 @@ from wtforms.validators import ValidationError
 
 class FormMapel(FlaskForm):
     mapel = StringField(label="Nama Mata Pelajaran")
-    submit = SubmitField(label="Submit Data")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_mapel(self, field):
         if len(field.data) == 0:
@@ -14,7 +14,7 @@ class FormMapel(FlaskForm):
 
 class FormEditMapel(FlaskForm):
     mapel = StringField(label="Nama Mata Pelajaran")
-    submit = SubmitField(label="Submit Data")
+    submit = SubmitField(label="Perbaharui Data")
 
     # def validate_mapel(self, field):
     #     if len(field.data) == 0:
@@ -30,7 +30,7 @@ class FormSemester(FlaskForm):
         label="Status",
         choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
     )
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
     def validate_semester(self, field):
         if field.data == "":
@@ -46,7 +46,7 @@ class FormEditSemester(FlaskForm):
         label="Status",
         choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
     )
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Perbaharui Data")
 
     def validate_status(self, field):
         if field.data == "":
@@ -59,7 +59,7 @@ class FormTahunAJaran(FlaskForm):
         label="Status",
         choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
     )
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
     def validate_tahunAjaran(self, field):
         if field.data == "":
@@ -72,7 +72,7 @@ class FormTahunAJaran(FlaskForm):
 
 class FormKelas(FlaskForm):
     kelas = StringField(label="Nama Kelas")
-    submit = SubmitField(label="Submit Data")
+    submit = SubmitField(label="Tambah Data Data")
 
     def validate_kelas(self, field):
         if field.data == "":
@@ -84,7 +84,7 @@ class FormEditKelas(FlaskForm):
     jumlahLaki = StringField(label="Laki-Laki")
     jumlahPerempuan = StringField(label="Perempuan")
     jumlahSiswa = StringField(label="Jumlah Siswa")
-    submit = SubmitField(label="Submit Data")
+    submit = SubmitField(label="Perbaharui Data")
 
     # def validate_kelas(self, field):
     #     if field.data == '':
@@ -105,7 +105,7 @@ class FormHari(FlaskForm):
             ("minggu", "Minggu"),
         ],
     )
-    submit = SubmitField(label="Submit Data")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_hari(self, field):
         if field.data == "":
@@ -114,7 +114,7 @@ class FormHari(FlaskForm):
 
 class FormJam(FlaskForm):
     jam = StringField("Jam")
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
     # def validate_jam(self, field):
     #     if field.data == '':
@@ -124,7 +124,7 @@ class FormJam(FlaskForm):
 class FormWaliKelas(FlaskForm):
     namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
     kelas = SelectField("Nama Kelas", choices=[("", "- Pilih -")])
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
     def validate_namaGuru(self, field):
         if field.data == "":
@@ -138,17 +138,17 @@ class FormWaliKelas(FlaskForm):
 class FormEditWaliKelas(FlaskForm):
     namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
     kelas = SelectField("Nama Kelas", choices=[("", "- Pilih -")])
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
 
 class FormEditGuruBK(FlaskForm):
     namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Perbaharui Data")
 
 
 class FormGuruBK(FlaskForm):
     namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
     def validate_namaGuru(self, field):
         if field.data == "":
@@ -161,7 +161,7 @@ class FormKepsek(FlaskForm):
     #     label="Status",
     #     choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
     # )
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
     def validate_namaGuru(self, field):
         if field.data == "":
@@ -170,8 +170,11 @@ class FormKepsek(FlaskForm):
 
 class FormKepsek(FlaskForm):
     namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
+    submit = SubmitField("Tambah Data")
 
-    submit = SubmitField("Submit Data")
+    def vaildate_namaGuru(self, field):
+        if field.data == "":
+            raise ValidationError("* Harap Pilih Nama Guru.")
 
 
 class FormEditKepsek(FlaskForm):
@@ -180,12 +183,12 @@ class FormEditKepsek(FlaskForm):
         label="Status",
         choices=[("", "- Pilih -"), ("1", "Aktif"), ("0", "Tidak Aktif")],
     )
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Perbaharui Data")
 
 
 class FormKategoriPelanggaran(FlaskForm):
     kategori = StringField(label="Nama Kategori")
-    submit = SubmitField(label="Submit")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_kategori(self, field):
         if field.data == "":
@@ -196,7 +199,7 @@ class FormJenisPelanggaran(FlaskForm):
     kategori = SelectField(label="Pilih Kategori", choices=[("", "- Pilih -")])
     jenis = StringField(label="Jenis Pelanggaran")
     poin = IntegerField(label="Jumlah Poin")
-    submit = SubmitField(label="Submit")
+    submit = SubmitField(label="Tambah Data")
 
     def validate_kategori(self, field):
         if field.data == "":

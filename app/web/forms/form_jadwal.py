@@ -18,7 +18,7 @@ class FormJadwalMengajar(FlaskForm):
     waktuMulai2 = StringField("Waktu Mulai")
     waktuSelesai2 = StringField("Waktu Selesai")
     jamKe = StringField("Jam-Ke")
-    submit = SubmitField("Submit Data")
+    submit = SubmitField("Tambah Data")
 
     def validate_namaGuru(self, field):
         if field.data == "":

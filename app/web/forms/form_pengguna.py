@@ -103,8 +103,8 @@ class FormEditAdmin(FlaskForm):
         validators=[DataRequired("* Telp/HP harus diisi.")],
         render_kw={"class": "form-control form-control-sm", "required": False},
     )
-    submit = SubmitField("Submit Data")
-    submit2 = SubmitField("Ubah Data")
+    submit = SubmitField("Tambah Data")
+    submit2 = SubmitField("Perbaharui Data")
     cancel = SubmitField("Batal")
 
     # def validate_username(self, field):

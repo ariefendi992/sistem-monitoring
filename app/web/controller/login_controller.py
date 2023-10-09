@@ -47,20 +47,21 @@ def index():
                 response = make_response(redirect(url_for("admin2.index")))
                 return response
         elif current_user.group == "guru":
-            if session["tipe_akun"] == "guru_mapel":
-                if "next" in session and session["next"]:
-                    if is_safe_url(session["next"]):
-                        return redirect(session["next"])
-                else:
-                    response = make_response(redirect(url_for("guru2.index")))
-                    return response
-            if session["tipe_akun"] == "wali_kelas":
-                if "next" in session and session["next"]:
-                    if is_safe_url(session["next"]):
-                        return redirect(session["next"])
-                else:
-                    response = make_response(redirect(url_for("wali_kelas.index")))
-                    return response
+            if "tipe_akun" in session:
+                if session["tipe_akun"] == "guru_mapel":
+                    if "next" in session and session["next"]:
+                        if is_safe_url(session["next"]):
+                            return redirect(session["next"])
+                    else:
+                        response = make_response(redirect(url_for("guru2.index")))
+                        return response
+                if session["tipe_akun"] == "wali_kelas":
+                    if "next" in session and session["next"]:
+                        if is_safe_url(session["next"]):
+                            return redirect(session["next"])
+                    else:
+                        response = make_response(redirect(url_for("wali_kelas.index")))
+                        return response
         elif current_user.group == "bk":
             if "next" in session and session["next"]:
                 if is_safe_url(session["next"]):

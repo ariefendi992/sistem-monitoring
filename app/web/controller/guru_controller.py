@@ -520,7 +520,7 @@ def absensi(mengajar_id):
                             "success",
                         )
             return redirect(
-                url_for("guru2.absensi", mengajar_id=data_mengajar["mengajar_id"])
+                url_for("guru2.data_kehadiran", mengajar=data_mengajar["mengajar_id"])
             )
 
         user = dbs.get_one(GuruModel, user_id=current_user.id)

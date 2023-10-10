@@ -94,7 +94,7 @@ class PelanggaranModel(db.Model):
         self.status = status
 
     def __repr__(self):
-        return f"{self.id}"
+        return f"{self.siswa.first_name.title()} {self.siswa.last_name.title()}"
 
 
 class JenisPelanggaranModel2(db.Model):

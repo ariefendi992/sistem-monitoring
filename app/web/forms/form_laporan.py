@@ -16,4 +16,8 @@ class FormLaporanPelanggaran(FlaskForm):
         render_kw=attr,
     )
 
-    siswa = QuerySelectField("Nama Siswa", allow_blank=True, blank_text="- Pilih -")
+    siswa = QuerySelectField(
+        "Nama Siswa",
+        allow_blank=True,
+        blank_text="- Pilih -",
+    )

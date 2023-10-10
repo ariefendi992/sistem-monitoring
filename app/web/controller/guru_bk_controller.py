@@ -783,24 +783,32 @@ def laporan_pelanggaran():
         form = FormLaporanPelanggaran()
 
         if form.kelas.data:
-            form.siswa.query = SiswaModel.query.filter_by(
-                kelas_id=form.kelas.data.id
-            ).all()
+            # form.siswa.query = SiswaModel.query.filter_by(
+            #     kelas_id=form.kelas.data.id
+            # ).all()
+            form.siswa.query = (
+                db.session.query(PelanggaranModel)
+                .join(SiswaModel)
+                .filter(PelanggaranModel.siswa_id == SiswaModel.user_id)
+                .filter(SiswaModel.kelas_id == form.kelas.data.id)
+                .group_by(PelanggaranModel.siswa_id)
+                .all()
+            )
         else:
             form.siswa.query = SiswaModel.query.filter(None).all()
 
         sql_pelanggaran = (
             PelanggaranModel.query.filter_by(
-                siswa_id=form.siswa.data.user_id if form.siswa.data else None
+                siswa_id=form.siswa.data.siswa.user_id if form.siswa.data else None
             )
             # .group_by(PelanggaranModel.siswa_id)
         )
         sql_wali = WaliKelasModel.query.filter_by(
-            kelas_id=form.siswa.data.kelas_id if form.siswa.data else None
+            kelas_id=form.siswa.data.siswa.kelas_id if form.siswa.data else None
         ).first()
 
         count_pembinaan = PembinaanModel.query.filter_by(
-            siswa_id=form.siswa.data.user_id if form.siswa.data else None
+            siswa_id=form.siswa.data.siswa.user_id if form.siswa.data else None
         ).count()
 
         if form.validate_on_submit():
@@ -843,7 +851,19 @@ def laporan_pelanggaran():
 def get_siswa():
     if current_user.group == "bk":
         kelas_id = request.args.get("kelas")
-        sql_siswa = SiswaModel.query.filter_by(kelas_id=kelas_id).all()
+        # sql_siswa = SiswaModel.query.filter_by(kelas_id=kelas_id).all()
+        sql_siswa = (
+            db.session.query(PelanggaranModel)
+            .join(SiswaModel)
+            .filter(
+                and_(
+                    SiswaModel.kelas_id == kelas_id,
+                    PelanggaranModel.siswa_id == SiswaModel.user_id,
+                )
+            )
+            .group_by(PelanggaranModel.siswa_id)
+            .all()
+        )
 
         user = dbs.get_one(GuruModel, user_id=current_user.id)
         session.update(

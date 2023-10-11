@@ -232,8 +232,6 @@ def create():
     password = request.json.get("password")
     group = request.json.get("group")
 
-    db.session.add()
-
     hash_pswd = generate_password_hash(password=password)
     user = BaseModel(
         UserModel(

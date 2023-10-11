@@ -1,5 +1,3 @@
-import os
-import click
 from flask import Flask
 from .extensions import jwt
 from app.api.register_app import register_app
@@ -54,18 +52,5 @@ def extended_ext(app):
     migrate.init_app(app, db)
     jwt.init_app(app)
     login_manager.init_app(app)
-
-
-# def loginManager(app):
-#     from app.extensions import login_manager
-
-#     login_manager.init_app(app)
-#     login_manager.session_protection = "strong"
-#     login_manager.login_view = "auth2.login"
-#     login_manager.login_message = (
-#         f"Ma'af...!!!\\nSilahkan Login Untuk Mengakses Halaman Ini."
-#     )
-#     login_manager.login_message_category = "warning"
-
 
 app = create_app()

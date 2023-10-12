@@ -560,7 +560,32 @@ class PenggunaSiswa:
     @login_required
     def id_card_siswa():
         if current_user.group == "admin":
-            sql_siswa = dbs.get_all(SiswaModel)
+            sql_siswa = (
+                db.session.query(SiswaModel)
+                .join(KelasModel)
+                .order_by(KelasModel.kelas.asc())
+                .order_by(SiswaModel.first_name.asc())
+                .all()
+            )
+            path = os.getcwd() + "/app/api/static/img/siswa/id_card/"
+            list_dir = os.listdir(path)
+
+            for i in sql_siswa:
+                if i.id_card and i.id_card not in list_dir:
+                    sql_update = SiswaModel.get_filter_by(id=i.id)
+                    sql_update.id_card = None
+                    db.session.commit()
+
+                # data.append(
+                #     dict(
+                #         id=i.id,
+                #         user_id=i.user_id,
+                #         first_name=i.first_name,
+                #         last_name=i.last_name,
+                #         id_card=i.id_card,
+                #     )
+                # )
+
             render = render_template("admin/siswa/id_card.html", data=sql_siswa)
             response = make_response(render)
             return response

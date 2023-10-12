@@ -91,6 +91,13 @@ class SiswaModel(db.Model):
     def __repr__(self):
         return f"{self.first_name.title()} {self.last_name.title()}"
 
+    @classmethod
+    def get_filter_by(cls, **filter):
+        return cls.query.filter_by(**filter).first()
+
+    def commit():
+        db.session.commit()
+
 
 class GuruModel(db.Model):
     __tablename__ = "detail_guru"

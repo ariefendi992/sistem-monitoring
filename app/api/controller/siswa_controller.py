@@ -71,12 +71,18 @@ def get():
     data = []
     path_file = os.getcwd() + "/app/api/static/img/siswa/"
     list_file = os.listdir(path_file + "foto/")
+    list_id_card = os.listdir(path_file + "id_card/")
     list_qr_file = os.listdir(path_file + "qr_code/")
 
     for user in model:
         if user.pic and user.pic not in list_file:
             sql_siswa = SiswaModel.query.filter_by(id=user.id).first()
             sql_siswa.pic = None
+            db.session.commit()
+
+        if user.id_card and user.id_card not in list_id_card:
+            sql_siswa = SiswaModel.get_filter_by(id=user.id)
+            sql_siswa.id_card = None
             db.session.commit()
 
         if user.qr_code and user.qr_code not in list_qr_file:
@@ -824,6 +830,7 @@ def check_password():
                 jsonify(msg="Kata sandi tidak valid, silahkan periksa kembali!"),
                 HTTP_403_FORBIDDEN,
             )
+
 
 @siswa.route("/update-password", methods=["GET", "PUT"])
 @jwt_required()

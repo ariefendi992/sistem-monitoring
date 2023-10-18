@@ -140,7 +140,7 @@ class JamMengajarModel(db.Model):
 class MengajarModel(db.Model):
     __tablename__ = "master_jadwal_mengajar"
     id = sa.Column(sa.Integer, primary_key=True)
-    kode_mengajar = sa.Column(sa.String(32), nullable=False)
+    kode_mengajar = sa.Column(sa.String(32), nullable=True)
     guru_id = sa.Column(
         sa.Integer,
         sa.ForeignKey("detail_guru.user_id", ondelete="CASCADE", onupdate="CASCADE"),

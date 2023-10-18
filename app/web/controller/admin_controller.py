@@ -2458,7 +2458,7 @@ class JadwalMengajar:
                 url = base_url + "api/v2/master/jadwal-mengajar/create"
                 payload = json.dumps(
                     {
-                        "kode_mengajar": kode_mengajar,
+                        # "kode_mengajar": kode_mengajar,
                         "tahun_ajaran_id": tahun_ajaran_id,
                         "semeter_id": semeter_id,
                         "guru_id": guru_id,
@@ -2471,7 +2471,6 @@ class JadwalMengajar:
                     }
                 )
                 headers = {"Content-Type": "application/json"}
-
                 resp = req.post(url=url, data=payload, headers=headers)
                 msg = resp.json()
                 if resp.status_code == 201:

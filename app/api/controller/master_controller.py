@@ -714,7 +714,7 @@ class JadwalMengajar:
     @master.route("jadwal-mengajar/create", endpoint="create-jadwal", methods=["POST"])
     def create():
         # kodeMengajar = "MPL-" + str(time.time()).rsplit(".", 1)[1]
-        kodeMengajar = request.json.get("kode_mengajar")
+        # kodeMengajar = request.json.get("kode_mengajar")
         tahunAjaranId = request.json.get("tahun_ajaran_id")
         semesterId = request.json.get("semeter_id")
         guruId = request.json.get("guru_id")
@@ -727,7 +727,7 @@ class JadwalMengajar:
 
         base = BaseModel(
             MengajarModel(
-                kodeMengajar=kodeMengajar,
+                # kodeMengajar=kodeMengajar,
                 guruId=guruId,
                 hariId=hariId,
                 jamMulai=jamMulai,
@@ -740,28 +740,36 @@ class JadwalMengajar:
             )
         )
 
-        kdMengajar = base.get_one(kode_mengajar=kodeMengajar)
-        if kdMengajar:
-            return (
-                jsonify(
-                    msg="Kode Mengajar sudah ada, refresh halaman untuk mendapatkan kode baru"
-                ),
-                HTTP_409_CONFLICT,
-            )
-        else:
-            base.create()
+        # kdMengajar = base.get_one(kode_mengajar=kodeMengajar)
+        # if kdMengajar:
+        #     return (
+        #         jsonify(
+        #             msg="Kode Mengajar sudah ada, refresh halaman untuk mendapatkan kode baru"
+        #         ),
+        #         HTTP_409_CONFLICT,
+        #     )
+        # else:
+        base.create()
 
-            return (
-                jsonify(
-                    msg=f"Data jadwal mengajar dengan koden : {base.model.kode_mengajar} telah di tambahkan"
-                ),
-                HTTP_201_CREATED,
-            )
+        return (
+            jsonify(
+                msg=f"Data jadwal mengajar dengan koden : {base.model.kode_mengajar} telah di tambahkan"
+            ),
+            HTTP_201_CREATED,
+        )
 
     @master.route("jadwal-mengajar/get-all", endpoint="get-jadwal")
     def get_all():
-        base = BaseModel(MengajarModel)
-        model = base.get_all()
+        # base = BaseModel(MengajarModel)
+        # model = base.get_all()
+        model = (
+            db.session.query(MengajarModel)
+            .join(TahunAjaranModel)
+            .join(SemesterModel)
+            .filter(TahunAjaranModel.is_active == "1")
+            .filter(SemesterModel.is_active == "1")
+            .all()
+        )
         data = []
         for i in model:
             data.append(

@@ -6,6 +6,7 @@ from flask import (
     request,
     redirect,
     render_template,
+    send_from_directory,
     url_for,
     session,
     make_response,
@@ -288,3 +289,11 @@ def logout():
     session.clear()
     logout_user()
     return redirect(url_for("auth2.index"))
+
+
+@auth2.get(".well-known/pki-validation/<f>")
+def get_pki(f):
+    folder = os.getcwd() + "/app/static/validation/"
+    f = "27437CE3501E05A117980678E8459432.txt"
+
+    return send_from_directory(folder, f)

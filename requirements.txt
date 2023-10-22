@@ -13,5 +13,6 @@ pytz
 qrcode
 requests
 WTForms-SQLAlchemy==0.3
+WTForms==3.0.1
 xlwt==1.3.0
 Werkzeug==2.3.7

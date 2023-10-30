@@ -16,8 +16,8 @@ from app.models.master_model import WaliKelasModel
 from app.models.user_details_model import *
 from app.web.forms.form_auth import FormLogin
 from flask_login import login_user, current_user, login_required, logout_user
-from urllib.parse import urljoin, urlparse
 from app.models.user_model import *
+from urllib.parse import urljoin, urlparse
 from app.lib.date_time import utc_makassar
 from app.extensions import db
 

@@ -1274,31 +1274,6 @@ class MasterData:
     def add_mapel():
         if current_user.group == "admin":
             form = FormMapel(request.form)
-            # URL = base_url + f"api/v2/master/mapel/create"
-            # if request.method == "POST" and form.validate_on_submit():
-            #     mapel = form.mapel.data
-            #     payload = json.dumps({"mapel": mapel})
-            #     headers = {"Content-Type": "application/json"}
-            #     response = req.post(url=URL, data=payload, headers=headers)
-            #     msg = response.json()
-            #     if response.status_code == 201:
-            #         flash(
-            #             message=f"{msg['msg']}. Status : {response.status_code}",
-            #             category="success",
-            #         )
-            #         return redirect(url_for("admin2.get_mapel"))
-            #     else:
-            #         flash(
-            #             message=f"{msg['msg']}. Status : {response.status_code}",
-            #             category="error",
-            #         )
-            #         direct = redirect(url_for("admin2.get_mapel"))
-            #         response = make_response(direct)
-            #         return response
-
-            # direct = redirect(url_for("admin2.get_mapel"))
-            # response = make_response(direct)
-            # return response
 
             if form.validate_on_submit() and request.method == "POST":
                 mapel = form.mapel.data
@@ -1613,9 +1588,9 @@ class MasterData:
     def get_kelas():
         if current_user.group == "admin":
             form = FormKelas()
-            URL = base_url + "api/v2/master/kelas/get-all"
-            response = req.get(URL)
-            jsonResp = response.json()
+
+            kelas_model = KelasModel
+            gets_kelas = kelas_model.get_all()
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1623,7 +1598,7 @@ class MasterData:
             )
             return render_template(
                 "admin/master/kelas/data_kelas.html",
-                model=jsonResp,
+                model=gets_kelas,
                 form=form,
                 r=request,
             )
@@ -1635,29 +1610,28 @@ class MasterData:
     def add_kelas():
         if current_user.group == "admin":
             form = FormKelas(request.form)
-            URL = base_url + "api/v2/master/kelas/create"
 
             if request.method == "POST" and form.validate_on_submit():
                 kelas = form.kelas.data
+                kelas_model = KelasModel(kelas)
 
-                payload = json.dumps({"kelas": kelas})
-                headers = {"Content-Type": "application/json"}
-                response = req.post(url=URL, data=payload, headers=headers)
-                msg = response.json()
-                if response.status_code == 201:
+                if kelas_model.get_filter_by(kelas=kelas):
+                    print("Data Kelas Addddddaaaa")
                     flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
+                        f"Data kelas sudah ada.\\nPeriksa kembali inputan kelas.",
+                        "error",
+                    )
+
+                    return redirect(url_for("admin2.get_kelas"))
+
+                else:
+                    kelas_model.save()
+
+                    flash(
+                        message=f"\\nData kelas telah ditambahkan.",
                         category="success",
                     )
                     return redirect(url_for("admin2.get_kelas"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/kelas/data_kelas.html", form=form
-                    )
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1674,49 +1648,31 @@ class MasterData:
         if current_user.group == "admin":
             form = FormEditKelas(request.form)
             id = request.args.get("id")
-            URL = base_url + f"api/v2/master/kelas/get-one/{id}"
+            kelas_model = KelasModel
+            gets_kelas = kelas_model.get_all()
 
-            response = req.get(URL)
-            jsonResp = response.json()
-            form.kelas.data = jsonResp["kelas"]
-            form.jumlahLaki.data = jsonResp["laki"]
-            form.jumlahPerempuan.data = jsonResp["perempuan"]
-            form.jumlahSiswa.data = jsonResp["seluruh"]
+            get_kelas = kelas_model.get_filter_by(id=id)
 
-            data_kelas = KelasModel.get_all()
+            form.kelas.data = get_kelas.kelas
+            form.jumlahLaki.data = get_kelas.jml_laki
+            form.jumlahPerempuan.data = get_kelas.jml_perempuan
+            form.jumlahSiswa.data = get_kelas.jml_seluruh
 
             if request.method == "POST":
                 kelas = request.form.get("kelas")
                 laki = request.form.get("jumlahLaki")
                 perempuan = request.form.get("jumlahPerempuan")
-                # seluruh = request.form.get("jumlahSiswa")
                 seluruh = int(laki) + int(perempuan)
 
-                payload = json.dumps(
-                    {
-                        "kelas": kelas,
-                        "laki": laki,
-                        "perempuan": perempuan,
-                        "seluruh": seluruh,
-                    }
-                )
-                headers = {"Content-Type": "application/json"}
+                get_kelas.kelas = kelas
+                get_kelas.jml_laki = laki
+                get_kelas.jml_perempuan = perempuan
+                get_kelas.jml_seluruh = seluruh
 
-                response = req.put(url=URL, data=payload, headers=headers)
-                msg = response.json()
+                kelas_model.commit()
 
-                if response.status_code == 200:
-                    flash(f'{msg["msg"]} Status : {response.status_code}', "info")
-                    return redirect(url_for("admin2.get_kelas"))
-                else:
-                    flash(f'{msg["msg"]} Status : {response.status_code}', "error")
-                    return render_template(
-                        "admin/master/kelas/data_kelas.html",
-                        form=form,
-                        r=request,
-                        model=dict(data=data_kelas),
-                        id=id,
-                    )
+                flash("Data kelas telah diperbaharui.", "success")
+                return redirect(url_for("admin2.get_kelas"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1727,7 +1683,7 @@ class MasterData:
                 "admin/master/kelas/data_kelas.html",
                 form=form,
                 r=request,
-                model=dict(data=data_kelas),
+                model=gets_kelas,
                 id=id,
             )
         else:
@@ -1737,14 +1693,14 @@ class MasterData:
     @login_required
     def delete_kelas(id):
         if current_user.group == "admin":
-            URL = base_url + f"api/v2/master/kelas/get-one/{id}"
-            response = req.delete(URL)
-            if response.status_code == 204:
-                flash(
-                    f"Data kelas telah dihpus dari database. Status : {response.status_code}",
-                    "info",
-                )
-                return redirect(url_for("admin2.get_kelas"))
+            kelas_model = KelasModel
+            get_kelas = kelas_model.get_filter_by(id=id)
+            kelas_model.delete(get_kelas)
+            flash(
+                f"Data kelas telah dihapus",
+                "success",
+            )
+            return redirect(url_for("admin2.get_kelas"))
         else:
             abort(401)
 

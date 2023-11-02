@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, IntegerField
 from wtforms.validators import ValidationError
 
+from app.models.master_model import KelasModel
+
 
 class FormMapel(FlaskForm):
     mapel = StringField(label="Nama Mata Pelajaran")
@@ -77,6 +79,9 @@ class FormKelas(FlaskForm):
     def validate_kelas(self, field):
         if field.data == "":
             raise ValidationError("*Inputan tidak boleh kosong.")
+
+        # if KelasModel.get_filter_by(kelas=field.data):
+        #     raise ValidationError("Data kelas sudah ada.")
 
 
 class FormEditKelas(FlaskForm):

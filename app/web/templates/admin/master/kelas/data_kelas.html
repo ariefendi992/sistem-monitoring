@@ -90,13 +90,13 @@
             </tr>
           </thead>
           <tbody>
-            {% for _ in model['data'] %}
+            {% for _ in model %}
             <tr>
               <td class="align-middle text-center" style="width: 12px;">{{ loop.index}}</td>
               <td class="align-middle text-center">{{ _.kelas }}</td>
-              <td class="align-middle text-center">{{ _.laki }}</td>
-              <td class="align-middle text-center">{{ _.perempuan }}</td>
-              <td class="align-middle text-center">{{ _.jum_seluruh }}</td>
+              <td class="align-middle text-center">{{ _.jml_laki }}</td>
+              <td class="align-middle text-center">{{ _.jml_perempuan }}</td>
+              <td class="align-middle text-center">{{ _.jml_seluruh }}</td>
               <!-- AKSI -->
               <td class="align-middle text-center" style="width: 120px;">
                 <a href="{{ url_for('admin2.edit_kelas',  id=_.id)}}" class="btn btn-outline-warning btn-xs"

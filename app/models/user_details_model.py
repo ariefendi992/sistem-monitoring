@@ -151,3 +151,7 @@ class GuruModel(db.Model):
     def get_all(cls):
         data = cls.query.all()
         return data
+    
+    @classmethod
+    def get_all_filter(cls, *filter):
+        db.session.query(cls).filter(*filter).all()

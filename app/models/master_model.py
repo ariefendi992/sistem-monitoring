@@ -33,6 +33,17 @@ class KelasModel(db.Model):
     def get_filter_by(cls, **filter):
         return cls.query.filter_by(**filter).first()
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def commit():
+        db.session.commit()
+
 
 class MapelModel(db.Model):
     __tablename__ = "master_mapel"
@@ -129,8 +140,12 @@ class WaliKelasModel(db.Model):
         return data
 
     @classmethod
-    def get_filter_by(cls, **data):
-        return cls.query.filter_by(**data).first()
+    def get_filter_by(cls, **filter):
+        return cls.query.filter_by(**filter).first()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class JamMengajarModel(db.Model):

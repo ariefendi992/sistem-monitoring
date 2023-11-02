@@ -30,6 +30,14 @@ class UserModel(db.Model, UserMixin):
     def __repr__(self) -> str:
         return self.username
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def get_filter_by(cls, **filter):
+        return cls.query.filter_by(**filter).first()
+
     def check_pswd(*args, **kwargs):
         return check_password_hash(*args, **kwargs)
 

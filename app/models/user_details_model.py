@@ -70,6 +70,7 @@ class SiswaModel(db.Model):
         nama_ortu=None,
         telp=None,
         alamat=None,
+        kelas_id=None,
         user_id=None,
         kelas=None,
         pic=None,
@@ -87,9 +88,18 @@ class SiswaModel(db.Model):
         self.user_id = user_id
         self.kelas_id = kelas
         self.pic = pic
+        self.kelas_id = kelas_id
 
     def __repr__(self):
         return f"{self.first_name.title()} {self.last_name.title()}"
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def getAll(cls):
+        return cls.query.order_by(cls.kelas_id.asc(), cls.first_name.asc()).all()
 
     @classmethod
     def get_filter_by(cls, **filter):

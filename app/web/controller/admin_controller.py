@@ -17,6 +17,7 @@ from flask import (
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from calendar import monthrange
+from app.lib.date_time import format_datetime_id, format_indo
 from app.lib.status_code import HTTP_413_REQUEST_ENTITY_TOO_LARGE
 from app.models.user_model import *
 from app.models.master_model import *
@@ -40,6 +41,7 @@ from app.models.user_login_model import *
 from app.models.data_model import *
 from sqlalchemy import func
 from app.lib.db_statement import DBStatement
+from app.api.controller import siswa_controller
 import os
 import requests as req
 import io
@@ -105,13 +107,72 @@ class PenggunaSiswa:
     @login_required
     def getSiswa():
         if current_user.group == "admin":
-            urlKelas = base_url + "api/v2/master/kelas/get-all"
-            respKelas = req.get(urlKelas)
-            jsonRespKelas = respKelas.json()
+            kelas_model = KelasModel
+            sql_kelas = kelas_model.get_all()
 
-            urlSiswa = base_url + url_for("siswa.get")
-            respSiswa = req.get(urlSiswa)
-            jsonRespSiswa = respSiswa.json()
+            siswa_model = SiswaModel
+            sql_siswa = siswa_model.getAll()
+
+            list_siswa = []
+            path_file = os.getcwd() + "/app/api/static/img/siswa/"
+            list_file = os.listdir(path_file + "foto/")
+            list_id_card = os.listdir(path_file + "id_card/")
+            list_qr_file = os.listdir(path_file + "qr_code/")
+
+            for i in sql_siswa:
+                if i.pic and i.pic not in list_file:
+                    get_siswa = siswa_model.get_filter_by(id=i.id)
+                    get_siswa.pic = None
+                    siswa_model.commit()
+                if i.id_card and i.id_card not in list_id_card:
+                    get_siswa = siswa_model.get_filter_by(id=i.id)
+                    get_siswa.id_card = None
+                    siswa_model.commit()
+
+                if i.qr_code and i.qr_code not in list_qr_file:
+                    get_siswa = siswa_model.get_filter_by(id=i.id)
+                    get_siswa.qr_code = None
+                    siswa_model.commit()
+
+                list_siswa.append(
+                    dict(
+                        id=i.user.id,
+                        nisn=i.user.username,
+                        first_name=i.first_name.title(),
+                        last_name=i.last_name.title(),
+                        gender=i.gender.title(),
+                        kelas=i.kelas.kelas if i.kelas_id else "-",
+                        kelas_id=i.kelas_id,
+                        tempat_lahir=i.tempat_lahir if i.tempat_lahir else "-",
+                        tgl_lahir=format_indo(i.tgl_lahir) if i.tgl_lahir else "-",
+                        agama=i.agama if i.agama else "-",
+                        alamat=i.alamat if i.alamat else "-",
+                        nama_ortu=i.nama_ortu_or_wali if i.nama_ortu_or_wali else "-",
+                        picture=url_for(
+                            "admin.static", filename="img/siswa/foto/" + i.pic
+                        )
+                        if i.pic
+                        else None,
+                        telp=i.no_telp if i.no_telp else "-",
+                        qr_code=url_for(
+                            "siswa.static", filename="img/siswa/qr_code" + i.qr_code
+                        )
+                        if i.qr_code
+                        else None,
+                        active="Aktif" if i.user.is_active == "1" else "Non-Aktif",
+                        join=format_datetime_id(i.user.join_date)
+                        if i.user.join_date
+                        else "-",
+                        last_update=format_indo(i.user.update_date)
+                        if i.user.update_date
+                        else "-",
+                        last_login=format_datetime_id(i.user.user_last_login)
+                        if i.user.user_last_login
+                        else "-",
+                        logout=i.user.user_logout if i.user.user_logout else "-",
+                        id_card=i.id_card,
+                    ),
+                )
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -120,8 +181,8 @@ class PenggunaSiswa:
 
             return render_template(
                 "admin/siswa/get_siswa.html",
-                kelas=jsonRespKelas,
-                siswa=jsonRespSiswa,
+                kelas=sql_kelas,
+                siswa=list_siswa,
             )
         else:
             flash(
@@ -207,12 +268,11 @@ class PenggunaSiswa:
         # get kelas
 
         if current_user.group == "admin":
-            url_kelas = base_url + f"/api/v2/master/kelas/get-all"
-            get_kelas = req.get(url_kelas)
-            data = get_kelas.json()
+            kelas_model = KelasModel
+            get_kelas = kelas_model.get_all()
             kelas = [("", "..::Select::..")]
-            for _ in data["data"]:
-                kelas.append((_["id"], _["kelas"]))
+            for i in get_kelas:
+                kelas.append((i.id, i.kelas))
 
             url = base_url + f"/api/v2/auth/create"
             form = FormAddSiswa(request.form)
@@ -234,35 +294,82 @@ class PenggunaSiswa:
                 kelas = form.kelas.data
                 telp = request.form.get("telp")
 
-                payload = json.dumps(
-                    {
-                        "username": username,
-                        "password": password,
-                        "group": group,
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "gender": gender,
-                        "agama": agama,
-                        "kelas_id": kelas,
-                        "telp": telp,
-                    }
+                get_one = UserModel.get_filter_by(username=username)
+                if get_one:
+                    flash(
+                        f"Username sudah terdaftar.\\nSilahkan masukkan username lain.",
+                        "error",
+                    )
+
+                hash_pswd = generate_password_hash(password=password)
+                user_model = UserModel(
+                    username=username, password=hash_pswd, group=group
                 )
-                headers = {"Content-Type": "application/json"}
-                response = req.post(url=url, headers=headers, data=payload)
-                msg = response.json()
-                if response.status_code == 201:
-                    flash(
-                        message=f"{msg['msg']}. Status : {response.status_code}",
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.getSiswa"))
-                elif response.status_code == 409:
-                    flash(
-                        message="NISN sudah yang di input, telah terdaftar",
-                        category="error",
-                    )
-                else:
-                    return render_template("admin/siswa/tambah_siswa.html", form=form)
+                user_model.save()
+
+                siswa_model = SiswaModel(
+                    first_name=first_name,
+                    last_name=last_name,
+                    gender=gender,
+                    agama=agama,
+                    kelas_id=kelas,
+                    telp=telp,
+                    user_id=user_model.id,
+                )
+                kelas_model = KelasModel
+                get_kelas = kelas_model.get_filter_by(id=kelas)
+                siswa_model.save()
+
+                countSiswaGender = (
+                    db.session.query(func.count(SiswaModel.kelas_id))
+                    .filter(SiswaModel.kelas_id == kelas)
+                    .filter(SiswaModel.gender == gender)
+                    .scalar()
+                )
+                countSiswaLaki = (
+                    db.session.query(func.count(SiswaModel.kelas_id))
+                    .filter(SiswaModel.kelas_id == kelas)
+                    .filter(SiswaModel.gender == "laki-laki")
+                    .scalar()
+                )
+                countSiswaPerempuan = (
+                    db.session.query(func.count(SiswaModel.kelas_id))
+                    .filter(SiswaModel.kelas_id == kelas)
+                    .filter(SiswaModel.gender == "perempuan")
+                    .scalar()
+                )
+                countSiswaAll = (
+                    db.session.query(func.count(SiswaModel.kelas_id))
+                    .filter(SiswaModel.kelas_id == kelas)
+                    .scalar()
+                )
+
+                if siswa_model.gender == "laki-laki":
+                    get_kelas.jml_laki = countSiswaGender
+                    get_kelas.jml_perempuan = countSiswaPerempuan
+
+                elif siswa_model.geder == "perempuan":
+                    get_kelas.jml_laki = countSiswaLaki
+                    get_kelas.jml_perempuan = countSiswaPerempuan
+
+                get_kelas.jml_seluruh = countSiswaAll
+                db.session.commit()
+                # headers = {"Content-Type": "application/json"}
+                # response = req.post(url=url, headers=headers, data=payload)
+                # msg = response.json()
+                # if response.status_code == 201:
+                # flash(
+                #     message=f"{msg['msg']}. Status : {response.status_code}",
+                #     category="success",
+                # )
+                return redirect(url_for("admin2.getSiswa"))
+                # elif response.status_code == 409:
+                #     flash(
+                #         message="NISN sudah yang di input, telah terdaftar",
+                #         category="error",
+                #     )
+                # else:
+                #     return render_template("admin/siswa/tambah_siswa.html", form=form)
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1143,10 +1250,11 @@ class MasterData:
     @login_required
     def get_mapel():
         if current_user.group == "admin":
-            url = base_url + f"api/v2/master/mapel/get-all"
-            response = req.get(url)
-            jsonRespon = response.json()
-
+            # url = base_url + f"api/v2/master/mapel/get-all"
+            # response = req.get(url)
+            # jsonRespon = response.json()
+            mapel_model = MapelModel
+            get_mapels = mapel_model.get_all()
             """
             NOTE : Form add data
             """
@@ -1154,7 +1262,7 @@ class MasterData:
             form = FormMapel()
             return render_template(
                 "admin/master/mapel/data_mapel.html",
-                model=jsonRespon,
+                model=get_mapels,
                 form=form,
                 r=request,
             )
@@ -1220,37 +1328,8 @@ class MasterData:
     @login_required
     def edit_mapel():
         if current_user.group == "admin":
-            # URL = base_url + f"api/v2/master/mapel/get-one/{id}"
-
-            # # NOTE: GET ONE DATA BY ID
-            # responGetMapel = req.get(url=URL)
-            # jsonResponse = responGetMapel.json()
-
-            # form = FormMapel(request.form)
-            # form.mapel.data = jsonResponse["mapel"]
-            # if request.method == "POST" and form.validate_on_submit():
-            #     mapel = request.form.get("mapel")
-            #     payload = json.dumps({"mapel": mapel})
-            #     headers = {"Content-Type": "application/json"}
-            #     response = req.put(url=URL, data=payload, headers=headers)
-            #     msg = response.json()
-            #     if response.status_code == 200:
-            #         flash(
-            #             message=f'{msg["msg"]} Status : {response.status_code}',
-            #             category="info",
-            #         )
-            #         return redirect(url_for("admin2.get_mapel"))
-            #     else:
-            #         flash(
-            #             message=f'{msg["msg"]} Status : {response.status_code}',
-            #             category="error",
-            #         )
-            #         return render_template(
-            #             "admin/master/mapel/edit_mapel.html", form=form
-            #         )
-
             form = FormEditMapel()
-            id = request.args.get("id")
+            id = request.args.get("id", type=int)
             mapels = MapelModel.get_all()
             get_mapel = MapelModel.get_filter_by(id=id)
 
@@ -1272,7 +1351,7 @@ class MasterData:
             )
             return render_template(
                 "admin/master/mapel/data_mapel.html",
-                model=dict(data=mapels),
+                model=mapels,
                 form=form,
                 r=request,
                 id=get_mapel.id,
@@ -1284,21 +1363,18 @@ class MasterData:
     @login_required
     def delete_mapel(id):
         if current_user.group == "admin":
-            URL = base_url + f"api/v2/master/mapel/get-one/{id}"
-            response = req.delete(URL)
-            if response.status_code == 204:
-                flash(
-                    message=f"Data mapel telah di hapus dari database. Status : {response.status_code}",
-                    category="info",
-                )
+            mapel_model = MapelModel
+            get_mapel = mapel_model.get_filter_by(id=id)
+
+            if not get_mapel:
+                flash("Data tidak ditemukan.\\nSilahkan periksa kembali.", "error")
                 return redirect(url_for("admin2.get_mapel"))
-            elif response.status_code == 404:
-                msg = response.json()
-                flash(
-                    message=f"{msg['msg']} : {response.status_code}",
-                    category="info",
-                )
-                return redirect(url_for("admin2.get_mapel"))
+
+            mapel_model.delete(get_mapel)
+
+            flash("\\nData mapel telah dihapus", "success")
+            return redirect(url_for("admin2.get_mapel"))
+
         else:
             abort(401)
 

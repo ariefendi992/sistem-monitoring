@@ -29,6 +29,10 @@ class KelasModel(db.Model):
     def get_all(cls):
         return cls.query.all()
 
+    @classmethod
+    def get_filter_by(cls, **filter):
+        return cls.query.filter_by(**filter).first()
+
 
 class MapelModel(db.Model):
     __tablename__ = "master_mapel"
@@ -53,6 +57,10 @@ class MapelModel(db.Model):
 
     def save(self):
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
         db.session.commit()
 
 

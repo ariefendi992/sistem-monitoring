@@ -143,7 +143,7 @@ class FormWaliKelas(FlaskForm):
 class FormEditWaliKelas(FlaskForm):
     namaGuru = SelectField("Nama Guru", choices=[("", "- Pilih -")])
     kelas = SelectField("Nama Kelas", choices=[("", "- Pilih -")])
-    submit = SubmitField("Tambah Data")
+    submit = SubmitField("Perbaharui Data")
 
 
 class FormEditGuruBK(FlaskForm):

@@ -93,12 +93,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for _ in model['data'] %}
+                        {% for _ in model %}
                         <tr>
                             <td class="align-middle text-center" style="width: 12px;">{{ loop.index}}</td>
-                            <td class="align-middle">{{ _.nip }}</td>
-                            <td class="align-middle">{{ _.first_name | title }} {{ _.last_name | title}}</td>
-                            <td class="align-middle text-center">{{ _.kelas }}</td>
+                            <td class="align-middle">{{ _.guru.user.username }}</td>
+                            <td class="align-middle">{{ _.guru.first_name | title }} {{ _.guru.last_name | title}}</td>
+                            <td class="align-middle text-center">{{ _.kelas.kelas }}</td>
                             <!-- AKSI -->
                             <td class="align-middle text-center" style="width: 120px;">
                                 <a href="{{ url_for('admin2.edit_wali', id=_.id)}}"

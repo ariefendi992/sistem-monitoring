@@ -4,7 +4,7 @@ from app.extensions import db
 import sqlalchemy.orm as rs
 from sqlalchemy.orm import backref
 from .user_details_model import *
-from typing import Optional
+from typing import Any, Optional
 
 # from .user_details_model import GuruModel
 
@@ -229,6 +229,24 @@ class MengajarModel(db.Model):
         self.tahun_ajaran_id = tahunAjaranId
         self.mapel_id = mapelId
         self.jam_ke = jamKe
+
+    @classmethod
+    def get_one(cls, *filter, **filter_by) -> Any:
+        if filter_by:
+            return cls.query.filter_by(**filter_by).first()
+        else:
+            return db.session.query.filter(*filter).first()
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def commit():
+        db.session.commit()
 
 
 class KepsekModel(db.Model):

@@ -25,7 +25,7 @@ from app.models.user_details_model import *
 from app.lib.base_model import BaseModel
 from app.web.forms.form_absen import FormSelectAbsensi, FormSelectKehadiranSemester
 from app.web.forms.form_auth import FormEditStatus
-from app.web.forms.form_jadwal import FormJadwalMengajar
+from app.web.forms.form_jadwal import FormJadwalMengajar, FormUpdateJadwalMengajar
 from app.web.forms.form_letter_report import FormSelectKelas
 from app.web.forms.form_master import *
 from app.web.forms.form_pengguna import (
@@ -2134,16 +2134,20 @@ class MasterData:
     @login_required
     def delete_bk(id):
         if current_user.group == "admin":
-            
-            get_bk = GuruBKModel.get_filter_by(id=id)
-            
-            if not get_bk:
-                flash('Terjadi kelasahan!\\nID tidak ditemukan dalam database.', 'error')
+            bk_model = GuruBKModel
+            get_bk = bk_model.get_filter_by(id=id)
 
-            flash('Data Guru BK telah dihapus.', 'success')
-           
+            if not get_bk:
+                flash(
+                    "Terjadi kelasahan!\\nID tidak ditemukan dalam database.", "error"
+                )
+
+            bk_model.delete(get_bk)
+
+            flash("Data Guru BK telah dihapus.", "success")
+
             return redirect(url_for("admin2.get_bk"))
-            
+
         else:
             abort(401)
 
@@ -2152,10 +2156,9 @@ class MasterData:
     @login_required
     def get_kepsek():
         if current_user.group == "admin":
-            
             get_kepsek = KepsekModel.get_all()
             get_guru = GuruModel.get_all()
-            
+
             url = base_url + "api/v2/master/kepsek/get-all"
             resp = req.get(url)
             jsonResp = resp.json()
@@ -2294,17 +2297,39 @@ class JadwalMengajar:
     @login_required
     def get_jadwal():
         if current_user.group == "admin":
-            url = base_url + "api/v2/master/jadwal-mengajar/get-all"
-            resp = req.get(url)
-            jsonResp = resp.json()
+            # url = base_url + "api/v2/master/jadwal-mengajar/get-all"
+            # resp = req.get(url)
+            # jsonResp = resp.json()
+            get_jadwal = (
+                db.session.query(MengajarModel)
+                .filter(TahunAjaranModel.is_active == "1")
+                .filter(SemesterModel.is_active == "1")
+                .all()
+            )
+            data = []
+            for i in get_jadwal:
+                data.append(
+                    dict(
+                        id=i.id,
+                        kode_mengajar=i.kode_mengajar,
+                        first_name=i.guru.first_name.title(),
+                        last_name=i.guru.last_name.title(),
+                        mapel=i.mapel.mapel,
+                        jam_ke=i.jam_ke,
+                        hari=i.hari.hari,
+                        jam_mulai=i.jam_mulai,
+                        jam_selesai=i.jam_selesai,
+                        kelas=i.kelas.kelas,
+                        semester=i.semester.semester,
+                        tahun_ajaran=i.tahun_ajaran.th_ajaran,
+                    ),
+                )
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
-            return render_template(
-                "admin/jadwal_mengajar/data_jadwal.html", model=jsonResp
-            )
+            return render_template("admin/jadwal_mengajar/data_jadwal.html", model=data)
         else:
             abort(401)
 
@@ -2314,46 +2339,45 @@ class JadwalMengajar:
         if current_user.group == "admin" and current_user.is_authenticated:
             form = FormJadwalMengajar(request.form)
             kodeMengajar = "MPL-" + str(time.time()).rsplit(".", 1)[1]
-            urlSemester = base_url + "api/v2/master/semester/get-all"
-            respSemester = req.get(urlSemester)
+
+            get_semester = SemesterModel.query.all()
             ta = None
             sms = None
             ta_id = None
             sms_id = None
-            for i in respSemester.json()["data"]:
-                if i["status"] == True:
-                    sms = i["semester"]
-                    sms_id = i["id"]
+            for i in get_semester:
+                if i.is_active == "1":
+                    sms = i.semester
+                    sms_id = i.id
 
-            urlTahunAjaran = base_url + "api/v2/master/ajaran/get-all"
-            respTahunAjaran = req.get(urlTahunAjaran)
-            for i in respTahunAjaran.json()["data"]:
-                if i["status"] == True:
-                    ta = i["th_ajaran"]
-                    ta_id = i["id"]
+            get_th_ajaran = TahunAjaranModel.query.all()
+            for i in get_th_ajaran:
+                if i.is_active == "1":
+                    ta = i.th_ajaran
+                    ta_id = i.id
 
-            urlGuru = base_url + "api/v2/guru/get-all"
-            respGuru = req.get(urlGuru)
-            jsonRespGuru = respGuru.json()
-            for i in jsonRespGuru:
+            get_guru = (
+                db.session.query(GuruModel)
+                .join(UserModel)
+                .filter(UserModel.group == "guru")
+                .all()
+            )
+            for i in get_guru:
                 form.namaGuru.choices.append(
-                    (i["id"], i["first_name"] + " " + i["last_name"])
+                    (i.user_id, i.first_name.title() + " " + i.last_name.title())
                 )
 
-            urlMapel = base_url + "api/v2/master/mapel/get-all"
-            respMapel = req.get(urlMapel)
-            for i in respMapel.json()["data"]:
-                form.namaMapel.choices.append((i["id"], i["mapel"].title()))
+            get_mapels = MapelModel.get_all()
+            for i in get_mapels:
+                form.namaMapel.choices.append((i.id, i.mapel.title()))
 
-            urlHari = base_url + "api/v2/master/hari/get-all"
-            respHari = req.get(urlHari)
-            for i in respHari.json()["data"]:
-                form.hari.choices.append((i["id"], i["hari"].title()))
+            get_hari = HariModel.query.all()
+            for i in get_hari:
+                form.hari.choices.append((i.id, i.hari.title()))
 
-            urlKelas = base_url + "api/v2/master/kelas/get-all"
-            respKelas = req.get(urlKelas)
-            for i in respKelas.json()["data"]:
-                form.kelas.choices.append((i["id"], i["kelas"]))
+            get_kelas = KelasModel.get_all()
+            for i in get_kelas:
+                form.kelas.choices.append((i.id, i.kelas))
 
             form.kode.data = kodeMengajar
             form.semester.data = sms.title()
@@ -2364,7 +2388,7 @@ class JadwalMengajar:
             if request.method == "POST" and form.validate_on_submit():
                 kode_mengajar = request.form.get("kode")
                 tahun_ajaran_id = request.form.get("ta")
-                semeter_id = request.form.get("sms")
+                semester_id = request.form.get("sms")
                 guru_id = request.form.get("namaGuru")
                 mapel_id = request.form.get("namaMapel")
                 hari_id = request.form.get("hari")
@@ -2374,30 +2398,21 @@ class JadwalMengajar:
                 jam_selesai2 = request.form.get("waktuSelesai2")
                 jam_ke = request.form.get("jamKe")
 
-                url = base_url + "api/v2/master/jadwal-mengajar/create"
-                payload = json.dumps(
-                    {
-                        # "kode_mengajar": kode_mengajar,
-                        "tahun_ajaran_id": tahun_ajaran_id,
-                        "semeter_id": semeter_id,
-                        "guru_id": guru_id,
-                        "mapel_id": mapel_id,
-                        "hari_id": hari_id,
-                        "kelas_id": kelas_id,
-                        "jam_mulai": jam_mulai2,
-                        "jam_selesai": jam_selesai2,
-                        "jam_ke": jam_ke,
-                    }
+                mengajar_model = MengajarModel(
+                    guruId=guru_id,
+                    hariId=hari_id,
+                    jamMulai=jam_mulai2,
+                    jamSelesai=jam_selesai2,
+                    kelasId=kelas_id,
+                    semesterId=semester_id,
+                    tahunAjaranId=tahun_ajaran_id,
+                    mapelId=mapel_id,
+                    jamKe=jam_ke,
                 )
-                headers = {"Content-Type": "application/json"}
-                resp = req.post(url=url, data=payload, headers=headers)
-                msg = resp.json()
-                if resp.status_code == 201:
-                    flash(f'{msg["msg"]} Status : {resp.status_code}', "success")
-                    return redirect(url_for("admin2.get_jadwal"))
-                else:
-                    flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
-                    return redirect(url_for("admin2.get_jadwal"))
+                mengajar_model.save()
+
+                flash("Data jadwal telah ditambahkan.", "success")
+                return redirect(url_for("admin2.get_jadwal"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -2412,44 +2427,57 @@ class JadwalMengajar:
     @admin2.route("edit-jadwal/<int:id>", methods=["GET", "POST"])
     def edit_jadwal(id):
         if current_user.group == "admin":
-            form = FormJadwalMengajar(request.form)
-            url = base_url + f"api/v2/master/jadwal-mengajar/get-one/{id}"
-            respGet = req.get(url)
-            jsonResp = respGet.json()
+            form = FormUpdateJadwalMengajar(request.form)
+            mengajar_model = MengajarModel
+            get_jadwal = mengajar_model.get_one(id=id)
 
-            urlGuru = base_url + "api/v2/guru/get-all"
-            respGuru = req.get(urlGuru)
-            jsonRespGuru = respGuru.json()
-            for i in jsonRespGuru:
+            data_jadwal = dict(
+                id=get_jadwal.id,
+                kode_mengajar=get_jadwal.kode_mengajar,
+                guru_id=get_jadwal.guru_id,
+                first_name=get_jadwal.guru.first_name,
+                last_name=get_jadwal.guru.last_name,
+                mapel=get_jadwal.mapel.mapel,
+                mapel_id=get_jadwal.mapel_id,
+                jam_ke=get_jadwal.jam_ke,
+                hari_id=get_jadwal.hari_id,
+                hari=get_jadwal.hari.hari,
+                jam_mulai=get_jadwal.jam_mulai,
+                jam_selesai=get_jadwal.jam_selesai,
+                kelas_id=get_jadwal.kelas_id,
+                kelas=get_jadwal.kelas.kelas,
+                semester=get_jadwal.semester.semester,
+                tahun_ajaran=get_jadwal.tahun_ajaran.th_ajaran,
+            )
+
+            get_guru = GuruModel.get_all()
+            for i in get_guru:
                 form.namaGuru.choices.append(
-                    (i["id"], i["first_name"] + " " + i["last_name"])
+                    (i.user_id, i.first_name.title() + " " + i.last_name.title())
                 )
 
-            urlMapel = base_url + "api/v2/master/mapel/get-all"
-            respMapel = req.get(urlMapel)
-            for i in respMapel.json()["data"]:
-                form.namaMapel.choices.append((i["id"], i["mapel"].title()))
+            get_mapel = MapelModel.get_all()
+            for i in get_mapel:
+                form.namaMapel.choices.append((i.id, i.mapel.title()))
 
-            urlHari = base_url + "api/v2/master/hari/get-all"
-            respHari = req.get(urlHari)
-            for i in respHari.json()["data"]:
-                form.hari.choices.append((i["id"], i["hari"].title()))
+            get_hari = HariModel.query.all()
+            for i in get_hari:
+                form.hari.choices.append((i.id, i.hari.title()))
 
-            urlKelas = base_url + "api/v2/master/kelas/get-all"
-            respKelas = req.get(urlKelas)
-            for i in respKelas.json()["data"]:
-                form.kelas.choices.append((i["id"], i["kelas"]))
+            get_kelas = KelasModel.get_all()
+            for i in get_kelas:
+                form.kelas.choices.append((i.id, i.kelas))
 
-            form.kode.default = jsonResp["kode_mengajar"]
-            form.tahunAjaran.default = jsonResp["tahun_ajaran"]
-            form.namaGuru.default = jsonResp["guru_id"]
-            form.semester.default = jsonResp["semester"].upper()
-            form.namaMapel.default = jsonResp["mapel_id"]
-            form.hari.default = jsonResp["hari_id"]
-            form.kelas.default = jsonResp["kelas_id"]
-            form.waktuMulai2.default = jsonResp["jam_mulai"]
-            form.waktuSelesai2.default = jsonResp["jam_selesai"]
-            form.jamKe.default = jsonResp["jam_ke"]
+            form.kode.default = data_jadwal["kode_mengajar"]
+            form.tahunAjaran.default = data_jadwal["tahun_ajaran"]
+            form.namaGuru.default = data_jadwal["guru_id"]
+            form.semester.default = data_jadwal["semester"].upper()
+            form.namaMapel.default = data_jadwal["mapel_id"]
+            form.hari.default = data_jadwal["hari_id"]
+            form.kelas.default = data_jadwal["kelas_id"]
+            form.waktuMulai2.default = data_jadwal["jam_mulai"]
+            form.waktuSelesai2.default = data_jadwal["jam_selesai"]
+            form.jamKe.default = data_jadwal["jam_ke"]
             form.process()
 
             if request.method == "POST":
@@ -2461,31 +2489,19 @@ class JadwalMengajar:
                 kelas_id = request.form.get("kelas")
                 jam_ke = request.form.get("jamKe")
 
-                payload = json.dumps(
-                    {
-                        "guru_id": guru_id,
-                        "hari_id": hari_id,
-                        "mapel_id": mapel_id,
-                        "jam_mulai": jam_mulai,
-                        "jam_selesai": jam_selesai,
-                        "kelas_id": kelas_id,
-                        "jam_ke": jam_ke,
-                    }
-                )
+                get_jadwal.guru_id = guru_id
+                get_jadwal.hari_id = hari_id
+                get_jadwal.mapel_id = mapel_id
+                get_jadwal.jam_mulai = jam_mulai
+                get_jadwal.jam_selesai = jam_selesai
+                get_jadwal.kelas_id = kelas_id
+                get_jadwal.jam_ke = jam_ke
 
-                headers = {"Content-Type": "application/json"}
+                mengajar_model.commit()
 
-                resp = req.put(url=url, data=payload, headers=headers)
+                flash("Data Jadwal telah di perbaharui.", "success")
 
-                jsonRespPut = resp.json()
-
-                if resp.status_code == 200:
-                    flash(f'{jsonRespPut["msg"]} Status : {resp.status_code}', "info")
-                    return redirect(url_for("admin2.get_jadwal"))
-                else:
-                    flash(
-                        f"Terjadi kesalahan dalam perbaharui data. Status : {resp.status_code}"
-                    )
+                return redirect(url_for("admin2.get_jadwal"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -2493,28 +2509,24 @@ class JadwalMengajar:
             )
 
             return render_template(
-                "admin/jadwal_mengajar/edit_jadwal.html", model=jsonResp, form=form
+                "admin/jadwal_mengajar/edit_jadwal.html", model=data_jadwal, form=form
             )
 
     @admin2.route("delete-jadwal/<int:id>", methods=["GET", "DELETE"])
     @login_required
     def delete_jadwal(id):
         if current_user.group == "admin":
-            url = base_url + f"api/v2/master/jadwal-mengajar/get-one/{id}"
-            resp = req.delete(url)
+            jadwal_model = MengajarModel
+            get_jadwal = jadwal_model.get_one(id=id)
 
-            if resp.status_code == 204:
-                flash(
-                    f"Data Jadwal Pelajaran telah dibatalkan. Status : {resp.status_code}",
-                    "info",
-                )
-                return redirect(url_for("admin2.get_jadwal"))
-            else:
-                flash(
-                    f"Gala memuat Data Jadwal Pelajaran. Status : {resp.status_code}",
-                    "error",
-                )
-                return redirect(url_for("admin2.get_jadwal"))
+            if not get_jadwal:
+                flash("Terjadi kesalah.\\nPeriksa kembali id jadwal.", "error")
+
+            jadwal_model.delete(get_jadwal)
+
+            flash("Data jadwal telah dihapus.", "success")
+            return redirect(url_for("admin2.get_jadwal"))
+
         else:
             abort(401)
 

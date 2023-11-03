@@ -1,3 +1,4 @@
+from requests import delete
 import sqlalchemy as sa
 from app.extensions import db
 import sqlalchemy.orm as rs
@@ -286,6 +287,10 @@ class GuruBKModel(db.Model):
     @classmethod
     def get_filter_by(cls, id):
         return cls.query.filter_by(id=id).first()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class NamaBulanModel(db.Model):

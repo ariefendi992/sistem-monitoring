@@ -2152,6 +2152,10 @@ class MasterData:
     @login_required
     def get_kepsek():
         if current_user.group == "admin":
+            
+            get_kepsek = KepsekModel.get_all()
+            get_guru = GuruModel.get_all()
+            
             url = base_url + "api/v2/master/kepsek/get-all"
             resp = req.get(url)
             jsonResp = resp.json()
@@ -2160,10 +2164,10 @@ class MasterData:
             respGuru = req.get(urlGuru)
             jsonRespGuru = respGuru.json()
 
-            if not jsonResp["data"]:
-                for i in jsonRespGuru:
+            if not get_kepsek:
+                for i in get_guru:
                     form.namaGuru.choices.append(
-                        (i["id"], i["first_name"] + "" + i["last_name"])
+                        (i.user_id, i.first_name.title() + "" + i.last_name.title())
                     )
 
             status = [
@@ -2178,7 +2182,7 @@ class MasterData:
 
             return render_template(
                 "admin/master/kepsek/data_kepsek.html",
-                model=jsonResp,
+                model=get_kepsek,
                 form=form,
                 jsonGuru=jsonRespGuru,
                 status=status,

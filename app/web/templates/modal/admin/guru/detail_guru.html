@@ -1,4 +1,4 @@
-<div class="modal fade" id="modal-detail{{ _.id }}">
+<div class="modal fade" id="modal-detail{{ _.user_id }}">
   <div class="modal-dialog overlay">
     <div class="modal-content">
       <div class="modal-header">
@@ -17,13 +17,13 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="" class="font-weight-normal">Nama Pengguna</label>
-              <input type="text" class="form-control form-control-sm" value="{{_.nip}}" disabled>
+              <input type="text" class="form-control form-control-sm" value="{{_.user.username}}" disabled>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="" class="font-weight-normal">Tipe Akun</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.type }}" disabled>
+              <input type="text" class="form-control form-control-sm" value="{{ _.user.group.upper() }}" disabled>
             </div>
           </div>
         </div>
@@ -32,13 +32,15 @@
             <div class="form-group">
               <label for="" class="font-weight-normal">Status Akun</label>
               <!-- <input type="text" class="form-control form-control-border border-width-1" id="exampleInputBorder"> -->
-              <input type="text" class="form-control form-control-sm" value="{{ _.active }}" disabled>
+              <input type="text" class="form-control form-control-sm"
+                value="{{'Aktif' if _.user.is_active == '1' else 'Tidak Aktif' }}" disabled>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label class="font-weight-normal">Tgl Buat</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.join}}" disabled>
+              <input type="text" class="form-control form-control-sm" value="{{ _.user.join_date | format_indo}}"
+                disabled>
             </div>
           </div>
         </div>
@@ -46,13 +48,15 @@
           <div class="col-md-6">
             <div class="form-group">
               <label class="font-weight-normal">Terakhir Ubah</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.last_update}}" disabled>
+              <input type="text" class="form-control form-control-sm"
+                value="{{ _.user.update_date | format_indo if _.user.update_date else '-'}}" disabled>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label class="font-weight-normal">Terakhir Masuk</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.last_login}}" disabled>
+              <input type="text" class="form-control form-control-sm"
+                value="{{ _.user.user_last_login | format_indo if _.user.user_last_login else '-'}}" disabled>
             </div>
           </div>
         </div>
@@ -65,14 +69,14 @@
           <div class="col-md-6">
             <div class="form-group">
               <label class="font-weight-normal">NIP</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.nip }}" disabled>
+              <input type="text" class="form-control form-control-sm" value="{{ _.user.username }}" disabled>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label class="font-weight-normal">Nama Lengkap</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.first_name}} {{ _.last_name}}"
-                disabled>
+              <input type="text" class="form-control form-control-sm"
+                value="{{ _.first_name.title() }} {{ _.last_name.title() }}" disabled>
             </div>
           </div>
         </div>
@@ -80,13 +84,13 @@
           <div class="col-md-6">
             <div class="form-group">
               <label class="font-weight-normal">Jenis Kelamin</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.gender}}" disabled>
+              <input type="text" class="form-control form-control-sm" value="{{ _.gender.title()}}" disabled>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label class="font-weight-normal">Agama</label>
-              <input type="text" class="form-control form-control-sm" value="{{ _.agama}}" disabled>
+              <input type="text" class="form-control form-control-sm" value="{{ _.agama.upper()}}" disabled>
             </div>
           </div>
         </div>

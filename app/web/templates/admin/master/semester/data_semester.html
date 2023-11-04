@@ -40,12 +40,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for _ in model['data'] %}
+                    {% for _ in model %}
                     <tr>
                         <td class="align-middle text-center" style="width: 12px;">{{ loop.index}}</td>
                         <td class="align-middle">{{ _.semester | title }}</td>
                         <td class="align-middle">
-                            {{'Aktif' if _.status == true else 'Tidak Aktif' }}
+                            {{'Aktif' if _.is_active== '1' else 'Tidak Aktif' }}
                         </td>
                         <!-- AKSI -->
                         <td class="align-middle text-center" style="width: 120px;">

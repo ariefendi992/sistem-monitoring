@@ -34,6 +34,13 @@ class UserModel(db.Model, UserMixin):
         db.session.add(self)
         db.session.commit()
 
+    def update():
+        db.session.commit()
+
+    @classmethod
+    def get_one(cls, **filter_by):
+        return cls.query.filter_by(**filter_by).first()
+
     @classmethod
     def get_filter_by(cls, **filter):
         return cls.query.filter_by(**filter).first()

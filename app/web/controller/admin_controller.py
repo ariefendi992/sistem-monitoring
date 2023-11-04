@@ -149,7 +149,7 @@ class PenggunaSiswa:
                         alamat=i.alamat if i.alamat else "-",
                         nama_ortu=i.nama_ortu_or_wali if i.nama_ortu_or_wali else "-",
                         picture=url_for(
-                            "admin.static", filename="img/siswa/foto/" + i.pic
+                            "siswa.static", filename="img/siswa/foto/" + i.pic
                         )
                         if i.pic
                         else None,
@@ -851,15 +851,13 @@ class PenggunaGuru:
     @login_required
     def get_guru():
         if current_user.group == "admin":
-            url = base_url + "api/v2/guru/get-all"
-            response = req.get(url)
-            json_resp = response.json()
+            get_guru = GuruModel.get_all()
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
-            return render_template("admin/guru/data_guru.html", model=json_resp)
+            return render_template("admin/guru/data_guru.html", model=get_guru)
         else:
             abort(401)
 
@@ -868,7 +866,6 @@ class PenggunaGuru:
     def add_guru():
         if current_user.group == "admin":
             form = FormAddGuru(request.form)
-            base = request.root_url
 
             if request.method == "POST" and form.validate_on_submit():
                 username = form.username.data
@@ -887,31 +884,28 @@ class PenggunaGuru:
                 alamat = form.alamat.data
                 telp = form.telp.data
 
-                url_create = base + "api/v2/auth/create"
-                payload = json.dumps(
-                    {
-                        "username": username,
-                        "password": password,
-                        "group": group,
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "gender": gender,
-                        "alamat": alamat,
-                        "agama": agama,
-                        "telp": telp,
-                    }
-                )
-                headers = {"Content-Type": "application/json"}
-                response = req.post(url=url_create, data=payload, headers=headers)
-                msg = response.json().get("msg")
+                hash_pswd = UserModel.generate_pswd(password)
 
-                if response.status_code == 201:
-                    flash(f"{msg} Status : {response.status_code}", "success")
-                    return redirect(url_for("admin2.get_guru"))
-                else:
-                    flash(f"{msg}. Status : {response.status_code}", "error")
-                    # return redirect(url_for('admin2.get_guru'))
-                    return render_template("admin/guru/tambah_guru.html", form=form)
+                get_one_user = UserModel.get_filter_by(username=username)
+                if get_one_user:
+                    flash("Username yang di input sudah ada.", "error")
+
+                user_model = UserModel(username, hash_pswd, group)
+                user_model.save()
+
+                guru_model = GuruModel(
+                    first_name.title(),
+                    last_name.title(),
+                    gender,
+                    alamat,
+                    agama,
+                    telp,
+                    user_model.id,
+                )
+                guru_model.save()
+
+                flash("Data guru telah di tambahkan.", "success")
+                return redirect(url_for("admin2.get_guru"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -927,17 +921,18 @@ class PenggunaGuru:
         if current_user.group == "admin":
             form = FormEditGuru(request.form)
             # NOTE: GET SINGLE OBJECT
-            url_obj = base_url + f"api/v2/guru/single/{id}"
-            resp_obj = req.get(url=url_obj)
-            jsonObj = resp_obj.json()
+            guru_model = GuruModel
+            get_one = guru_model.get_one(user_id=id)
 
             # FORM DEFAULT VALUE
-            form.nip.default = jsonObj["nip"]
-            form.fullname.default = jsonObj["first_name"] + " " + jsonObj["last_name"]
-            form.jenisKelamin.default = jsonObj["gender"].lower()
-            form.agama.default = jsonObj["agama"].lower()
-            form.alamat.default = jsonObj["alamat"]
-            form.telp.default = jsonObj["telp"]
+            form.nip.default = get_one.user.username
+            form.fullname.default = (
+                get_one.first_name.title() + " " + get_one.last_name.title()
+            )
+            form.jenisKelamin.default = get_one.gender.lower()
+            form.agama.default = get_one.agama.lower()
+            form.alamat.default = get_one.alamat
+            form.telp.default = get_one.telp
             form.process()
 
             # NOTE: REQUEST FORM TO SAVE CHANGES
@@ -958,28 +953,18 @@ class PenggunaGuru:
                 alamat = request.form.get("alamat")
                 telp = request.form.get("telp")
 
-                # HEADERS, DATA TO RESPONSE
-                payload = json.dumps(
-                    {
-                        "nip": nip,
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "gender": gender,
-                        "agama": agama,
-                        "alamat": alamat,
-                        "telp": telp,
-                    }
-                )
-                headers = {"Content-Type": "application/json"}
+                get_one.user.username = nip
+                get_one.first_name = first_name.title()
+                get_one.last_name = last_name.title()
+                get_one.gender = gender
+                get_one.agama = agama
+                get_one.alamat = alamat
+                get_one.telp = telp
 
-                resp_obj = req.put(url=url_obj, data=payload, headers=headers)
-                msg = resp_obj.json()
-                if resp_obj.status_code == 200:
-                    flash(f"{msg['msg']} Status : {resp_obj.status_code}", "success")
-                    return redirect(url_for("admin2.get_guru"))
-                else:
-                    flash(f"{msg['msg']}. Status : {resp_obj.status_code}", "error")
-                return render_template("admin/guru/edit_guru.html", form=form)
+                guru_model.update()
+
+                flash("Data Guru telah diperbaharui.", "success")
+                return redirect(url_for("admin2.get_guru"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -993,21 +978,15 @@ class PenggunaGuru:
     @login_required
     def delete_guru(id):
         if current_user.group == "admin":
-            url = base_url + f"api/v2/guru/single/{id}"
-            response = req.delete(url=url)
+            guru_model = GuruModel
+            get_one = guru_model.get_one(user_id=id)
 
-            if response.status_code == 204:
-                flash(
-                    message=f"Data guru telah berhasil di hapus. Status : {response.status_code}",
-                    category="info",
-                )
-                return redirect(url_for("admin2.get_guru"))
-            else:
-                flash(
-                    message=f"Terjadi kesalahan dalama memuat data. Status : {response.status_code}",
-                    category="info",
-                )
-                return redirect(url_for("admin2.get_guru"))
+            if not get_one:
+                flash("Terjadi kesalah!\\nPeriksa User ID atau ID", "error")
+
+            guru_model.delete(get_one)
+            flash("Data Guru telah dihapus", "success")
+            return redirect(url_for("admin2.get_guru"))
         else:
             abort(401)
 
@@ -1017,9 +996,7 @@ class PenggunaUser:
     @login_required
     def get_user():
         if current_user.group == "admin":
-            # url = base_url + f"api/v2/auth/get-all"
-            # response = req.get(url)
-            # json_resp = response.json()
+            
             users = UserModel.query.all()
             form = FormEditStatus()
             formUpdatePassword = FormEditPassword()
@@ -1125,31 +1102,20 @@ class PenggunaUser:
     def update_password(id):
         if current_user.group == "admin":
             url = base_url + f"api/v2/auth/edit-password?id={id}"
+            user_model = UserModel
+            get_one = user_model.get_one(id=id)
+            
             if request.method == "POST":
                 password = request.form.get("kataSandi")
+                
+                hash_pass = UserModel.generate_pswd(password)
+                
+                get_one.password = hash_pass
+                user_model.update()
+                
+                flash(f'Kata Sandi dengan username {get_one.username}\\ntelah diperbaharui.', 'success')
 
-                headers = {"Content-Type": "application/json"}
-                payload = json.dumps({"password": password})
-
-                response = req.put(url=url, data=payload, headers=headers)
-                msg = response.json()
-                if response.status_code == 200:
-                    flash(
-                        message=f'{msg["msg"]}, status : {response.status_code}',
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.get_user"))
-                elif response.status_code == 400:
-                    flash(
-                        f'Error: {msg["msg"]}, status : {response.status_code}', "error"
-                    )
-                    return redirect(url_for("admin2.get_user"))
-                else:
-                    flash(
-                        f"Error: Terjadi kesalahan dalam memuat data, status : {response.status_code}",
-                        "error",
-                    )
-                    return redirect(url_for("admin2.get_user"))
+                return redirect(url_for("admin2.get_user"))
         else:
             abort(401)
 
@@ -1250,9 +1216,7 @@ class MasterData:
     @login_required
     def get_mapel():
         if current_user.group == "admin":
-            # url = base_url + f"api/v2/master/mapel/get-all"
-            # response = req.get(url)
-            # jsonRespon = response.json()
+           
             mapel_model = MapelModel
             get_mapels = mapel_model.get_all()
             """
@@ -1358,11 +1322,9 @@ class MasterData:
     @login_required
     def get_semester():
         if current_user.group == "admin":
-            URL = base_url + f"api/v2/master/semester/get-all"
-            response = req.get(URL)
-            jsonResp = response.json()
+            get_semester = SemesterModel.query.all()
             return render_template(
-                "admin/master/semester/data_semester.html", model=jsonResp
+                "admin/master/semester/data_semester.html", model=get_semester
             )
         else:
             abort(401)

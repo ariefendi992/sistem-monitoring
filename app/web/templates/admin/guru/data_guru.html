@@ -41,20 +41,20 @@
         {% for _ in model %}
         <tr>
           <td class="align-middle">{{ loop.index }}</td>
-          <td class="align-middle">{{ _.nip }}</td>
-          <td class="align-middle">{{ _.first_name }} {{_.last_name}}</td>
-          <td class="align-middle">{{ _.gender }}</td>
-          <td class="align-middle">{{ _.agama }}</td>
+          <td class="align-middle">{{ _.user.username }}</td>
+          <td class="align-middle">{{ _.first_name.title() }} {{_.last_name.title()}}</td>
+          <td class="align-middle">{{ _.gender.title() }}</td>
+          <td class="align-middle">{{ _.agama.title() }}</td>
           <!-- AKSI -->
           <td class="align-middle text-center">
-            <button class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#modal-detail{{_.id}}">
+            <button class="btn btn-outline-info btn-xs" data-toggle="modal" data-target="#modal-detail{{_.user_id}}">
               <i class="fas fa-eye"></i>
             </button>
-            <a href="{{ url_for('admin2.update_guru', id=_.id)}}" class="btn btn-outline-warning btn-xs">
+            <a href="{{ url_for('admin2.update_guru', id=_.user_id)}}" class="btn btn-outline-warning btn-xs">
               <i class="fas fa-pencil-alt"></i>
             </a>
             <button class="btn btn-outline-danger btn-xs" title="Delete data." data-toggle="modal"
-              data-target="#delete-{{_.id}}">
+              data-target="#delete-{{_.user_id}}">
               <i class="fas fa-trash-alt"></i>
             </button>
           </td>

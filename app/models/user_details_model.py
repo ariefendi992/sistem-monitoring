@@ -147,10 +147,25 @@ class GuruModel(db.Model):
     def __str__(self) -> str:
         return f"{self.first_name.title()} {self.last_name.title()}"
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update():
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
     @classmethod
     def get_all(cls):
         data = cls.query.all()
         return data
+
+    @classmethod
+    def get_one(cls, **filter_by):
+        return cls.query.filter_by(**filter_by).first()
 
     @classmethod
     def get_all_filter(cls, *filter, **filter_by):

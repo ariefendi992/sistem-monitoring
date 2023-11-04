@@ -1,4 +1,4 @@
-<div class="modal fade" id="delete-{{ _.id }}">
+<div class="modal fade" id="delete-{{ _.user_id }}">
     <div class="modal-dialog modal-sm">
         <div class="modal-content ">
             <div class="modal-header bg-danger">
@@ -16,7 +16,7 @@
             </div>
             <div class="modal-footer justify-content-end">
                 <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Tutup</button>
-                <a href="{{url_for('admin2.delete_guru', id=_.id)}}" class="btn btn-danger btn-sm">Ya, Hapus</a>
+                <a href="{{url_for('admin2.delete_guru', id=_.user_id)}}" class="btn btn-danger btn-sm">Ya, Hapus</a>
             </div>
         </div>
         <!-- /.modal-content -->

@@ -10,7 +10,7 @@
       <div class="modal-body">
         <div class="row justify-content-center mb-4">
 
-          <img src="{{i.qr_code if i.qr_code else '#' }}"
+          <img src="{{ url_for('siswa.static', filename='img/siswa/qr_code/'+ i.qr_code) if i.qr_code else '#' }}"
             style="height: 200px; border-radius: 12px; box-shadow: #ccc 4px 8px 8px; alt="">
         </div>
         <div class=" modal-footer justify-content-end">

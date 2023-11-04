@@ -1,3 +1,4 @@
+from fileinput import filename
 import json
 import time
 from typing import Any
@@ -148,17 +149,9 @@ class PenggunaSiswa:
                         agama=i.agama if i.agama else "-",
                         alamat=i.alamat if i.alamat else "-",
                         nama_ortu=i.nama_ortu_or_wali if i.nama_ortu_or_wali else "-",
-                        picture=url_for(
-                            "siswa.static", filename="img/siswa/foto/" + i.pic
-                        )
-                        if i.pic
-                        else None,
+                        picture = i.pic,
                         telp=i.no_telp if i.no_telp else "-",
-                        qr_code=url_for(
-                            "siswa.static", filename="img/siswa/qr_code" + i.qr_code
-                        )
-                        if i.qr_code
-                        else None,
+                        qr_code= i.qr_code,
                         active="Aktif" if i.user.is_active == "1" else "Non-Aktif",
                         join=format_datetime_id(i.user.join_date)
                         if i.user.join_date
@@ -996,7 +989,6 @@ class PenggunaUser:
     @login_required
     def get_user():
         if current_user.group == "admin":
-            
             users = UserModel.query.all()
             form = FormEditStatus()
             formUpdatePassword = FormEditPassword()
@@ -1104,16 +1096,19 @@ class PenggunaUser:
             url = base_url + f"api/v2/auth/edit-password?id={id}"
             user_model = UserModel
             get_one = user_model.get_one(id=id)
-            
+
             if request.method == "POST":
                 password = request.form.get("kataSandi")
-                
+
                 hash_pass = UserModel.generate_pswd(password)
-                
+
                 get_one.password = hash_pass
                 user_model.update()
-                
-                flash(f'Kata Sandi dengan username {get_one.username}\\ntelah diperbaharui.', 'success')
+
+                flash(
+                    f"Kata Sandi dengan username {get_one.username}\\ntelah diperbaharui.",
+                    "success",
+                )
 
                 return redirect(url_for("admin2.get_user"))
         else:
@@ -1216,7 +1211,6 @@ class MasterData:
     @login_required
     def get_mapel():
         if current_user.group == "admin":
-           
             mapel_model = MapelModel
             get_mapels = mapel_model.get_all()
             """

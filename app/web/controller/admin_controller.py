@@ -265,7 +265,7 @@ class PenggunaSiswa:
                 return redirect(request.url)
             first_name = (
                 get_one.first_name
-                if len(get_one.first_name) >= 2
+                if len(get_one.first_name) >= 3
                 else get_one.last_name.split(" ", 1)[0]
             )
             user_first_name = first_name.replace(" ", "_").lower()
@@ -275,13 +275,13 @@ class PenggunaSiswa:
                 get_one.pic = up_resize["filename"]
                 siswa_model.commit()
                 flash(
-                    f"Unggah Foto siswa {get_one.first_name.title() if len(get_one.first_name) >=2 else get_one.last_name.title()}\\nberhasil.",
+                    f"Unggah Foto siswa {get_one.first_name.title() if len(get_one.first_name) >=3 else get_one.last_name.title()}\\nberhasil.",
                     "success",
                 )
                 return redirect(url_for("admin2.getSiswa"))
             else:
                 flash(
-                    f"Unggah Foto siswa {get_one.first_name.title() if len(get_one.first_name) >=2 else get_one.last_name.title()}\\ngagal.",
+                    f"Unggah Foto siswa {get_one.first_name.title() if len(get_one.first_name) >=3 else get_one.last_name.title()}\\ngagal.",
                     "error",
                 )
                 return redirect(url_for("admin2.getSiswa"))

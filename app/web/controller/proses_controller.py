@@ -57,7 +57,7 @@ def generate_idcard():
     enc = hashlib.md5(
         get_secure_filename(sql_siswa.first_name).encode("utf-8")
     ).hexdigest()
-    f_name = f"{sql_siswa.kelas}_{sql_siswa.first_name.title()}_{enc[1:5]}"
+    f_name = f"{sql_siswa.kelas}_{sql_siswa.first_name.title() if len(sql_siswa.first_name)>= 3 else sql_siswa.last_name.split(" ",1)[0].replace(" ", "_").lower()}_{enc[1:5]}"
 
     html = url_for("proses.get_idcard", siswa=sql_siswa.user_id)
     url = urlparse(request.base_url)

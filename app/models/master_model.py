@@ -1,4 +1,3 @@
-from requests import delete
 import sqlalchemy as sa
 from app.extensions import db
 import sqlalchemy.orm as rs

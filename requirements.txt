@@ -15,6 +15,7 @@ pyOpenSSL==23.2.0
 python-dotenv==1.0.0
 pytz==2023.3
 qrcode==7.4.2
+requests==2.31.0
 SQLAlchemy==2.0.20
 Werkzeug==2.3.7
 WTForms==3.0.1

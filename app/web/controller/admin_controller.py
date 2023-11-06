@@ -1,10 +1,7 @@
-from fileinput import filename
-import json
+import hashlib
 import time
-from typing import Any
 from flask import (
     Blueprint,
-    Response,
     abort,
     make_response,
     request,
@@ -15,11 +12,14 @@ from flask import (
     render_template,
     flash,
 )
+import qrcode
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.moduledrawers import *
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from calendar import monthrange
 from app.lib.date_time import format_datetime_id, format_indo
-from app.lib.status_code import HTTP_413_REQUEST_ENTITY_TOO_LARGE
+from app.lib.uploader import upload_resize_photo
 from app.models.user_model import *
 from app.models.master_model import *
 from app.models.user_details_model import *
@@ -37,14 +37,12 @@ from app.web.forms.form_pengguna import (
 from app.web.forms.form_siswa import FormAddSiswa, FormEditSiswa
 from ..forms.form_auth import *
 from ..forms.form_guru import *
-from ..lib.base_url import base_url
+
 from app.models.user_login_model import *
 from app.models.data_model import *
 from sqlalchemy import func
 from app.lib.db_statement import DBStatement
-from app.api.controller import siswa_controller
 import os
-import requests as req
 import io
 import xlwt
 
@@ -69,15 +67,10 @@ dbs = DBStatement()
 @login_required
 def index():
     if current_user.group == "admin":
-        jml_siswa = sql(
-            x=db.session.query(UserModel).filter(UserModel.group == "siswa").count()
-        )
+        jml_siswa = sql(x=db.session.query(SiswaModel).count())
 
-        jml_bk = db.session.query(UserModel).filter(UserModel.group == "bk").count()
-        jml_guru = (
-            sql(x=db.session.query(UserModel).filter(UserModel.group == "guru").count())
-            + jml_bk
-        )
+        jml_bk = db.session.query(GuruBKModel).count()
+        jml_guru = sql(x=db.session.query(GuruModel).count())
         jml_admin = sql(
             x=db.session.query(UserModel).filter(UserModel.group == "admin").count()
         )
@@ -115,16 +108,20 @@ class PenggunaSiswa:
             sql_siswa = siswa_model.getAll()
 
             list_siswa = []
+            list_nama_foto = []
             path_file = os.getcwd() + "/app/api/static/img/siswa/"
             list_file = os.listdir(path_file + "foto/")
             list_id_card = os.listdir(path_file + "id_card/")
             list_qr_file = os.listdir(path_file + "qr_code/")
 
             for i in sql_siswa:
+                if i.pic is not None:
+                    list_nama_foto.append(i.pic)
                 if i.pic and i.pic not in list_file:
                     get_siswa = siswa_model.get_filter_by(id=i.id)
                     get_siswa.pic = None
                     siswa_model.commit()
+
                 if i.id_card and i.id_card not in list_id_card:
                     get_siswa = siswa_model.get_filter_by(id=i.id)
                     get_siswa.id_card = None
@@ -149,9 +146,9 @@ class PenggunaSiswa:
                         agama=i.agama if i.agama else "-",
                         alamat=i.alamat if i.alamat else "-",
                         nama_ortu=i.nama_ortu_or_wali if i.nama_ortu_or_wali else "-",
-                        picture = i.pic,
+                        picture=i.pic,
                         telp=i.no_telp if i.no_telp else "-",
-                        qr_code= i.qr_code,
+                        qr_code=i.qr_code,
                         active="Aktif" if i.user.is_active == "1" else "Non-Aktif",
                         join=format_datetime_id(i.user.join_date)
                         if i.user.join_date
@@ -188,22 +185,60 @@ class PenggunaSiswa:
     @login_required
     def generate_qc():
         if current_user.group == "admin":
+            qc_folder = os.getcwd() + "/app/api/static/img/siswa/qr_code/"
             id = request.args.get("id")
-            url = base_url + url_for("siswa.generate_qc", id=id)
-            headers = {"Content-Type": "application/json"}
-            r = req.put(url, headers=headers)
-            if r.status_code == 200:
-                flash(
-                    message=f"Generate QR kode berhasil. Status : {r.status_code}",
-                    category="success",
-                )
-                return redirect(url_for("admin2.getSiswa"))
-            else:
-                flash(
-                    message=f"Maaf terjadi kesalahan dalam generate QR CODE. Status : {r.status_code}",
-                    category="error",
-                )
-                return redirect(url_for("admin2.getSiswa"))
+            siswa_model = SiswaModel
+            get_one = siswa_model.get_one(user_id=id)
+
+            if not get_one:
+                flash("Terjadi kesalahan!\\nPeriksa ID Siswa", "error")
+
+            qc = qrcode.QRCode(
+                error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=20, border=2
+            )
+            qc.add_data(get_one.user.username)
+            qc_image = qc.make_image(
+                image_factory=StyledPilImage,
+                module_drawer=RoundedModuleDrawer(),
+                fit=True,
+            )
+            enc_filename = hashlib.md5(
+                secure_filename(get_one.user.username).encode("utf-8")
+            ).hexdigest()
+
+            first_name = (
+                get_one.first_name
+                if len(get_one.first_name) != 2
+                else get_one.last_name.split(" ", 1)[0]
+            )
+            path_file = (
+                qc_folder
+                + get_one.kelas.kelas
+                + "_"
+                + first_name.lower()
+                + "_"
+                + enc_filename
+                + ".png"
+            )
+
+            qc_image.save(path_file)
+
+            get_one.qr_code = (
+                get_one.kelas.kelas
+                + "_"
+                + first_name.lower()
+                + "_"
+                + enc_filename
+                + ".png"
+            )
+
+            siswa_model.commit()
+
+            flash(
+                f"Kode QR {get_one.first_name} {get_one.last_name}\\ntelah dibuat.",
+                "success",
+            )
+            return redirect(url_for("admin2.getSiswa"))
         else:
             flash(
                 f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
@@ -212,32 +247,69 @@ class PenggunaSiswa:
             abort(401)
 
     # NOTE:  UPLOAD FOTO
+    @admin2.get("/upload-photo")
     @admin2.post("/upload-photo")
     @login_required
     def upload_foto():
         if current_user.group == "admin":
             id = request.args.get("id")
-            url = base_url + url_for("siswa.upload_photo", id=id)
+            siswa_model = SiswaModel
+            get_one = siswa_model.get_one(user_id=id)
+
+            if not get_one:
+                flash("Terjadi kesalahan upload!\\nPeriksa User ID Siswa.", "error")
+
             file = request.files["file"]
-            file_name = secure_filename(file.filename)
-            upload_folder = os.getcwd() + "/temp/"
-            path = upload_folder + file_name
-            file.save(path)
+            if file.filename == "":
+                flash("Tidak ada foto terpilih!", "error")
+                return redirect(request.url)
+            first_name = (
+                get_one.first_name
+                if len(get_one.first_name) >= 2
+                else get_one.last_name.split(" ", 1)[0]
+            )
+            user_first_name = first_name.replace(" ", "_").lower()
+            up_resize = upload_resize_photo(file, user_first_name, get_one.kelas)
 
-            files = {"images": open(path, "rb")}
-            response = req.post(url, files=files)
-
-            if response.status_code == 200:
-                files.get("images").close()
-                temp_file = upload_folder + file_name
-                os.remove(f"{temp_file}")
+            if up_resize["status"] == "Ok":
+                get_one.pic = up_resize["filename"]
+                siswa_model.commit()
                 flash(
-                    f"File foto siswa telah berhasil di upload. Status : {response.status_code}",
+                    f"Unggah Foto siswa {get_one.first_name.title() if len(get_one.first_name) >=2 else get_one.last_name.title()}\\nberhasil.",
                     "success",
                 )
                 return redirect(url_for("admin2.getSiswa"))
             else:
-                return f"<p>error : {response.status_code}</p>"
+                flash(
+                    f"Unggah Foto siswa {get_one.first_name.title() if len(get_one.first_name) >=2 else get_one.last_name.title()}\\ngagal.",
+                    "error",
+                )
+                return redirect(url_for("admin2.getSiswa"))
+
+            """
+                Jika uploda menggunakan requests (API) maka bisa gunakan code dibawah ini
+                dengan menambahkan foldet temp terlebih dahulu.
+
+                # file_name = secure_filename(file.filename)
+                # upload_folder = os.getcwd() + "/temp/"
+                # path = upload_folder + file_name
+                # file.save(path)
+
+                # files = {"images": open(path, "rb")}
+                # response = req.post(url, files=files)
+
+                # if response.status_code == 200:
+                #     files.get("images").close()
+                #     temp_file = upload_folder + file_name
+                #     os.remove(f"{temp_file}")
+                #     flash(
+                #         f"File foto siswa telah berhasil di upload. Status : {response.status_code}",
+                #         "success",
+                #     )
+                #     return redirect(url_for("admin2.getSiswa"))
+                # else:
+                #     return f"<p>error : {response.status_code}</p>"
+            """
         else:
             flash(
                 f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
@@ -267,7 +339,6 @@ class PenggunaSiswa:
             for i in get_kelas:
                 kelas.append((i.id, i.kelas))
 
-            url = base_url + f"/api/v2/auth/create"
             form = FormAddSiswa(request.form)
             form.kelas.choices = kelas
             if request.method == "POST" and form.validate_on_submit():
@@ -341,7 +412,7 @@ class PenggunaSiswa:
                     get_kelas.jml_laki = countSiswaGender
                     get_kelas.jml_perempuan = countSiswaPerempuan
 
-                elif siswa_model.geder == "perempuan":
+                elif siswa_model.gender == "perempuan":
                     get_kelas.jml_laki = countSiswaLaki
                     get_kelas.jml_perempuan = countSiswaPerempuan
 
@@ -774,68 +845,68 @@ class PenggunaSiswa:
             abort(401)
 
     # eksport data
-    @admin2.route("/export-siswa")
-    def export_siswa():
-        url = request.url_root + url_for("siswa.get")
-        req_url = req.get(url)
-        data = req_url.json()
-        # output in bytes
-        output = io.BytesIO()
-        # create workbook object
-        workbook = xlwt.Workbook()
-        # style header
-        # style = xlwt.easyxf('font: name Times New Roman, color-index black, bold on; \
-        #                     align: wrap on, vert center, horiz center;')
-        style = xlwt.XFStyle()
-        # background
-        bg_color = xlwt.Pattern()
-        bg_color.pattern = xlwt.Pattern.SOLID_PATTERN
-        bg_color.pattern_fore_colour = xlwt.Style.colour_map["ocean_blue"]
-        style.pattern = bg_color
+    # @admin2.route("/export-siswa")
+    # def export_siswa():
+    #     url = request.url_root + url_for("siswa.get")
+    #     req_url = requests.get(url)
+    #     data = req_url.json()
+    #     # output in bytes
+    #     output = io.BytesIO()
+    #     # create workbook object
+    #     workbook = xlwt.Workbook()
+    #     # style header
+    #     # style = xlwt.easyxf('font: name Times New Roman, color-index black, bold on; \
+    #     #                     align: wrap on, vert center, horiz center;')
+    #     style = xlwt.XFStyle()
+    #     # background
+    #     bg_color = xlwt.Pattern()
+    #     bg_color.pattern = xlwt.Pattern.SOLID_PATTERN
+    #     bg_color.pattern_fore_colour = xlwt.Style.colour_map["ocean_blue"]
+    #     style.pattern = bg_color
 
-        # border
-        boder = xlwt.Borders()
-        boder.bottom = xlwt.Borders.THIN
-        style.borders = boder
+    #     # border
+    #     boder = xlwt.Borders()
+    #     boder.bottom = xlwt.Borders.THIN
+    #     style.borders = boder
 
-        # font
-        font = xlwt.Font()
-        font.bold = True
-        font.name = "Times New Roman"
-        font.height = 220
-        style.font = font
+    #     # font
+    #     font = xlwt.Font()
+    #     font.bold = True
+    #     font.name = "Times New Roman"
+    #     font.height = 220
+    #     style.font = font
 
-        # font aligment
-        align = xlwt.Alignment()
-        align.wrap = xlwt.Alignment.NOT_WRAP_AT_RIGHT
-        align.horz = xlwt.Alignment.HORZ_CENTER
-        align.vert = xlwt.Alignment.VERT_CENTER
-        style.alignment = align
+    #     # font aligment
+    #     align = xlwt.Alignment()
+    #     align.wrap = xlwt.Alignment.NOT_WRAP_AT_RIGHT
+    #     align.horz = xlwt.Alignment.HORZ_CENTER
+    #     align.vert = xlwt.Alignment.VERT_CENTER
+    #     style.alignment = align
 
-        # add a sheet
-        sh = workbook.add_sheet("Data Siswa")
-        # add headers
-        sh.write(0, 0, "NO", style)
-        sh.write(0, 1, "ID", style)
-        sh.write(0, 2, "Nama", style)
+    #     # add a sheet
+    #     sh = workbook.add_sheet("Data Siswa")
+    #     # add headers
+    #     sh.write(0, 0, "NO", style)
+    #     sh.write(0, 1, "ID", style)
+    #     sh.write(0, 2, "Nama", style)
 
-        no = 0
-        urut = 0
+    #     no = 0
+    #     urut = 0
 
-        for row in data["data"]:
-            sh.write(no + 1, 0, urut + 1)
-            sh.write(no + 1, 1, row["id"])
-            no += 1
-            urut += 1
+    #     for row in data["data"]:
+    #         sh.write(no + 1, 0, urut + 1)
+    #         sh.write(no + 1, 1, row["id"])
+    #         no += 1
+    #         urut += 1
 
-        workbook.save(output)
-        output.seek(0)
+    #     workbook.save(output)
+    #     output.seek(0)
 
-        return Response(
-            output,
-            mimetype="application/ms-excel",
-            headers={"Content-Disposition": "attachment; filename=data_siswa.xls"},
-        )
+    #     return Response(
+    #         output,
+    #         mimetype="application/ms-excel",
+    #         headers={"Content-Disposition": "attachment; filename=data_siswa.xls"},
+    #     )
 
 
 # """NOTE: DATA GURU"""
@@ -1093,7 +1164,6 @@ class PenggunaUser:
     @login_required
     def update_password(id):
         if current_user.group == "admin":
-            url = base_url + f"api/v2/auth/edit-password?id={id}"
             user_model = UserModel
             get_one = user_model.get_one(id=id)
 
@@ -1328,30 +1398,20 @@ class MasterData:
     def add_semester():
         if current_user.group == "admin":
             form = FormSemester(request.form)
-            URL = base_url + f"api/v2/master/semester/create"
+            semester_model = SemesterModel
+
             if request.method == "POST" and form.validate_on_submit():
                 semester = form.semester.data
                 status = form.status.data
 
-                payload = json.dumps({"semester": semester, "status": status})
-                headers = {"Content-Type": "application/json"}
-                response = req.post(url=URL, data=payload, headers=headers)
-                msg = response.json()
+                semester_model.semester = semester
+                semester_model.is_active = status
 
-                if response.status_code == 201:
-                    flash(
-                        message=f'{msg["msg"]} Status: {response.status_code}',
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.get_semester"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status: {response.status_code}',
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/semester/tambah_semester.html", form=form
-                    )
+                semester_model.save(semester_model)
+
+                flash("Data semester telah ditambahkan", "success")
+                return redirect(url_for("admin2.get_semester"))
+
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
@@ -1367,32 +1427,20 @@ class MasterData:
     def edit_semester(id):
         if current_user.group == "admin":
             form = FormEditSemester(request.form)
-            URL = base_url + f"api/v2/master/semester/get-one/{id}"
-            responseGet = req.get(url=URL)
-            jsonResp = responseGet.json()
-            form.status.data = "1" if jsonResp["status"] == True else "0"
+            model = SemesterModel
+            get_one = model.get_one(id=id)
+            form.status.data = get_one.is_active
 
             if request.method == "POST" and form.validate_on_submit():
                 status = request.form.get("status")
-                payload = json.dumps({"status": status})
-                headers = {"Content-Type": "application/json"}
-                response = req.put(url=URL, data=payload, headers=headers)
-                msg = response.json()
 
-                if response.status_code == 200:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="info",
-                    )
-                    return redirect(url_for("admin2.get_semester"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/semester/edit_semester.html", form=form
-                    )
+                get_one.is_active = status
+
+                model.update()
+
+                flash("Data semester telah diperbaharui", "success")
+
+                return redirect(url_for("admin2.get_semester"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1408,14 +1456,14 @@ class MasterData:
     @login_required
     def delete_semester(id):
         if current_user.group == "admin":
-            URL = base_url + f"api/v2/master/semester/get-one/{id}"
-            response = req.delete(URL)
-            if response.status_code == 204:
-                flash(
-                    message=f"Data semester telah di hapus dari database. Status : {response.status_code}",
-                    category="info",
-                )
-                return redirect(url_for("admin2.get_semester"))
+            model = SemesterModel
+            get_one = model.get_one(id=id)
+
+            model.delete(get_one)
+
+            flash("Data semester telah dihapus!", "success")
+
+            return redirect(url_for("admin2.get_semester"))
         else:
             abort(401)
 
@@ -1424,16 +1472,15 @@ class MasterData:
     @login_required
     def get_ajaran():
         if current_user.group == "admin":
-            URL = base_url + "api/v2/master/ajaran/get-all"
-            response = req.get(URL)
-            jsonResp = response.json()
-
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
+
+            model = TahunAjaranModel.get_all()
+
             return render_template(
-                "admin/master/tahun_ajaran/data_tahun_ajaran.html", model=jsonResp
+                "admin/master/tahun_ajaran/data_tahun_ajaran.html", model=model
             )
         else:
             abort(401)
@@ -1443,31 +1490,19 @@ class MasterData:
     def add_ajaran():
         if current_user.group == "admin":
             form = FormTahunAJaran(request.form)
-            URL = base_url + "api/v2/master/ajaran/create"
+            model = TahunAjaranModel
 
             if request.method == "POST" and form.validate_on_submit():
                 ajaran = form.tahunAjaran.data
                 status = form.status.data
 
-                payload = json.dumps({"ajaran": ajaran, "status": status})
-                headers = {"Content-Type": "application/json"}
-                response = req.post(url=URL, data=payload, headers=headers)
-                msg = response.json()
+                model.th_ajaran = ajaran
+                model.is_active = status
 
-                if response.status_code == 201:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.get_ajaran"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/tahun_ajaran/tambah_tahun_ajaran.html", form=form
-                    )
+                model.save(model)
+
+                flash("Data tahun ajaran telah ditambahkan.", "success")
+                return redirect(url_for("admin2.get_ajaran"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1484,33 +1519,24 @@ class MasterData:
     def edit_ajaran(id):
         if current_user.group == "admin":
             form = FormTahunAJaran(request.form)
-            URL = base_url + f"api/v2/master/ajaran/get-one/{id}"
-            response = req.get(URL)
-            jsonResp = response.json()
-            form.tahunAjaran.data = jsonResp["ajaran"]
-            form.status.data = "1" if jsonResp["status"] == True else "0"
+            model = TahunAjaranModel
+            get_one = model.get_one(id=id)
+
+            form.tahunAjaran.data = get_one.th_ajaran
+            form.status.data = get_one.is_active
 
             if request.method == "POST" and form.validate_on_submit():
                 ajaran = request.form.get("tahunAjaran")
                 status = request.form.get("status")
-                payload = json.dumps({"ajaran": ajaran, "status": status})
-                headers = {"Content-Type": "application/json"}
-                response = req.put(url=URL, data=payload, headers=headers)
-                msg = response.json()
-                if response.status_code == 200:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="info",
-                    )
-                    return redirect(url_for("admin2.get_ajaran"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/tahun_ajaran/edit_tahun_ajaran.html", form=form
-                    )
+
+                get_one.th_ajaran = ajaran
+                get_one.is_active = status
+
+                model.update()
+
+                flash("Data tahun ajaran telah diperbaharui.", "success")
+
+                return redirect(url_for("admin2.get_ajaran"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1527,14 +1553,13 @@ class MasterData:
     @login_required
     def delete_ajaran(id):
         if current_user.group == "admin":
-            URL = base_url + f"api/v2/master/ajaran/get-one/{id}"
-            response = req.delete(URL)
-            if response.status_code == 204:
-                flash(
-                    message=f"Data Tahun Ajaran telah dihapus dari database. Status : {response.status_code}",
-                    category="info",
-                )
-                return redirect(url_for("admin2.get_ajaran"))
+            model = TahunAjaranModel
+            get_one = model.get_one(id=id)
+            model.delete(get_one)
+
+            flash("Data tahun ajaran telah dihapus.", "success")
+
+            return redirect(url_for("admin2.get_ajaran"))
         else:
             abort(401)
 
@@ -1665,15 +1690,13 @@ class MasterData:
     @login_required
     def get_hari():
         if current_user.group == "admin":
-            URL = base_url + "api/v2/master/hari/get-all"
-            response = req.get(URL)
-            jsonResp = response.json()
+            model = HariModel.get_all()
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
                 first_name=user.first_name.title(), last_name=user.last_name.title()
             )
-            return render_template("admin/master/hari/data_hari.html", model=jsonResp)
+            return render_template("admin/master/hari/data_hari.html", model=model)
         else:
             abort(401)
 
@@ -1681,29 +1704,19 @@ class MasterData:
     @login_required
     def add_hari():
         if current_user.group == "admin":
-            URL = base_url + "api/v2/master/hari/create"
             form = FormHari(request.form)
+            model = HariModel
+
             if request.method == "POST" and form.validate_on_submit():
                 hari = form.hari.data
 
-                payload = json.dumps({"hari": hari})
-                headers = {"Content-Type": "application/json"}
-                response = req.post(url=URL, data=payload, headers=headers)
-                msg = response.json()
-                if response.status_code == 201:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.get_hari"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status : {response.status_code}',
-                        category="error",
-                    )
-                    return render_template(
-                        "admin/master/hari/tambah_hari.html", form=form
-                    )
+                model.hari = hari
+
+                model.save(model)
+
+                flash("Data hari telah ditambahkan.", "success")
+
+                return redirect(url_for("admin2.get_hari"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -1721,117 +1734,12 @@ class MasterData:
     @login_required
     def delete_hari(id):
         if current_user.group == "admin":
-            URL = base_url + f"api/v2/master/hari/get-one/{id}"
-            response = req.delete(URL)
-            if response.status_code == 204:
-                flash(
-                    f"Data hari telah di hapus dari database. Status : {response.status_code}",
-                    "info",
-                )
-                return redirect(url_for("admin2.get_hari"))
-        else:
-            abort(401)
+            model = HariModel
+            get_one = model.get_one(id=id)
 
-    # NOTE: ================== MASTER DATA JAM =====================================
-    @admin2.route("data-jam")
-    @login_required
-    def get_jam():
-        if current_user.group == "admin":
-            url = base_url + "api/v2/master/jam/get-all"
-            resp = req.get(url)
-            jsonResp = resp.json()
-            form = FormJam(request.form)
-
-            user = dbs.get_one(AdminModel, user_id=current_user.id)
-            session.update(
-                first_name=user.first_name.title(), last_name=user.last_name.title()
-            )
-
-            return render_template(
-                "admin/master/jam/data_jam.html", model=jsonResp, form=form
-            )
-        else:
-            abort(401)
-
-    @admin2.route("tambah-jam", methods=["GET", "POST"])
-    @login_required
-    def add_jam():
-        if current_user.group == "admin":
-            form = FormJam(request.form)
-            url = base_url + "api/v2/master/jam/create"
-            if request.method == "POST":
-                jam = form.jam.data
-                payload = json.dumps({"jam": jam})
-                headers = {"Content-Type": "application/json"}
-                resp = req.post(url=url, data=payload, headers=headers)
-                msg = resp.json()
-                if resp.status_code == 201:
-                    flash(
-                        message=f'{msg["msg"]} Status : {resp.status_code}',
-                        category="success",
-                    )
-                    return redirect(url_for("admin2.get_jam"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status : {resp.status_code}',
-                        category="error",
-                    )
-                    return redirect(url_for("admin2.get_jam"))
-            else:
-                flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
-                )
-                abort(401)
-
-    @admin2.route("edit-jam/<int:id>", methods=["GET", "POST"])
-    @login_required
-    def edit_jam(id):
-        if current_user.group == "admin":
-            url = base_url + f"api/v2/master/jam/get-one/{id}"
-            if request.method == "POST":
-                jam = request.form.get("jam")
-                payload = json.dumps({"jam": jam})
-                headers = {"Content-Type": "application/json"}
-                resp = req.put(url=url, data=payload, headers=headers)
-                msg = resp.json()
-                if resp.status_code == 200:
-                    flash(
-                        message=f'{msg["msg"]} Status: {resp.status_code}',
-                        category="info",
-                    )
-                    return redirect(url_for("admin2.get_jam"))
-                else:
-                    flash(
-                        message=f'{msg["msg"]} Status: {resp.status_code}',
-                        category="error",
-                    )
-                    return redirect(url_for("admin2.get_jam"))
-            else:
-                flash(
-                    f"Hak akses anda telah dicabut/berakhir. Silahkan login kembali",
-                    "error",
-                )
-                abort(401)
-
-    @admin2.route("delete-jam/<int:id>", methods=["GET", "POST"])
-    @login_required
-    def delete_jam(id):
-        if current_user.group == "admin":
-            url = base_url + f"api/v2/master/jam/get-one/{id}"
-            resp = req.delete(url=url)
-            if resp.status_code == 204:
-                flash(
-                    message=f"Data Jam telah dihapus dari database Status: {resp.status_code}",
-                    category="info",
-                )
-                return redirect(url_for("admin2.get_jam"))
-            else:
-                msg = resp.json()
-                flash(
-                    message=f'{msg["msg"]} Status: {resp.status_code}', category="error"
-                )
-                return redirect(url_for("admin2.get_jam"))
+            model.delete(get_one)
+            flash("Data hari telah dihapus.", "success")
+            return redirect(url_for("admin2.get_hari"))
         else:
             abort(401)
 
@@ -2115,14 +2023,7 @@ class MasterData:
             get_kepsek = KepsekModel.get_all()
             get_guru = GuruModel.get_all()
 
-            url = base_url + "api/v2/master/kepsek/get-all"
-            resp = req.get(url)
-            jsonResp = resp.json()
             form = FormKepsek(request.form)
-            urlGuru = base_url + "api/v2/guru/get-all"
-            respGuru = req.get(urlGuru)
-            jsonRespGuru = respGuru.json()
-
             if not get_kepsek:
                 for i in get_guru:
                     form.namaGuru.choices.append(
@@ -2143,7 +2044,7 @@ class MasterData:
                 "admin/master/kepsek/data_kepsek.html",
                 model=get_kepsek,
                 form=form,
-                jsonGuru=jsonRespGuru,
+                jsonGuru=get_guru,
                 status=status,
             )
         else:
@@ -2153,19 +2054,6 @@ class MasterData:
     @login_required
     def add_kepsek():
         if current_user.group == "admin":
-            # url = base_url + f"api/v2/master/kepsek/create"
-            # guru_id = request.form.get("namaGuru")
-            # payload = json.dumps({"guru_id": guru_id})
-            # headers = {"Content-Type": "application/json"}
-            # resp = req.post(url=url, data=payload, headers=headers)
-
-            # if resp.status_code == 201:
-            #     msg = resp.json()
-            #     flash(f'{msg["msg"]} Status : {resp.status_code}', "success")
-            #     return redirect(url_for("admin2.get_kepsek"))
-            # else:
-            #     flash(f"Ma'af! Terjadi kesalahan menginput data.", "error")
-            #     return redirect(url_for("admin2.get_kepsek"))
             form = FormKepsek()
             data_guru = GuruModel.get_all()
             data_kepsek = KepsekModel.get_all()
@@ -2205,44 +2093,17 @@ class MasterData:
         else:
             abort(401)
 
-    @admin2.route("edit-kepsek/<int:id>", methods=["GET", "POST"])
-    @login_required
-    def edit_kepsek(id):
-        if current_user.group == "admin":
-            url = base_url + f"api/v2/master/kepsek/get-one/{id}"
-            guru_id = request.form.get("namaGuru")
-            status = request.form.get("status")
-
-            payload = json.dumps({"guru_id": guru_id, "status": status})
-            headers = {"Content-Type": "application/json"}
-
-            resp = req.put(url=url, data=payload, headers=headers)
-            msg = resp.json()
-            if resp.status_code == 200:
-                flash(f'{msg["msg"]} Status : {resp.status_code}', "info")
-                return redirect(url_for("admin2.get_kepsek"))
-            else:
-                flash(f'{msg["msg"]} Status : {resp.status_code}', "error")
-                return redirect(url_for("admin2.get_kepsek"))
-        else:
-            abort(401)
-
     @admin2.route("delete-kepsek/<int:id>", methods=["GET", "DELETE"])
     @login_required
     def delete_kepsek(id):
         if current_user.group == "admin":
-            url = base_url + f"api/v2/master/kepsek/get-one/{id}"
+            model = KepsekModel
+            get_one = model.get_one(id=id)
 
-            resp = req.delete(url=url)
-            if resp.status_code == 204:
-                flash(
-                    f"Data Kepala Sekolah telah dihapus dari database. Status : {resp.status_code}",
-                    "info",
-                )
-                return redirect(url_for("admin2.get_kepsek"))
-            else:
-                flash(f"Gagal memuat data. Status : {resp.status_code}", "error")
-                return redirect(url_for("admin2.get_kepsek"))
+            model.delete(get_one)
+
+            flash("Data Kepsek telah dihapus.", "success")
+            return redirect(url_for("admin2.get_kepsek"))
         else:
             abort(401)
 
@@ -2253,11 +2114,10 @@ class JadwalMengajar:
     @login_required
     def get_jadwal():
         if current_user.group == "admin":
-            # url = base_url + "api/v2/master/jadwal-mengajar/get-all"
-            # resp = req.get(url)
-            # jsonResp = resp.json()
             get_jadwal = (
                 db.session.query(MengajarModel)
+                .join(TahunAjaranModel)
+                .join(SemesterModel)
                 .filter(TahunAjaranModel.is_active == "1")
                 .filter(SemesterModel.is_active == "1")
                 .all()

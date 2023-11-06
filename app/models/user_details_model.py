@@ -98,6 +98,10 @@ class SiswaModel(db.Model):
         db.session.commit()
 
     @classmethod
+    def get_one(cls, **filter_by):
+        return cls.query.filter_by(**filter_by).first()
+
+    @classmethod
     def getAll(cls):
         return cls.query.order_by(cls.kelas_id.asc(), cls.first_name.asc()).all()
 
@@ -106,7 +110,7 @@ class SiswaModel(db.Model):
         return cls.query.filter_by(**filter).first()
 
     def commit():
-        db.session.commit()
+        return db.session.commit()
 
 
 class GuruModel(db.Model):

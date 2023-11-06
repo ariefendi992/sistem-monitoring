@@ -87,6 +87,26 @@ class HariModel(db.Model):
     def __repr__(self) -> str:
         return self.hari
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def update():
+        return db.session.commit()
+
+    @classmethod
+    def get_one(cls, **filter_by: any):
+        cls.query.filter_by(**filter_by).first()
+
+    @classmethod
+    def get_all(cls):
+        cls.query.all()
+
 
 class TahunAjaranModel(db.Model):
     __tablename__ = "master_tahun_ajaran"
@@ -101,6 +121,26 @@ class TahunAjaranModel(db.Model):
     def __repr__(self) -> str:
         return self.th_ajaran
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def update():
+        return db.session.commit()
+
+    @classmethod
+    def get_one(cls, **filter_by: any):
+        cls.query.filter_by(**filter_by).first()
+
+    @classmethod
+    def get_all(cls):
+        cls.query.all()
+
 
 class SemesterModel(db.Model):
     __tablename__ = "master_semester"
@@ -114,6 +154,26 @@ class SemesterModel(db.Model):
 
     def __repr__(self) -> str:
         return self.semester
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
+
+    @classmethod
+    def get_one(cls, **filter_by):
+        return cls.query.filter_by(**filter_by).first()
+
+    @staticmethod
+    def update():
+        return db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class WaliKelasModel(db.Model):
@@ -269,9 +329,21 @@ class KepsekModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def update():
+        return db.session.commit()
+
     @classmethod
     def get_all(cls):
         return cls.query.all()
+
+    @classmethod
+    def get_one(cls, **filter_by):
+        return cls.query.filter_by(**filter_by).first()
 
     @classmethod
     def get_filter_by(cls, id):

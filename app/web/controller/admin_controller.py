@@ -40,7 +40,7 @@ from ..forms.form_guru import *
 
 from app.models.user_login_model import *
 from app.models.data_model import *
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from app.lib.db_statement import DBStatement
 import os
 import io
@@ -418,22 +418,8 @@ class PenggunaSiswa:
 
                 get_kelas.jml_seluruh = countSiswaAll
                 db.session.commit()
-                # headers = {"Content-Type": "application/json"}
-                # response = req.post(url=url, headers=headers, data=payload)
-                # msg = response.json()
-                # if response.status_code == 201:
-                # flash(
-                #     message=f"{msg['msg']}. Status : {response.status_code}",
-                #     category="success",
-                # )
+
                 return redirect(url_for("admin2.getSiswa"))
-                # elif response.status_code == 409:
-                #     flash(
-                #         message="NISN sudah yang di input, telah terdaftar",
-                #         category="error",
-                #     )
-                # else:
-                #     return render_template("admin/siswa/tambah_siswa.html", form=form)
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -503,8 +489,10 @@ class PenggunaSiswa:
             form = FormEditSiswa(request.form)
 
             user_id = request.args.get("siswa", type=int)
-            kelas_id_sebelum = request.args.get("kelas", type=int)
             sql_siswa = SiswaModel.query.filter_by(user_id=user_id).first()
+            # kelas_id_sebelum = request.args.get("kelas", type=int)
+            # kelas_id_sebelum = request.args.get("kelas", type=int)
+            kelas_id_sebelum = sql_siswa.kelas_id
 
             sql_count_siswa = SiswaModel.query
 
@@ -526,61 +514,69 @@ class PenggunaSiswa:
                 alamat = form.alamat.data
                 orang_tua = form.namaOrtu.data
                 telp = form.telp.data
-
-                sql_siswa.user.username = nisn
-                sql_siswa.first_name = first_name.title()
-                sql_siswa.last_name = last_name.title()
-                sql_siswa.kelas_id = kelas
-                sql_siswa.gender = gender
-                sql_siswa.tempat_lahir = tempat
-                sql_siswa.tgl_lahir = tgl_lahir
-                sql_siswa.agama = agama
-                sql_siswa.alamat = alamat
-                sql_siswa.nama_ortu_or_wali = orang_tua
-                sql_siswa.telp = telp
-
-                sql_kelas = KelasModel.query
-                kelas_baru = sql_kelas.filter_by(id=kelas).first()
-                kelas_lama = sql_kelas.filter_by(id=kelas_id_sebelum).first()
-
-                if kelas_baru.id != kelas_lama.id:
-                    kelas_baru.jml_seluruh = sql_count_siswa.filter_by(
-                        kelas_id=kelas
-                    ).count()
-                    kelas_baru.jml_perempuan = sql_count_siswa.filter_by(
-                        gender="perempuan", kelas_id=kelas
-                    ).count()
-                    kelas_baru.jml_laki = sql_count_siswa.filter_by(
-                        gender="laki-laki", kelas_id=kelas
-                    ).count()
-
-                    kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
-                        kelas_id=kelas_id_sebelum
-                    ).count()
-                    kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
-                        gender="perempuan", kelas_id=kelas_id_sebelum
-                    ).count()
-                    kelas_lama.jml_laki = sql_count_siswa.filter_by(
-                        gender="laki-laki", kelas_id=kelas_id_sebelum
-                    ).count()
+                
+                if (nisn == '' or nisn is None) or (fullname == '' or fullname is None) or (kelas == '' or kelas is None):
+                    flash(f"Gagal!\\nForm Kelas atau Nama atau NISN tidak boleh kosong.","error")
+                    # flash(f"Gagal!\\nForm {'Kelas' if (kelas == "" or kelas == None) else 'NISN' if (nisn=='' or nisn is None) else 'Nama Lengkap' } tidak boleh kosong.","error")
+                    
+                    return redirect(url_for('.get_object_siswa', siswa=user_id))
                 else:
-                    kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
-                        kelas_id=kelas_id_sebelum
-                    ).count()
-                    kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
-                        gender="perempuan", kelas_id=kelas_id_sebelum
-                    ).count()
-                    kelas_lama.jml_laki = sql_count_siswa.filter_by(
-                        gender="laki-laki", kelas_id=kelas_id_sebelum
-                    ).count()
+                    
+                    sql_siswa.user.username = nisn
+                    sql_siswa.first_name = first_name.title()
+                    sql_siswa.last_name = last_name.title()
+                    sql_siswa.kelas_id = kelas
+                    sql_siswa.gender = gender
+                    sql_siswa.tempat_lahir = tempat
+                    sql_siswa.tgl_lahir = tgl_lahir
+                    sql_siswa.agama = agama
+                    sql_siswa.alamat = alamat
+                    sql_siswa.nama_ortu_or_wali = orang_tua
+                    sql_siswa.telp = telp
 
-                db.session.commit()
+                    sql_kelas = KelasModel.query
+                    kelas_baru = sql_kelas.filter_by(id=kelas).first()
+                    kelas_lama = sql_kelas.filter_by(id=kelas_id_sebelum).first()
 
-                flash("Data profil sisa telah diperbaharui", "success")
-                direct = redirect(url_for(".getSiswa"))
-                response = make_response(direct)
+                    if kelas_id_sebelum is not None:
+                        if kelas_baru.id != kelas_lama.id:
+                            kelas_baru.jml_seluruh = sql_count_siswa.filter_by(
+                                kelas_id=kelas
+                            ).count()
+                            kelas_baru.jml_perempuan = sql_count_siswa.filter_by(
+                                gender="perempuan", kelas_id=kelas
+                            ).count()
+                            kelas_baru.jml_laki = sql_count_siswa.filter_by(
+                                gender="laki-laki", kelas_id=kelas
+                            ).count()
 
-                return response
+                            kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
+                                kelas_id=kelas_id_sebelum
+                            ).count()
+                            kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
+                                gender="perempuan", kelas_id=kelas_id_sebelum
+                            ).count()
+                            kelas_lama.jml_laki = sql_count_siswa.filter_by(
+                                gender="laki-laki", kelas_id=kelas_id_sebelum
+                            ).count()
+                        else:
+                            kelas_lama.jml_seluruh = sql_count_siswa.filter_by(
+                                kelas_id=kelas_id_sebelum
+                            ).count()
+                            kelas_lama.jml_perempuan = sql_count_siswa.filter_by(
+                                gender="perempuan", kelas_id=kelas_id_sebelum
+                            ).count()
+                            kelas_lama.jml_laki = sql_count_siswa.filter_by(
+                                gender="laki-laki", kelas_id=kelas_id_sebelum
+                            ).count()
+
+                    db.session.commit()
+
+                    flash("Data profil sisa telah diperbaharui", "success")
+                    direct = redirect(url_for(".getSiswa"))
+                    response = make_response(direct)
+
+                    return response
 
             else:
                 direct = redirect(url_for(".get_object_siswa", siswa=user_id))
@@ -1572,6 +1568,24 @@ class MasterData:
 
             kelas_model = KelasModel
             gets_kelas = kelas_model.get_all()
+            for i in gets_kelas:
+                get_count_l = (
+                    SiswaModel.query.filter_by(kelas_id=i.id)
+                    .filter_by(gender="laki-laki")
+                    .count()
+                )
+                get_count_p = (
+                    SiswaModel.query.filter_by(kelas_id=i.id)
+                    .filter_by(gender="perempuan")
+                    .count()
+                )
+
+                get_kelas = kelas_model.get_filter_by(id=i.id)
+                get_kelas.jml_laki = get_count_l
+                get_kelas.jml_perempuan = get_count_p
+                get_kelas.jml_seluruh = get_count_l + get_count_p
+
+                kelas_model.commit()
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(
@@ -2305,19 +2319,31 @@ class JadwalMengajar:
                 kelas_id = request.form.get("kelas")
                 jam_ke = request.form.get("jamKe")
 
-                get_jadwal.guru_id = guru_id
-                get_jadwal.hari_id = hari_id
-                get_jadwal.mapel_id = mapel_id
-                get_jadwal.jam_mulai = jam_mulai
-                get_jadwal.jam_selesai = jam_selesai
-                get_jadwal.kelas_id = kelas_id
-                get_jadwal.jam_ke = jam_ke
+                if (
+                    guru_id == ""
+                    or mapel_id == ""
+                    or hari_id == ""
+                    or (kelas_id == "" or kelas_id is None)
+                    or jam_mulai == ""
+                    or jam_selesai == ""
+                    or jam_ke == ""
+                ):
+                    flash(
+                        "Perbaharui jadwal gagal.\\nTidak boleh ada form yang kosong!",
+                        "error",
+                    )
+                else:
+                    get_jadwal.guru_id = guru_id
+                    get_jadwal.hari_id = hari_id
+                    get_jadwal.mapel_id = mapel_id
+                    get_jadwal.jam_mulai = jam_mulai
+                    get_jadwal.jam_selesai = jam_selesai
+                    get_jadwal.kelas_id = kelas_id
+                    get_jadwal.jam_ke = jam_ke
+                    mengajar_model.commit()
+                    flash("Data Jadwal telah di perbaharui.", "success")
 
-                mengajar_model.commit()
-
-                flash("Data Jadwal telah di perbaharui.", "success")
-
-                return redirect(url_for("admin2.get_jadwal"))
+                    return redirect(url_for("admin2.get_jadwal"))
 
             user = dbs.get_one(AdminModel, user_id=current_user.id)
             session.update(

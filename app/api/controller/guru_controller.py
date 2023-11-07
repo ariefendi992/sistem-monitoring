@@ -655,11 +655,11 @@ def absen_siswa_guru_mapel():
             # )
             # base.create()
 
-            if (now >= jam_mulai) and (now >= jam_selesai):
-                return (
-                    jsonify(status="Gagal", msg="Telah melewati batas waktu absen!"),
-                    HTTP_400_BAD_REQUEST,
-                )
+            # if (now >= jam_mulai) and (now >= jam_selesai):
+            #     return (
+            #         jsonify(status="Gagal", msg="Telah melewati batas waktu absen!"),
+            #         HTTP_400_BAD_REQUEST,
+            #     )
             absen = AbsensiModel(
                 mengajar_id=mengajar_id,
                 siswa_id=siswa_id,

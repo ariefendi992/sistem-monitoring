@@ -9,6 +9,8 @@ from hypercorn.asyncio import serve
     Flask with granian
     cli comman:
         granian --interface wsgi|asgi|rsgi --reload main:myApp
+        granian --interface wsgi --reload --ssl-certificate certificate.crt --ssl-keyfile private.key --host ['0.0.0.0','0.0.0.0'] --port [80,443] --port 443 main:myApp
+        granian --interface wsgi --reload --ssl-certificate certificate.crt --ssl-keyfile private.key --host 0.0.0.0 --port 80 --port 443 main:myApp
 """
 myApp = create_app()
 

@@ -18,7 +18,7 @@
         </div>
 
         <div class="foto">
-            <img id="siswa" src="{{file.foto}}" alt="">
+            <img id="siswa" src="{{ url_for('siswa.static', filename='img/siswa/foto/'+data.pic) }}" alt="">
 
         </div>
         <div class="info">
@@ -27,7 +27,7 @@
                 <h3 id="value">{{ data.kelas.kelas }}</h3>
             </div>
             <div class="qr">
-                <img src="{{ file.qr }}" alt="">
+                <img src="{{ url_for('siswa.static', filename='img/siswa/foto/'+ data.qr_code) }}" alt="">
                 <h3 id="nisn">{{ data.user.username }}</h3>
             </div>
         </div>

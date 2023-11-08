@@ -1,6 +1,7 @@
 from datetime import datetime, time
 from flask import Blueprint, jsonify, request, url_for
 from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_login import current_user
 from sqlalchemy import and_
 from app.lib.base_model import BaseModel
 from app.lib.date_time import (
@@ -536,6 +537,8 @@ def get_siswa_kelas():
     siswa_absen = (
         db.session.query(AbsensiModel)
         .join(SiswaModel)
+        .join(MengajarModel)
+        .join(GuruModel)
         .filter(
             AbsensiModel.tgl_absen
             == datetime.date(
@@ -543,8 +546,14 @@ def get_siswa_kelas():
             )
         )
         .filter(SiswaModel.kelas_id == kelas_id)
+        .filter(AbsensiModel.mengajar_id == MengajarModel.id)
+        .filter(GuruModel.user_id == get_jwt_identity()["id"])
         .all()
     )
+
+    for i in siswa_absen:
+        print(f"Nama : {i.siswa.first_name} {i.siswa.last_name}")
+        print(f"Kelas : {i.siswa.kelas.kelas}")
 
     # print(f"SISWA ADA ==> {siswa_absen}")
     if sql_wali:

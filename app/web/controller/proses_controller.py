@@ -1,7 +1,6 @@
 import os
 import hashlib
 import time
-from h11 import Response
 from werkzeug.utils import secure_filename
 from flask import (
     Blueprint,
@@ -13,7 +12,6 @@ from flask import (
     url_for,
 )
 from html2image import Html2Image
-from selenium import webdriver
 from flask_login import current_user, login_required
 from app.lib.db_statement import DBStatement
 from app.models.user_details_model import SiswaModel

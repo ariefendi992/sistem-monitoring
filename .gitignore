@@ -14,6 +14,8 @@ cert.pem
 *.txt
 wa.py
 z/
-*.png
-*.jpg
-*.jpeg
+# *.png
+# *.jpg
+# *.jpeg
+app/api/static/img/siswa/foto/
+app/api/static/img/siswa/id_card/
